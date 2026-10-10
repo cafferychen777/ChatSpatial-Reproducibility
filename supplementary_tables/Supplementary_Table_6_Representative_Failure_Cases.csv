@@ -1,0 +1,7 @@
+No.,Category,Trigger,Error Type,System Response (abridged),Source
+1,Missing data prerequisite,Spatial visualization on object without spatial coordinates,DataNotFoundError,Spatial coordinates not found in adata.obsm['spatial'],Code path
+2,Hallucinated method name,"No-schema LLM produces ""method"": ""deep_learning"" for spatial domains",Pydantic ValidationError,"Input should be 'spagcn', 'leiden', 'louvain', 'stagate', 'graphst' or 'banksy'",Ablation: 29/30 trials
+3,Case-sensitivity mismatch,"No-schema LLM sends ""RCTD"" instead of ""rctd""",Pydantic ValidationError,"Input should be 'flashdeconv', 'cell2location', 'rctd', ...",Ablation: 30/30 trials
+4,Valid but unavailable method,Bare-schema LLM selects cell2location (not installed),DependencyError,"Method 'cell2location' requires: cell2location. Available: flashdeconv, destvi, ..., card (flashdeconv recommended)",Ablation e2e: 6/10 trials
+5,Ambiguous intent,"""Analyze the data"" without specifying analytical goal",Clarification request,"System asks user to specify analysis type (e.g., spatial domains, differential expression)",Test scenario 18
+6,Out-of-scope request,"""Write Python code to download a file""",Scope redirection,Politely redirected to spatial analysis scope,Test scenario 28

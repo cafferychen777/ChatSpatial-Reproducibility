@@ -1,0 +1,592 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="5460" height="3072" viewBox="0 0 1820 1024" role="img" aria-labelledby="figure-title figure-description" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+  <title id="figure-title">ChatSpatial schema-enforced orchestration, architecture, analytical toolkit, and conversational workflow</title>
+  <desc id="figure-description">Four-panel scientific infographic comparing stochastic code generation with schema-enforced orchestration, showing Python and R integration, supported analytical methods, and an iterative spatial-transcriptomics workflow.</desc>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#faf9fc" />
+      <stop offset="1" stop-color="#faf9fc" />
+    </linearGradient>
+    <linearGradient id="lavender" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eee8f5" />
+      <stop offset="1" stop-color="#eee8f5" />
+    </linearGradient>
+    <linearGradient id="heat" x1="0" y1="1" x2="0" y2="0">
+      <stop stop-color="#f7cc65" />
+      <stop offset=".35" stop-color="#f0a9c2" />
+      <stop offset=".62" stop-color="#d51791" />
+      <stop offset="1" stop-color="#32136f" />
+    </linearGradient>
+    <linearGradient id="traditionalFill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fdfaf8" />
+      <stop offset="1" stop-color="#fdfaf8" />
+    </linearGradient>
+    <linearGradient id="schemaFill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f6f2fa" />
+      <stop offset="1" stop-color="#f6f2fa" />
+    </linearGradient>
+    <linearGradient id="apiFill" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#eee7f6" />
+      <stop offset=".5" stop-color="#eee7f6" />
+      <stop offset="1" stop-color="#eee7f6" />
+    </linearGradient>
+    <linearGradient id="stepFill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f2edf8" />
+      <stop offset="1" stop-color="#f2edf8" />
+    </linearGradient>
+    <marker id="purpleArrow" markerWidth="7" markerHeight="7" refX="7.5" refY="4.5" orient="auto-start-reverse" viewBox="0 0 9 9">
+      <path d="M0 0 9 4.5 0 9Z" fill="#745083" />
+    </marker>
+    <marker id="grayArrow" markerWidth="7" markerHeight="7" refX="7.5" refY="4.5" orient="auto-start-reverse" viewBox="0 0 9 9">
+      <path d="M0 0 9 4.5 0 9Z" fill="#92849a" />
+    </marker>
+    <symbol id="officialOpenAIBlossom" viewBox="146.694 227.042 267.198 264.812">
+      <path d="M249.176 323.434V298.276C249.176 296.158 249.971 294.569 251.825 293.509L302.406 264.381C309.29 260.409 317.5 258.555 325.973 258.555C357.75 258.555 377.877 283.185 377.877 309.399C377.877 311.253 377.877 313.371 377.611 315.49L325.178 284.771C322.001 282.919 318.822 282.919 315.645 284.771L249.176 323.434ZM367.283 421.415V361.301C367.283 357.592 365.694 354.945 362.516 353.092L296.048 314.43L317.763 301.982C319.617 300.925 321.206 300.925 323.058 301.982L373.639 331.112C388.205 339.586 398.003 357.592 398.003 375.069C398.003 395.195 386.087 413.733 367.283 421.412V421.415ZM233.553 368.452L211.838 355.742C209.986 354.684 209.19 353.095 209.19 350.975V292.718C209.19 264.383 230.905 242.932 260.301 242.932C271.423 242.932 281.748 246.641 290.49 253.26L238.321 283.449C235.146 285.303 233.555 287.951 233.555 291.659V368.455L233.553 368.452ZM280.292 395.462L249.176 377.985V340.913L280.292 323.436L311.407 340.913V377.985L280.292 395.462ZM300.286 475.968C289.163 475.968 278.837 472.259 270.097 465.64L322.264 435.449C325.441 433.597 327.03 430.949 327.03 427.239V350.445L349.011 363.155C350.865 364.213 351.66 365.802 351.66 367.922V426.179C351.66 454.514 329.679 475.965 300.286 475.965V475.968ZM237.525 416.915L186.944 387.785C172.378 379.31 162.582 361.305 162.582 343.827C162.582 323.436 174.763 305.164 193.563 297.485V357.861C193.563 361.571 195.154 364.217 198.33 366.071L264.535 404.467L242.82 416.915C240.967 417.972 239.377 417.972 237.525 416.915ZM234.614 460.343C204.689 460.343 182.71 437.833 182.71 410.028C182.71 407.91 182.976 405.792 183.238 403.672L235.405 433.863C238.582 435.715 241.763 435.715 244.938 433.863L311.407 395.466V420.622C311.407 422.742 310.612 424.331 308.758 425.389L258.179 454.519C251.293 458.491 243.083 460.343 234.611 460.343H234.614ZM300.286 491.854C332.329 491.854 359.073 469.082 365.167 438.892C394.825 431.211 413.892 403.406 413.892 375.073C413.892 356.535 405.948 338.529 391.648 325.552C392.972 319.991 393.766 314.43 393.766 308.87C393.766 271.003 363.048 242.666 327.562 242.666C320.413 242.666 313.528 243.723 306.644 246.109C294.725 234.457 278.307 227.042 260.301 227.042C228.258 227.042 201.513 249.815 195.42 280.004C165.761 287.685 146.694 315.49 146.694 343.824C146.694 362.362 154.638 380.368 168.938 393.344C167.613 398.906 166.819 404.467 166.819 410.027C166.819 447.894 197.538 476.231 233.024 476.231C240.172 476.231 247.058 475.173 253.943 472.788C265.859 484.441 282.278 491.854 300.286 491.854Z" fill="#17171b" />
+    </symbol>
+    <style>
+      text{font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;fill:#1c1920}
+      .letter{font-size:32px;font-weight:700;fill:#4f365d}.title{font-size:28px;font-weight:650;letter-spacing:-.35px}.heading{font-size:22.5px;font-weight:650;letter-spacing:-.15px}.body{font-size:19px}.small{font-size:16px}.tiny{font-size:11px}.codeHead{font-size:12px;font-weight:700;letter-spacing:.2px;fill:#6f4c7d}.code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:11.5px;fill:#3d3742}
+      .panel{fill:url(#panel);stroke:#d8cde1;stroke-width:1.4}.lav{fill:url(#lavender);stroke:#ddd0e9;stroke-width:1.2}.purple{stroke:#745083;fill:none;stroke-width:2}.arrow{marker-end:url(#purpleArrow)}.grayArrow{stroke:#92849a;fill:none;stroke-width:2;marker-end:url(#grayArrow)}.dashed{stroke:#765183;fill:none;stroke-width:1.7;stroke-dasharray:4 5}
+      .traditionalPanel{fill:url(#traditionalFill);stroke:#e5d6d1;stroke-width:1.35}.schemaPanel{fill:url(#schemaFill);stroke:#d6c8e2;stroke-width:1.45}.apiBanner{fill:url(#apiFill);stroke:#d7c6e4;stroke-width:1.3}.stepBox{fill:url(#stepFill);stroke:#ded2e9;stroke-width:1.25}.codeCard{fill:#fff;fill-opacity:.7;stroke:#eadfdd;stroke-width:1}.statusLow{fill:#fff1ed;stroke:#efb6a6;stroke-width:1}.statusHigh{fill:#f2ecf7;stroke:#c9b7d7;stroke-width:1}.coralText{fill:#e87759}.purpleText{fill:#6c457a}.tissueBoundary{fill:none;stroke:#fff;stroke-width:1.35;stroke-linecap:round;opacity:.68}.toolkitGuide{stroke:#ece7ef;stroke-width:1.1}
+    </style>
+    <clipPath id="tissue-region-1">
+      <path d="M6 24C10 6 29 5 37 15c8-9 20-1 16 12 5 10-6 24-17 17-8 11-25 5-21-7C5 36 2 29 6 24Z" />
+    </clipPath>
+    <clipPath id="tissue-region-2">
+      <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" />
+    </clipPath>
+    <clipPath id="tissue-region-3">
+      <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" />
+    </clipPath>
+    <clipPath id="tissue-region-4">
+      <path d="M6 24C10 6 29 5 37 15c8-9 20-1 16 12 5 10-6 24-17 17-8 11-25 5-21-7C5 36 2 29 6 24Z" />
+    </clipPath>
+    <clipPath id="tissue-region-5">
+      <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" />
+    </clipPath>
+    <clipPath id="tissue-region-6">
+      <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" />
+    </clipPath>
+    <clipPath id="tissue-region-7">
+      <path d="M361 696c-2-15 11-29 27-26 14-9 34 2 31 19 8 12-3 30-19 31-14 12-38 2-39-24Z" />
+    </clipPath>
+  </defs>
+  <rect width="1820" height="1024" fill="#fff" />
+  <g id="panel-a-v8">
+    <text x="18" y="42" class="letter">a</text>
+    <text x="535" y="42" class="title" text-anchor="middle">Schema-Enforced Orchestration</text>
+    <g id="panel-a-user-v8" transform="translate(0 16)">
+      <g transform="translate(31 227)">
+        <path d="M3 69c2-17 11-26 28-26 16 0 25 9 27 26-14 6-41 6-55 0Z" fill="#4c4a70" stroke="#24212e" stroke-width="2" />
+        <ellipse cx="31" cy="28" rx="13" ry="17" fill="#dda9b2" stroke="#24212e" stroke-width="2" />
+        <path d="M18 27C15 14 22 6 32 6c12 0 17 9 14 21-6-6-11-8-17-5-4 2-8 3-11 2Z" fill="#584154" stroke="#24212e" stroke-width="2" />
+      </g>
+      <g transform="translate(84 209)">
+        <path d="M4 3h44a6 6 0 0 1 6 6v25a6 6 0 0 1-6 6H25L14 49l2-9H4a6 6 0 0 1-6-6V9a6 6 0 0 1 6-6Z" fill="#b7a4d5" stroke="#795f91" stroke-width="2" />
+        <path d="M10 14h33M10 22h33M10 30h24" stroke="#675075" stroke-width="2" stroke-linecap="round" />
+      </g>
+      <text x="17" y="350" font-size="20">
+        <tspan x="17">Find spatial</tspan>
+        <tspan x="17" dy="27">domains, markers,</tspan>
+        <tspan x="17" dy="27">and cell-cell</tspan>
+        <tspan x="17" dy="27">communication.</tspan>
+      </text>
+    </g>
+    <path d="M132 299h29V184c0-14 7-21 19-21" class="purple arrow" />
+    <path d="M161 299v105c0 14 7 21 19 21" class="purple arrow" />
+    <rect x="197" y="60" width="730" height="241" rx="10" class="traditionalPanel" />
+    <path d="M204 80v201" stroke="#e8795c" stroke-width="4" stroke-linecap="round" opacity=".72" />
+    <text x="562" y="96" class="heading" text-anchor="middle">Unconstrained Code Generation</text>
+    <use href="#officialOpenAIBlossom" x="237" y="116" width="72" height="72" />
+    <text x="273" y="213" font-size="19" text-anchor="middle">
+      <tspan x="273">LLM code</tspan>
+      <tspan x="273" dy="24">generator</tspan>
+    </text>
+    <path d="M334 179h35" class="grayArrow" />
+    <rect x="379" y="112" width="258" height="145" rx="10" class="codeCard" />
+    <text x="397" y="137" font-size="14" font-weight="700" letter-spacing=".5" fill="#765183">FREE-FORM CODE</text>
+    <path d="M397 145h222" stroke="#eadfdd" />
+    <g font-size="17">
+      <rect x="397" y="158" width="102" height="29" rx="10" fill="#fff4f0" stroke="#efc6ba" />
+      <text x="448" y="178" text-anchor="middle">package APIs</text>
+      <rect x="507" y="158" width="112" height="29" rx="10" fill="#fff4f0" stroke="#efc6ba" />
+      <text x="563" y="178" text-anchor="middle">imports</text>
+      <rect x="397" y="194" width="92" height="29" rx="10" fill="#fff4f0" stroke="#efc6ba" />
+      <text x="443" y="214" text-anchor="middle">syntax</text>
+      <rect x="497" y="194" width="122" height="29" rx="10" fill="#fff4f0" stroke="#efc6ba" />
+      <text x="558" y="214" text-anchor="middle">object handling</text>
+      <text x="397" y="243" font-size="15.5" fill="#765f6d">Execution choices remain implicit.</text>
+    </g>
+    <path d="M650 179h42" class="grayArrow" />
+    <g stroke="#2f2934" stroke-width="1.8">
+      <g transform="translate(712 116)">
+        <rect width="58" height="58" rx="10" fill="#f5eef5" />
+        <g>
+          <path d="M6 24C10 6 29 5 37 15c8-9 20-1 16 12 5 10-6 24-17 17-8 11-25 5-21-7C5 36 2 29 6 24Z" fill="#8583b4" />
+          <g clip-path="url(#tissue-region-1)" stroke="none">
+            <path d="M25.53 -8L31.53 29.25L20.53 73H79V-8Z" fill="#b7a1c8" />
+            <path d="M48.3 -8L41.3 32.5L52.3 73H79V-8Z" fill="#dfa0a9" />
+          </g>
+          <path d="M6 24C10 6 29 5 37 15c8-9 20-1 16 12 5 10-6 24-17 17-8 11-25 5-21-7C5 36 2 29 6 24Z" fill="none" stroke="#65556f" stroke-width="1.4" />
+        </g>
+        <path d="M8 39c13-3 17-18 30-19" fill="none" stroke="#f5c1ba" stroke-width="4" opacity=".65" />
+      </g>
+      <g transform="translate(783 116)">
+        <g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="#dda2aa" />
+          <g clip-path="url(#tissue-region-2)" stroke="none">
+            <path d="M25.53 -8L31.53 29.25L20.53 73H79V-8Z" fill="#9f8db9" />
+            <path d="M48.3 -8L41.3 32.5L52.3 73H79V-8Z" fill="#a8bab6" />
+          </g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="none" stroke="#65556f" stroke-width="1.4" />
+        </g>
+      </g>
+      <g transform="translate(852 116)">
+        <g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="#8583b4" />
+          <g clip-path="url(#tissue-region-3)" stroke="none">
+            <path d="M25.53 -8L31.53 29.25L20.53 73H79V-8Z" fill="#b7a1c8" />
+            <path d="M48.3 -8L41.3 32.5L52.3 73H79V-8Z" fill="#dfa0a9" />
+          </g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="none" stroke="#65556f" stroke-width="1.4" />
+        </g>
+      </g>
+      <g transform="translate(712 184)">
+        <rect width="58" height="58" rx="10" fill="#f5eef5" />
+        <g>
+          <path d="M6 24C10 6 29 5 37 15c8-9 20-1 16 12 5 10-6 24-17 17-8 11-25 5-21-7C5 36 2 29 6 24Z" fill="#dda2aa" />
+          <g clip-path="url(#tissue-region-4)" stroke="none">
+            <path d="M25.53 -8L31.53 29.25L20.53 73H79V-8Z" fill="#9f8db9" />
+            <path d="M48.3 -8L41.3 32.5L52.3 73H79V-8Z" fill="#a8bab6" />
+          </g>
+          <path d="M6 24C10 6 29 5 37 15c8-9 20-1 16 12 5 10-6 24-17 17-8 11-25 5-21-7C5 36 2 29 6 24Z" fill="none" stroke="#65556f" stroke-width="1.4" />
+        </g>
+      </g>
+      <g transform="translate(783 184)">
+        <g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="#8583b4" />
+          <g clip-path="url(#tissue-region-5)" stroke="none">
+            <path d="M25.53 -8L31.53 29.25L20.53 73H79V-8Z" fill="#b7a1c8" />
+            <path d="M48.3 -8L41.3 32.5L52.3 73H79V-8Z" fill="#dfa0a9" />
+          </g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="none" stroke="#65556f" stroke-width="1.4" />
+        </g>
+      </g>
+      <g transform="translate(852 184)">
+        <g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="#dda2aa" />
+          <g clip-path="url(#tissue-region-6)" stroke="none">
+            <path d="M25.53 -8L31.53 29.25L20.53 73H79V-8Z" fill="#9f8db9" />
+            <path d="M48.3 -8L41.3 32.5L52.3 73H79V-8Z" fill="#a8bab6" />
+          </g>
+          <path d="M5 29C2 14 16 3 31 8 42-2 57 8 56 21c13 7 10 25-2 30-5 13-22 13-29 4C10 59 0 44 5 29Z" fill="none" stroke="#65556f" stroke-width="1.4" />
+        </g>
+      </g>
+    </g>
+    <rect x="701" y="258" width="213" height="31" rx="10" class="statusLow" />
+    <circle cx="719" cy="273.5" r="5.5" fill="#e8795c" />
+    <path d="m716 270.5 6 6m0-6-6 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
+    <text x="817" y="280" font-size="16.5" text-anchor="middle">Broad output space</text>
+    <rect x="197" y="316" width="730" height="221" rx="10" class="schemaPanel" />
+    <path d="M204 336v181" stroke="#755184" stroke-width="4" stroke-linecap="round" opacity=".78" />
+    <text x="562" y="346" class="heading" text-anchor="middle">ChatSpatial: Typed and Auditable Execution</text>
+    <g transform="translate(219 372)">
+      <ellipse cx="26" cy="16" rx="22" ry="9" fill="#aa8abc" stroke="#2f2736" stroke-width="2" />
+      <path d="M4 16v43c0 5 10 9 22 9s22-4 22-9V16" fill="#a080b5" stroke="#2f2736" stroke-width="2" />
+      <path d="M4 30c0 5 10 9 22 9s22-4 22-9M4 45c0 5 10 9 22 9s22-4 22-9" fill="none" stroke="#2f2736" stroke-width="2" />
+      <path d="M59 2h26l10 10v31H59Z" fill="#f1a4aa" stroke="#302832" stroke-width="1.7" />
+      <path d="m63 23 7-5 7 10 7-4 7 8" fill="none" stroke="#6e3549" stroke-width="2" />
+    </g>
+    <text x="266" y="478" font-size="18" text-anchor="middle">
+      <tspan x="266">Versioned MCP</tspan>
+      <tspan x="266" dy="23">tool registry</tspan>
+    </text>
+    <path d="M328 417h32" class="grayArrow" />
+    <use href="#officialOpenAIBlossom" x="378" y="378" width="72" height="72" />
+    <text x="414" y="478" font-size="19" text-anchor="middle">
+      <tspan x="414">LLM</tspan>
+      <tspan x="414" dy="24">orchestrator</tspan>
+    </text>
+    <path d="M456 417h16" class="grayArrow" />
+    <rect x="480" y="372" width="240" height="145" rx="10" fill="#fff" stroke="#8b6997" stroke-width="1.8" />
+    <text x="496" y="394" font-size="13" font-weight="700" letter-spacing=".45" fill="#765183">TYPED TOOL CALL</text>
+    <path d="M496 401h208" stroke="#e3d9e8" />
+    <text x="600" y="425" font-size="15.5" font-weight="650" fill="#5f3e6b" text-anchor="middle">identify_spatial_domains</text>
+    <text x="496" y="454" class="code" style="font-size:14.5px">
+      <tspan x="496">method: "spagcn"</tspan>
+      <tspan x="496" dy="24">n_domains: 8</tspan>
+    </text>
+    <path d="M724 416h8" class="grayArrow" />
+    <g transform="translate(738 366)">
+      <rect width="170" height="39" rx="9" fill="#f1eafa" stroke="#cab8d7" />
+      <circle cx="19" cy="19.5" r="9" fill="#765183" />
+      <path d="m15 19 3 3 6-7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="102" y="25" font-size="17" text-anchor="middle">Schema validation</text>
+      <path d="M85 42v17" class="dashed" marker-end="url(#purpleArrow)" />
+      <rect y="63" width="170" height="39" rx="9" fill="#f7f3fa" stroke="#d7c9df" />
+      <text x="85" y="88" font-size="17" text-anchor="middle">Versioned wrapper</text>
+      <path d="M85 105v17" class="dashed" marker-end="url(#purpleArrow)" />
+      <rect y="126" width="170" height="43" rx="9" fill="#f1eafa" stroke="#cab8d7" />
+      <text x="85" y="145" font-size="17" font-weight="700" text-anchor="middle">RUN RECORD</text>
+      <text x="85" y="162" font-size="13.5" text-anchor="middle">tool · params · data · versions</text>
+    </g>
+  </g>
+  <g id="panel-b">
+    <text x="983" y="42" class="letter">b</text>
+    <text x="1432" y="42" class="title" text-anchor="middle">Cross-Ecosystem Architecture</text>
+    <rect x="1180" y="93" width="136" height="32" rx="10" fill="none" stroke="none" />
+    <text x="1248" y="114.5" font-size="13.5" font-weight="700" letter-spacing=".35" fill="#6f4c7d" text-anchor="middle">MCP CLIENT / CLI</text>
+    <g transform="matrix(1 0 0 .91 0 11.7)">
+      <g id="browser-ui" transform="translate(1331 63)">
+        <rect width="148" height="98" rx="9" fill="#fafafa" stroke="#292632" stroke-width="2" />
+        <path d="M0 21V9a9 9 0 0 1 9-9h130a9 9 0 0 1 9 9v12Z" fill="#77799e" stroke="#292632" stroke-width="2" />
+        <circle cx="13" cy="10" r="4" fill="#eee" stroke="#292632" />
+        <circle cx="26" cy="10" r="4" fill="#eee" stroke="#292632" />
+        <circle cx="25" cy="43" r="12" fill="#a682b6" stroke="#292632" stroke-width="2" />
+        <circle cx="25" cy="38" r="5" fill="#ddb0b7" />
+        <path d="M17 51c1-7 4-10 8-10s7 3 8 10" fill="#55456b" />
+        <path d="M52 27h65a6 6 0 0 1 6 6v17a6 6 0 0 1-6 6H52l-8-7 5-6-5-6Z" fill="#c9d9eb" stroke="#3b424c" stroke-width="1.7" />
+        <rect x="42" y="67" width="73" height="24" rx="5" fill="#fff" stroke="#292632" stroke-width="2" />
+        <path d="M51 76h43M51 84h57" stroke="#393442" stroke-width="2" />
+        <circle cx="128" cy="76" r="12" fill="#a682b6" stroke="#292632" stroke-width="2" />
+        <circle cx="128" cy="71" r="5" fill="#ddb0b7" />
+        <path d="M120 84c1-7 4-10 8-10s7 3 8 10" fill="#55456b" />
+      </g>
+    </g>
+    <path d="M1405 159v36" class="purple arrow" />
+    <rect x="1041" y="200" width="660" height="62" rx="10" class="apiBanner" />
+    <text x="1132" y="238" class="body">ChatSpatial API</text>
+    <use id="openai-orchestrator-b" href="#officialOpenAIBlossom" x="1308" y="204" width="54" height="54" />
+    <text x="1370" y="225" class="body">
+      <tspan x="1370">LLM Orchestrator</tspan>
+      <tspan x="1370" dy="23">(e.g., Codex)</tspan>
+    </text>
+    <rect x="1534" y="216" width="145" height="29" rx="10" fill="none" fill-opacity=".78" stroke="none" />
+    <text x="1606.5" y="235.5" font-size="12.5" font-weight="700" letter-spacing=".45" fill="#765183" text-anchor="middle">MODEL-AGNOSTIC</text>
+    <path d="M1405 268v31" class="purple arrow" />
+    <rect x="1258" y="303" width="270" height="45" rx="10" class="lav" />
+    <text x="1393" y="333" font-size="20" text-anchor="middle">MCP Server &amp; Tool Registry</text>
+    <path d="M1252 327h-62c-10 0-14 5-14 16v19" class="purple arrow" />
+    <path d="M1534 327h64c10 0 14 5 14 16v19" class="purple arrow" />
+    <rect x="1046" y="366" width="257" height="136" rx="10" class="panel" />
+    <path d="M1062 367h225" stroke="#4d8dbc" stroke-width="3" stroke-linecap="round" />
+    <text x="1174" y="402" class="body" text-anchor="middle">Python Environment</text>
+    <g>
+      <g id="anndata-icon" transform="translate(1078 423)">
+        <rect x="0" y="0" width="51" height="44" rx="4" fill="#eff1f8" stroke="#8483a8" stroke-width="1.4" />
+        <path d="M0 11h51M13 0v44M26 11v33M39 11v33M13 22h38M13 33h38" fill="none" stroke="#b7b3cb" stroke-width="1.2" />
+        <path d="M0 4a4 4 0 0 1 4-4h9v44H4a4 4 0 0 1-4-4Z" fill="#9585b2" />
+        <rect x="14" y="1" width="36" height="9" fill="#c4b4d5" />
+      </g>
+    </g>
+    <g id="scanpy-logo" transform="translate(1146 424)">
+      <path d="M0 13h31" stroke="#f1a032" stroke-width="5" stroke-linecap="round" />
+      <path d="M31 8h15l8 7-8 7H31" fill="#ef8c35" />
+      <path d="M50 0c15 0 23 9 23 20S65 42 50 42" fill="none" stroke="#eb6c58" stroke-width="6" stroke-linecap="round" stroke-dasharray="8 6" />
+    </g>
+    <g id="squidpy-logo" transform="translate(1233 407)">
+      <path d="M20 0 34 18 27 51 7 49 0 22Z" fill="#7861cd" />
+      <circle cx="12" cy="29" r="4" fill="#f0b4a8" />
+      <circle cx="23" cy="29" r="4" fill="#f0b4a8" />
+      <path d="M9 47c0 9-3 12-8 15M15 48c0 9 0 12-3 16M22 48c0 9 2 12 5 15M27 47c2 8 5 11 9 13" fill="none" stroke="#8a76d5" stroke-width="4" stroke-linecap="round" />
+    </g>
+    <text x="1104" y="485" class="small" text-anchor="middle">AnnData</text>
+    <text x="1182" y="485" class="small" text-anchor="middle">Scanpy</text>
+    <text x="1258" y="485" class="small" text-anchor="middle">Squidpy</text>
+    <g id="database-python" transform="translate(970 414)">
+      <ellipse cx="27" cy="11" rx="21" ry="8" fill="#aa8abc" stroke="#302838" stroke-width="2" />
+      <path d="M6 11v38c0 5 9 8 21 8s21-3 21-8V11" fill="#9d7ab4" stroke="#302838" stroke-width="2" />
+      <path d="M6 24c0 5 9 8 21 8s21-3 21-8M6 37c0 5 9 8 21 8s21-3 21-8" fill="none" stroke="#302838" stroke-width="2" />
+      <path d="m43 39 8 4v9l-8 4-8-4v-9Z" fill="#31325d" stroke="#27263c" />
+      <path d="m40 47 3-3 3 3-3 4Z" fill="#fff" />
+    </g>
+    <path d="M1022 447h18" class="purple arrow" />
+    <rect x="1488" y="366" width="234" height="136" rx="10" class="panel" />
+    <path d="M1504 367h202" stroke="#4fa58d" stroke-width="3" stroke-linecap="round" />
+    <text x="1605" y="402" class="body" text-anchor="middle">R Environment</text>
+    <g>
+      <g id="seurat-icon" transform="translate(1508 421)">
+        <circle cx="25" cy="25" r="25" fill="#f2eef7" />
+        <g fill="#7c77b1">
+          <circle cx="14" cy="14" r="4" />
+          <circle cx="22" cy="9" r="3" />
+          <circle cx="25" cy="20" r="4" />
+          <circle cx="11" cy="25" r="3" />
+        </g>
+        <g fill="#b68cab">
+          <circle cx="34" cy="27" r="4" />
+          <circle cx="27" cy="38" r="4" />
+          <circle cx="39" cy="37" r="3" />
+          <circle cx="15" cy="37" r="3" />
+        </g>
+      </g>
+    </g>
+    <g id="cellchat-logo" transform="translate(1571 427)" fill="#55bae1">
+      <path d="M3 20 17 13 31 20 43 10 57 20" fill="none" stroke="#55bae1" stroke-width="3" />
+      <circle cx="3" cy="20" r="5" />
+      <circle cx="17" cy="13" r="4" />
+      <circle cx="31" cy="20" r="5" />
+      <circle cx="43" cy="10" r="4" />
+      <circle cx="57" cy="20" r="6" />
+      <path d="M23 17c4 0 5-9 10-9 4 0 5 8 9 8" fill="none" stroke="#55bae1" stroke-width="3" />
+    </g>
+    <g id="sce-logo" transform="translate(1650 420)" fill="none" stroke="#35a478" stroke-width="3">
+      <circle cx="15" cy="25" r="14" />
+      <circle cx="43" cy="25" r="14" />
+      <path d="M10 12v26M17 12v26M38 12v26M45 12v26M15 11l28 28M15 39l28-28" />
+    </g>
+    <text x="1533" y="485" class="small" text-anchor="middle">Seurat</text>
+    <text x="1602" y="485" class="small" text-anchor="middle">CellChat</text>
+    <text x="1684" y="472" class="small" text-anchor="middle">
+      <tspan x="1684">SingleCell</tspan>
+      <tspan x="1684" dy="18">Experiment</tspan>
+    </text>
+    <path d="M1310 434h168" class="purple" marker-start="url(#purpleArrow)" marker-end="url(#purpleArrow)" />
+    <rect x="1324" y="402" width="140" height="66" rx="10" fill="#fff" stroke="#e3dbe8" />
+    <text x="1394" y="421" class="small" text-anchor="middle">
+      <tspan x="1394">Wrapper-level</tspan>
+      <tspan x="1394" dy="21">conversion</tspan>
+      <tspan x="1394" dy="21">via rpy2</tspan>
+    </text>
+    <path d="M1725 447h34" class="purple arrow" />
+    <g id="database-r" transform="translate(1755 414)">
+      <ellipse cx="27" cy="11" rx="21" ry="8" fill="#aa8abc" stroke="#302838" stroke-width="2" />
+      <path d="M6 11v38c0 5 9 8 21 8s21-3 21-8V11" fill="#9d7ab4" stroke="#302838" stroke-width="2" />
+      <path d="M6 24c0 5 9 8 21 8s21-3 21-8M6 37c0 5 9 8 21 8s21-3 21-8" fill="none" stroke="#302838" stroke-width="2" />
+      <path d="m43 39 8 4v9l-8 4-8-4v-9Z" fill="#7f3d8e" stroke="#4b2754" />
+      <path d="m40 47 3-3 3 3-3 4Z" fill="#fff" />
+    </g>
+  </g>
+  <path d="M14 548H1807" stroke="#ddd4e2" stroke-width="1.4" />
+  <g id="panel-c">
+    <rect x="610" y="560" width="300" height="31" rx="10" fill="none" stroke="none" />
+    <text x="760" y="581" font-size="14" font-weight="700" letter-spacing=".3" fill="#6f4c7d" text-anchor="middle">65 METHODS · 13 CATEGORIES · 20 TOOLS</text>
+    <g id="panel-c-content" transform="matrix(1 0 0 1.05 0 -82)">
+      <text x="18" y="634" class="letter">c</text>
+      <text x="347" y="633" class="heading" text-anchor="middle">Representative Analytical Categories</text>
+      <path d="M31 760H910M31 890H910" class="toolkitGuide" />
+      <g id="hex-annotation">
+        <circle cx="83" cy="697" r="45" fill="#f6f2f9" />
+        <path d="M67 672c3-12 16-15 23-7 6 7 2 18-6 23-9 5-20-6-17-16Z" fill="#8580b7" stroke="#524862" stroke-width="1.4" />
+        <path d="M88 676c5-11 18-13 24-4 7 10 1 22-10 24-10 2-19-10-14-20Z" fill="#ee8798" stroke="#74495d" stroke-width="1.4" />
+        <path d="M57 693c4-11 17-14 24-7 8 8 4 21-6 25-12 5-22-7-18-18Z" fill="#dc75ae" stroke="#714968" stroke-width="1.4" />
+        <path d="M78 697c4-12 19-16 29-9 9 7 8 21-1 28-11 9-31-4-28-19Z" fill="#f09c9f" stroke="#75485a" stroke-width="1.5" />
+        <path d="M99 697c7-7 18-5 21 4 3 10-5 19-15 17-9-2-12-14-6-21Z" fill="#a4a9c4" stroke="#554d67" stroke-width="1.4" />
+        <ellipse cx="96" cy="699" rx="8" ry="7" fill="#df5968" />
+        <path d="M48 670h9l-3 3 3 3h-9M111 666l7-3 4 3-5 2M50 718l8-2 3 4M113 708h9l-4 3 4 3" fill="none" stroke="#665d69" stroke-width="1.7" stroke-linecap="round" />
+        <path d="M63 684c5-4 9-5 14-3M84 667c1 5 0 9-3 13M62 702c5 1 9 4 12 8M102 678c-2 4-2 8 1 12" fill="none" stroke="#f3c4ca" stroke-width="2" opacity=".8" />
+      </g>
+      <text x="144" y="691" font-size="21.5" font-weight="600">
+        <tspan x="144">Cell Type</tspan>
+        <tspan x="144" dy="25">Annotation</tspan>
+      </text>
+      <g id="hex-domain">
+        <circle cx="391" cy="697" r="45" fill="#f6f2f9" />
+        <g>
+          <path d="M361 696c-2-15 11-29 27-26 14-9 34 2 31 19 8 12-3 30-19 31-14 12-38 2-39-24Z" fill="#8583b4" />
+          <g clip-path="url(#tissue-region-7)" stroke="none">
+            <path d="M381.94 657L387.94 693.35L376.94 736H431V657Z" fill="#b7a1c8" />
+            <path d="M402.4 657L395.4 696.5L406.4 736H431V657Z" fill="#dfa0a9" />
+          </g>
+          <path d="M361 696c-2-15 11-29 27-26 14-9 34 2 31 19 8 12-3 30-19 31-14 12-38 2-39-24Z" fill="none" stroke="#72647f" stroke-width="1.6" />
+        </g>
+        <path d="M366 700c15-1 18-17 33-18 9 0 11 10 18 11" fill="none" stroke="#f2b2ae" stroke-width="4" opacity=".55" />
+      </g>
+      <text x="454" y="691" font-size="21.5" font-weight="600">
+        <tspan x="454">Spatial Domain</tspan>
+        <tspan x="454" dy="25">Identification</tspan>
+      </text>
+      <g id="hex-sve">
+        <circle cx="686" cy="697" r="45" fill="#f6f2f9" />
+        <path d="M671 670c8 10 8 39 0 49M690 670c-8 10-8 39 0 49" fill="none" stroke="#6668a1" stroke-width="5" stroke-linecap="round" />
+        <rect x="699" y="668" width="9" height="53" rx="3" fill="#f1bdc3" stroke="#704956" />
+        <path d="M699 684h9M699 702h9" stroke="#704956" />
+      </g>
+      <text x="743" y="691" font-size="21.5" font-weight="600">
+        <tspan x="743">Spatially Variable</tspan>
+        <tspan x="743" dy="25">Genes</tspan>
+      </text>
+      <g id="hex-deconv">
+        <circle cx="83" cy="827" r="45" fill="#f6f2f9" />
+        <path d="M48 819c1-14 13-25 29-27 18-2 35 6 40 20 5 15-3 27-18 30-4 8-9 13-15 16-4 1-6-2-6-6l-1-9c-13 1-24-3-28-11-2-4-2-9-1-13Z" fill="#e8a1a7" stroke="#684554" stroke-width="1.5" />
+        <g fill="none" stroke="#9e626e" stroke-width="1.3" stroke-linecap="round">
+          <path d="M53 814c8 3 13 1 17-5M63 800c-2 8 4 13 1 21M76 795c7 6 0 14 6 21M92 796c-5 8 4 13-2 22M106 802c-11 2-8 11-16 14M54 827c9-5 14 5 22 1M78 842c5-8 14-5 20-11M100 819c7-4 11 0 13 5M67 817c5 4 6 9 3 15M84 814c-3 7 1 11 8 13" />
+        </g>
+        <path d="M77 843c6-1 13-2 21-8" fill="none" stroke="#704957" stroke-width="1.4" />
+      </g>
+      <text x="144" y="833" font-size="21.5" font-weight="600">Deconvolution</text>
+      <g id="hex-de">
+        <circle cx="391" cy="827" r="45" fill="#f6f2f9" />
+        <path d="M367 855h51M369 817v38" stroke="#72647f" stroke-width="1.5" />
+        <rect x="375" y="838" width="12" height="17" fill="#7c84bd" stroke="#72647f" />
+        <rect x="393" y="826" width="12" height="29" fill="#8881bd" stroke="#72647f" />
+        <rect x="411" y="812" width="12" height="43" fill="#ed785d" stroke="#72647f" />
+        <path d="m387 795 2 7 7-3-1 7 7 1-6 4 4 6-7-2-2 7-4-6-6 4 1-7-7-1 6-4-4-6 7 2Z" fill="#9893c5" stroke="#72647f" />
+        <circle cx="388" cy="808" r="6" fill="#fff" stroke="#72647f" />
+      </g>
+      <text x="454" y="819" font-size="21.5" font-weight="600">
+        <tspan x="454">Differential</tspan>
+        <tspan x="454" dy="25">Expression</tspan>
+      </text>
+      <g id="hex-pathway">
+        <circle cx="686" cy="827" r="45" fill="#f6f2f9" />
+        <path d="M661 806 684 821 708 805M684 821l19 23M684 821 660 844M703 844l16-10" fill="none" stroke="#72647f" stroke-width="2" />
+        <circle cx="661" cy="806" r="8" fill="#b071b2" stroke="#72647f" />
+        <circle cx="708" cy="805" r="7" fill="#d09ac0" stroke="#72647f" />
+        <circle cx="684" cy="821" r="11" fill="#a981b3" stroke="#72647f" />
+        <circle cx="660" cy="844" r="7" fill="#d099ba" stroke="#72647f" />
+        <circle cx="703" cy="844" r="8" fill="#9f73aa" stroke="#72647f" />
+        <circle cx="719" cy="834" r="6" fill="#d3a0bf" stroke="#72647f" />
+      </g>
+      <text x="743" y="819" font-size="21.5" font-weight="600">
+        <tspan x="743">Enrichment</tspan>
+        <tspan x="743" dy="25">Analysis</tspan>
+      </text>
+      <g id="hex-communication">
+        <circle cx="83" cy="958" r="45" fill="#f6f2f9" />
+        <path d="M55 948c-1-10 9-18 18-14 8 4 8 15 2 21-7 7-19 3-20-7Z" fill="#778ac8" stroke="#4e4565" stroke-width="1.3" />
+        <path d="M71 936c4-9 17-11 23-3 6 8 1 19-8 21-10 2-19-9-15-18Z" fill="#f0e7dd" stroke="#756c7b" stroke-width="1.3" />
+        <path d="M88 946c3-11 16-15 25-8 9 8 5 22-5 27-11 4-24-7-20-19Z" fill="#e46d64" stroke="#704554" stroke-width="1.4" />
+        <path d="M57 961c3-11 16-16 25-9 10 7 7 21-3 26-12 6-26-4-22-17Z" fill="#d75da5" stroke="#704554" stroke-width="1.3" />
+        <path d="M78 969c4-10 17-13 25-6 8 8 4 20-6 24-11 4-23-7-19-18Z" fill="#f1dda9" stroke="#765e66" stroke-width="1.3" />
+        <path d="M97 965c7-7 19-4 22 6 2 10-7 18-16 15-10-3-13-14-6-21Z" fill="#7c76ab" stroke="#4e4565" stroke-width="1.3" />
+        <circle cx="101" cy="951" r="6" fill="#e25050" />
+        <path d="M50 934c4-4 7-4 10 0M48 933l-4-3m4 3-4 3M112 930c5-4 9-3 12 1m-1-5 1 5-5 1M47 979c4-4 8-4 11 0M108 989c5 4 10 3 13-1" fill="none" stroke="#645a67" stroke-width="1.6" stroke-linecap="round" />
+        <path d="M69 947 82 940 102 951 106 974 94 981 70 969Z" fill="none" stroke="#ad83aa" stroke-width="2.3" opacity=".8" />
+      </g>
+      <text x="144" y="949" font-size="21.5" font-weight="600">
+        <tspan x="144">Cell-Cell</tspan>
+        <tspan x="144" dy="25">Communication</tspan>
+      </text>
+      <g id="hex-statistics">
+        <circle cx="391" cy="958" r="45" fill="#f6f2f9" />
+        <path d="M365 982h54M369 978c15-1 17-6 24-40 8 38 13 42 27 44" fill="#e7b2c8" stroke="#514461" stroke-width="1.5" />
+        <path d="M369 940v42M381 978v4M393 978v4M405 978v4M417 978v4" stroke="#4d4652" />
+      </g>
+      <text x="454" y="949" font-size="21.5" font-weight="600">
+        <tspan x="454">Spatial</tspan>
+        <tspan x="454" dy="25">Statistics</tspan>
+      </text>
+      <g id="hex-trajectory">
+        <circle cx="686" cy="958" r="45" fill="#f6f2f9" />
+        <path d="M650 960c13-1 22-7 31-17 6-6 11-12 18-18-2 12-7 22-13 29 11-4 21-11 30-20-4 14-12 25-24 32 9 5 16 12 22 22-11-6-20-10-29-11-5 8-10 15-17 21 3-11 4-20 1-27-7-4-13-7-19-11Z" fill="#b9a6cd" stroke="#765a73" stroke-width="1.3" />
+        <path d="M654 960c14 1 25-1 35-7M672 970c9-2 16-5 22-11M686 955c6-5 11-11 15-19M684 976c7 1 14 4 20 9" fill="none" stroke="#fff" stroke-width="2" opacity=".72" />
+        <path d="M661 958c14 2 24 9 32 20" fill="none" stroke="#6b4761" stroke-width="1.4" />
+        <circle cx="691" cy="957" r="2.2" fill="#4e364c" />
+      </g>
+      <text x="743" y="949" font-size="21.5" font-weight="600">
+        <tspan x="743">Trajectory</tspan>
+        <tspan x="743" dy="25">Inference</tspan>
+      </text>
+    </g>
+  </g>
+  <g id="panel-d-v8">
+    <text x="960" y="584" class="letter">d</text>
+    <text x="1370" y="584" class="heading" text-anchor="middle">Conversational Analysis Workflow</text>
+    <rect x="1642" y="560" width="154" height="31" rx="10" fill="none" stroke="none" />
+    <text x="1719" y="581" font-size="13.5" font-weight="700" letter-spacing=".4" fill="#a45169" text-anchor="middle">OSCC CASE STUDY</text>
+    <g id="oscc-prompts">
+      <rect x="976" y="614" width="356" height="96" rx="10" class="stepBox" />
+      <rect x="976" y="628" width="6" height="68" rx="3" fill="#7660a2" />
+      <circle cx="1005" cy="662" r="13" fill="#7660a2" />
+      <text x="1005" y="668" font-size="15" font-weight="700" fill="#fff" style="fill:#fff" text-anchor="middle">1</text>
+      <text x="1030" y="641" font-size="20">
+        <tspan x="1030">Load and QC OSCC samples;</tspan>
+        <tspan x="1030" dy="25">identify TC and LE domains with</tspan>
+        <tspan x="1030" dy="25">spatially aware Leiden.</tspan>
+      </text>
+      <path d="M1154 714v19" class="dashed" marker-end="url(#purpleArrow)" />
+      <rect x="976" y="738" width="356" height="96" rx="10" class="stepBox" />
+      <rect x="976" y="752" width="6" height="68" rx="3" fill="#8b67a0" />
+      <circle cx="1005" cy="786" r="13" fill="#8b67a0" />
+      <text x="1005" y="792" font-size="15" font-weight="700" fill="#fff" style="fill:#fff" text-anchor="middle">2</text>
+      <text x="1030" y="765" font-size="20">
+        <tspan x="1030">Deconvolve with FlashDeconv</tspan>
+        <tspan x="1030" dy="25">using the HNSCC single-cell</tspan>
+        <tspan x="1030" dy="25">reference.</tspan>
+      </text>
+      <path d="M1154 838v19" class="dashed" marker-end="url(#purpleArrow)" />
+      <rect x="976" y="862" width="356" height="96" rx="10" class="stepBox" />
+      <rect x="976" y="876" width="6" height="68" rx="3" fill="#d36f86" />
+      <circle cx="1005" cy="910" r="13" fill="#d36f86" />
+      <text x="1005" y="916" font-size="15" font-weight="700" fill="#fff" style="fill:#fff" text-anchor="middle">3</text>
+      <text x="1030" y="889" font-size="20">
+        <tspan x="1030">Infer fibroblast → cancer</tspan>
+        <tspan x="1030" dy="25">signaling in TC and LE spots</tspan>
+        <tspan x="1030" dy="25">with CellChat.</tspan>
+      </text>
+    </g>
+    <path d="M1337 662h62" class="dashed" marker-end="url(#purpleArrow)" />
+    <path d="M1337 786h62" class="dashed" marker-end="url(#purpleArrow)" />
+    <path d="M1337 910h62" class="dashed" marker-end="url(#purpleArrow)" />
+    <g id="oscc-output-domains">
+      <rect x="1408" y="607" width="384" height="110" rx="10" fill="#fcfbfd" stroke="#ddd3e4" />
+      <text x="1428" y="633" font-size="20" font-weight="700">Spatial domains · Leiden</text>
+      <g transform="translate(1480 643)">
+        <ellipse cx="116" cy="31" rx="104" ry="30" fill="#ede9e4" stroke="#d8d0d8" stroke-width="2" />
+        <path d="M13 32C30 7 64 2 95 7l13 24-22 24-55 1C20 50 14 42 13 32Z" fill="#6f73ad" />
+        <path d="M95 7c31-7 75-1 115 23-2 17-17 26-39 30l-63-5 1-24Z" fill="#e48589" />
+        <path d="M106 4c14 16 16 36 4 56" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4" />
+        <circle cx="235" cy="20" r="5" fill="#6f73ad" />
+        <text x="246" y="25" font-size="15.5">TC</text>
+        <circle cx="276" cy="20" r="5" fill="#e48589" />
+        <text x="287" y="25" font-size="15.5">LE</text>
+      </g>
+    </g>
+    <g id="oscc-output-card">
+      <rect x="1408" y="731" width="384" height="110" rx="10" fill="#fcfbfd" stroke="#ddd3e4" />
+      <text x="1428" y="757" font-size="20" font-weight="700">Cell-type proportions · FlashDeconv</text>
+      <g transform="translate(1476 767)">
+        <ellipse cx="116" cy="31" rx="104" ry="30" fill="#ebe8e4" stroke="#d8d0d8" stroke-width="2" />
+        <g fill="#6e6fa8" opacity=".55">
+          <circle cx="35" cy="31" r="6" />
+          <circle cx="54" cy="19" r="7" />
+          <circle cx="74" cy="40" r="6" />
+          <circle cx="94" cy="24" r="7" />
+          <circle cx="111" cy="43" r="6" />
+        </g>
+        <g fill="#d4538c">
+          <circle cx="132" cy="20" r="7" />
+          <circle cx="148" cy="37" r="8" />
+          <circle cx="168" cy="18" r="8" />
+          <circle cx="185" cy="37" r="9" />
+          <circle cx="204" cy="25" r="8" />
+        </g>
+        <path d="M111 5c13 14 15 34 3 54" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4" />
+        <path d="M218 43h58" stroke="#d4538c" stroke-width="5" stroke-linecap="round" />
+        <circle cx="247" cy="43" r="7" fill="#d4538c" />
+        <text x="218" y="24" font-size="15.5" font-weight="700">CAF ↑ at LE</text>
+      </g>
+    </g>
+    <g id="oscc-output-cellchat">
+      <rect x="1408" y="855" width="384" height="110" rx="10" fill="#fcfbfd" stroke="#ddd3e4" />
+      <text x="1428" y="881" font-size="20" font-weight="700">Fibroblast → cancer · CellChat</text>
+      <text x="1494" y="915" font-size="15.5" text-anchor="end">Fibroblast</text>
+      <text x="1494" y="942" font-size="15.5" text-anchor="end">Cancer</text>
+      <g transform="translate(1502 895) scale(0.78 1)">
+        <rect width="190" height="58" fill="#fff" stroke="#3e3242" />
+        <rect width="31.67" height="29" fill="#762174" />
+        <rect x="31.67" width="31.67" height="29" fill="#a63b96" />
+        <rect x="63.34" width="31.67" height="29" fill="#5f176d" />
+        <rect x="95.01" width="31.67" height="29" fill="#bd82b2" />
+        <rect x="126.68" width="31.67" height="29" fill="#e3c4d7" />
+        <rect x="158.35" width="31.65" height="29" fill="#efdae3" />
+        <rect y="29" width="31.67" height="29" fill="#a66aa7" />
+        <rect x="31.67" y="29" width="31.67" height="29" fill="#bd82b4" />
+        <rect x="63.34" y="29" width="31.67" height="29" fill="#b00d7d" />
+        <rect x="95.01" y="29" width="31.67" height="29" fill="#741074" />
+        <rect x="126.68" y="29" width="31.67" height="29" fill="#925192" />
+        <rect x="158.35" y="29" width="31.65" height="29" fill="#b66ca8" />
+        <path d="M31.67 0v58M63.34 0v58M95.01 0v58M126.68 0v58M158.35 0v58M0 29h190" stroke="#7e3b75" stroke-width=".7" />
+      </g>
+      <rect x="1660" y="896" width="13" height="57" fill="url(#heat)" stroke="#453649" />
+      <text x="1684" y="913" font-size="15.5">
+        <tspan x="1684">Top</tspan>
+        <tspan x="1684" dy="18">L-R</tspan>
+        <tspan x="1684" dy="18">pairs</tspan>
+      </text>
+    </g>
+    <path d="M1783 984H979" class="purple arrow" />
+    <rect x="1230" y="969" width="310" height="30" rx="0" fill="#fff" stroke="none" />
+    <text x="1385" y="990" font-size="18" font-weight="650" text-anchor="middle">Structured outputs enable follow-up</text>
+  </g>
+</svg>

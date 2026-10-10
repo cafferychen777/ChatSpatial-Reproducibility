@@ -1,0 +1,25 @@
+arm,backend,n,n_ok,followed_desc,followed_target
+desc_swap,Claude Haiku 4.5,80,80,0.0,1.0
+desc_swap,Claude Haiku 5.5,80,80,0.0,1.0
+desc_swap,Claude Opus 5.5,80,80,0.0,1.0
+desc_swap,Claude Sonnet 5.5,80,80,0.0,1.0
+desc_swap,GPT-6 Sol,80,80,0.0,1.0
+desc_swap,GPT-6.1 Sol,80,80,0.0,1.0
+desc_swap,Qwen3.8 27B (FP8),80,79,0.050632911392405,0.9493670886075948
+desc_swap,Gemma 4 12B,80,80,0.0125,0.9875
+neutral_intact,Claude Haiku 4.5,80,80,0.0,1.0
+neutral_intact,Claude Haiku 5.5,80,80,0.0,1.0
+neutral_intact,Claude Opus 5.5,80,80,0.0,1.0
+neutral_intact,Claude Sonnet 5.5,80,80,0.0,1.0
+neutral_intact,GPT-6 Sol,80,80,0.0,1.0
+neutral_intact,GPT-6.1 Sol,80,80,0.0,1.0
+neutral_intact,Qwen3.8 27B (FP8),80,80,0.0,1.0
+neutral_intact,Gemma 4 12B,80,80,0.0,1.0
+neutral_swap,Claude Haiku 4.5,80,80,0.0,1.0
+neutral_swap,Claude Haiku 5.5,80,80,0.0,1.0
+neutral_swap,Claude Opus 5.5,80,80,0.0,1.0
+neutral_swap,Claude Sonnet 5.5,80,80,0.0,1.0
+neutral_swap,GPT-6 Sol,80,80,0.0,1.0
+neutral_swap,GPT-6.1 Sol,80,80,0.0,1.0
+neutral_swap,Qwen3.8 27B (FP8),80,80,0.25,0.75
+neutral_swap,Gemma 4 12B,80,80,0.25,0.75

@@ -1,0 +1,88 @@
+[
+ {
+  "sample": "s5",
+  "run": "rctd",
+  "method": "rctd",
+  "reference": "ref_int.h5ad",
+  "status": "ok",
+  "seconds": 418.6,
+  "chatspatial": "1.5.5",
+  "cell_types": [
+   "B cell",
+   "Cancer",
+   "Dendritic",
+   "Endothelial",
+   "Fibroblast",
+   "Macrophage",
+   "Mast",
+   "T cell"
+  ],
+  "row_sum_median": 1.0
+ },
+ {
+  "sample": "s5",
+  "run": "flashdeconv",
+  "method": "flashdeconv",
+  "reference": "ref_int.h5ad",
+  "status": "ok",
+  "seconds": 2.6,
+  "chatspatial": "1.5.5",
+  "cell_types": [
+   "-Fibroblast",
+   "B cell",
+   "Cancer",
+   "Dendritic",
+   "Endothelial",
+   "Fibroblast",
+   "Macrophage",
+   "Mast",
+   "T cell",
+   "myocyte"
+  ],
+  "row_sum_median": 1.0
+ },
+ {
+  "sample": "s5",
+  "run": "flashdeconv_logref",
+  "method": "flashdeconv",
+  "reference": "ref_log.h5ad",
+  "status": "ok",
+  "seconds": 2.0,
+  "chatspatial": "1.5.5",
+  "cell_types": [
+   "-Fibroblast",
+   "B cell",
+   "Cancer",
+   "Dendritic",
+   "Endothelial",
+   "Fibroblast",
+   "Macrophage",
+   "Mast",
+   "T cell",
+   "myocyte"
+  ],
+  "row_sum_median": 1.0
+ },
+ {
+  "sample": "s5",
+  "run": "card",
+  "method": "card",
+  "reference": "ref_int.h5ad",
+  "status": "ok",
+  "seconds": 24.8,
+  "chatspatial": "1.5.5",
+  "cell_types": [
+   "Fibroblast",
+   "Cancer",
+   "B cell",
+   "myocyte",
+   "-Fibroblast",
+   "Macrophage",
+   "Endothelial",
+   "T cell",
+   "Dendritic",
+   "Mast"
+  ],
+  "row_sum_median": 1.0
+ }
+]

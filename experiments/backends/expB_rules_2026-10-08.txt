@@ -1,0 +1,184 @@
+EXPERIMENT B — EVALUATION RULES (written 2026-10-08, before any experiment-B trial was run)
+==========================================================================================
+Scope: ChatSpatial manuscript, experiment B (backend dependence). Scripts: scripts/expB_*.py.
+These rules are fixed before running. Any later change is logged at the bottom with its date and reason.
+
+1. DESIGN
+- Prompts: the original 8 ablation prompts (ablation_invocation.TEST_PROMPTS), unchanged.
+- Mechanism: json = original prompt-requested JSON (original system text + RESPONSE_INSTRUCTION, original parser);
+  native = provider tool-calling API, tool_choice "auto", one user turn, system prompt expB_common.NATIVE_SYSTEM.
+- Information: full / bare / minimal. JSON arm uses the original SCHEMA_FULL / SCHEMA_BARE / SCHEMA_MINIMAL text;
+  native arm uses the same content rendered as JSON Schema (expB_common.native_tools).
+- 10 replicates per cell. Temperature 1.0 where accepted, else the provider default (recorded per trial).
+  Each model runs with its default reasoning/thinking configuration; max output tokens 4096.
+- Backends: two open-weight models served with vLLM (native tool calling through vLLM's tool parser) and the closed models
+  callable on the run date; version pairs = successive versions of one family (planned: claude-haiku-4-5 -> claude-haiku-5-5;
+  gpt-5.4 -> gpt-5.5).
+- Description ablation (native + full; 8 prompts x 10 reps):
+  desc_swap      real names; tool-level descriptions of the prompt's target tool and its fixed partner swapped
+                 (pairs: domains<->SVG, deconvolution<->CNV, communication<->trajectory, statistics<->visualize);
+  neutral_intact tool names replaced by tool_01..tool_08, descriptions intact;
+  neutral_swap   neutral names + the same swap.
+- Method-choice bias (native + full): 7 open-ended prompts naming no method (expB_common.BIAS_PROMPTS), 10 reps.
+
+2. PER-TRIAL OUTCOMES
+2.1 parse_status (format): json arm — ok / empty / unparseable (original parser fails) / malformed (no tool_name or
+    non-object parameters); native arm — ok / no_tool_call (text answer, no tool call) / bad_arguments (arguments not a
+    JSON object). api_error = transport failure after retries (excluded from denominators and reported).
+2.2 Tool selection: selected tool = canonical name of the (first) call (json arm: original alias table; native: exact
+    name). tool_correct = selected tool == expected tool of the prompt. Accuracy denominator = all trials (format
+    failures count as not correct), and separately among format-ok trials.
+2.3 Error decomposition (B-MIS): each not-correct trial is either a FORMAT failure (parse_status != ok, or a tool name
+    that maps to no tool) or a GENUINE MIS-SELECTION (a parseable call to a different existing tool).
+2.4 Manipulation check only: Pydantic validity of (tool, params) against the current ChatSpatial models (extra="forbid").
+2.5 Execution: every trial whose call is parseable, names the expected tool and passes Pydantic is executed with the
+    real ChatSpatial tool function on a fixed fixture for its prompt (Section 3). Calls are canonicalised as the
+    validated parameter object (model_dump, sorted JSON); each unique (prompt, canonical call) is executed once and the
+    result is assigned to every trial that issued it (execution is deterministic given the call; replay tests this
+    separately). Wall-clock limit 45 min per execution; a timeout is an execution failure.
+2.6 Output-verified completion = the requested output exists and parses:
+    identify_spatial_domains   obs[domain_key] present, one label per spot, >= 2 distinct labels
+    deconvolve_data            obsm[proportions_key] present, n_spots x >= 2, all finite, rows sum to 1 +/- 0.05
+    find_spatial_genes         non-empty list of returned genes, all in var_names
+    analyze_cell_communication result reports >= 1 ligand-receptor interaction with a score table stored in the AnnData
+    analyze_spatial_statistics for analysis_type moran/geary/local_moran: a non-empty per-gene (or per-spot) result
+                               table with finite statistics; other types: the tool's stored result object is non-empty
+    visualize_data             an image is returned and decodes (PIL) with width and height > 0
+    analyze_trajectory_data    obs pseudotime column present with >= 50% finite values
+    analyze_cnv                obsm CNV matrix present, n_obs x >= 1, finite
+    A trial counts as completed only if the selected tool is the expected tool and its output is verified. Trials not
+    executed (format failure, wrong tool, Pydantic rejection) count as not completed.
+2.7 Silent failure (rules derived only from the user's prompt text, not from the schema). A trial is a silent failure if
+    execution reported success (no exception) AND at least one of:
+    (a) the requested output fails the 2.6 check;
+    (b) prompt-specified method not executed:
+        spatial_domains "using deep learning": executed method not in {spagcn, stagate, graphst} (graph neural network
+          methods; leiden/louvain/banksy are not deep learning);
+        deconvolution_rctd: executed method != rctd;   cellchat: executed method != cellchat_r;
+        moran_i: executed analysis_type != moran;       trajectory: executed method != cellrank;
+        spatial_plot: plot is not of the 'cell_type' annotation on spatial coordinates
+          (feature/cluster_key must reference 'cell_type'; basis must be spatial);
+    (c) a user-specified value dropped or overridden:
+        deconvolution_rctd reference_data_id == 'sc_ref' and cell_type_key == 'celltype';
+        cellchat species == 'human' and cell_type_key == 'cell_type';
+        cnv reference_key == 'cell_type' and set(reference_categories) == {'T cells','B cells'}.
+    The executed values are those of the validated parameter object (i.e. after package defaults are applied), so an
+    omitted method that falls back to a different default counts under (b).
+    Explicit failure = exception / validation error (user is told). Silent-failure rate denominator = all trials of the
+    cell; it is also reported among executed trials.
+2.8 Invocation determinism: per (backend, prompt, condition) cell, call = (selected tool, sorted-JSON raw parameters)
+    as emitted (same definition as headline_metric_candidates.py, with sorted keys); modal-call share = share of the 10
+    replicates that equal the most frequent call; identical-call cell = all 10 equal. pass^k (k = 10): share of cells in
+    which all 10 replicates completed (2.6) AND issued the identical call.
+2.9 Cross-backend agreement on constrained parameters: constrained params as listed per prompt in TEST_PROMPTS, taken
+    from the validated parameter object (defaults applied); a call that fails validation or selects another tool has
+    value INVALID. For two backends A,B and a cell: agreement = sum_v pA(v) pB(v) (probability that a random run of A and
+    a random run of B issue the same constrained values). Version-pair agreement (B8) = this quantity for old vs new
+    version, averaged over prompts, reported for native+full (primary) and for every condition.
+2.10 Description ablation (B-DESC): among trials with a parseable call, share selecting the swap partner (the tool that
+    now carries the target's description) = "followed the description"; share selecting the original target =
+    "followed name/parameters". Primary = desc_swap (real names, only the description changed). neutral_* reported as
+    secondary.
+2.11 Bias (B-BIAS): per backend and prompt, distribution of the executed method (validated object, defaults applied;
+    also whether the method was stated explicitly), compared with the schema default stated in SCHEMA_FULL.
+
+3. EXECUTION FIXTURES (fixed before running; built by expB_fixtures.py)
+    spatial_domains     DLPFC 151673 (Visium; paper/data/dlpfc_benchmark/samples/151673.h5ad, as used in the DLPFC benchmark)
+    deconvolution_rctd  OSCC S1 Visium (GSE208253 s1_processed.h5ad, raw counts layer) + Puram HNSCC scRNA reference loaded
+                        under data_id 'sc_ref' with its cell_type column copied to 'celltype'
+    svg_detection       squidpy MERFISH example (mouse hypothalamus), one slice (the largest Bregma slice)
+    cellchat, moran_i, spatial_plot, cnv
+                        OSCC S1 Visium with obs 'cell_type' assigned by a fixed marker rule (argmax of mean z-scored
+                        expression of marker sets: Cancer cells KRT5 KRT14 KRT6A KRT17 SFN; Fibroblasts COL1A1 COL1A2
+                        COL3A1 DCN LUM; T cells CD3D CD3E CD2 TRAC CD52; B cells MS4A1 CD79A CD79B IGHM CD19;
+                        Macrophages CD68 CD163 C1QA C1QB LYZ; Endothelial cells PECAM1 VWF CDH5 CLDN5)
+    trajectory          pancreas endocrinogenesis (scVelo; RNA velocity precomputed by scvelo stochastic mode),
+                        obsm['spatial'] := UMAP coordinates (the dataset has no physical coordinates; documented limitation)
+    Every execution uses a fresh copy of the fixture. Data identity is fixed by the paths above.
+
+4. STATISTICS
+- CIs: cluster bootstrap over prompts (resample the 8 prompts with replacement, then trials within), 10,000 draws,
+  percentile 95% CI, seed 20261008.
+- GLMM (logistic, lme4::glmer): outcome ~ mechanism * information + backend + (1 | prompt), outcomes = output-verified
+  completion (primary), tool-selection accuracy, silent failure. B10 = odds ratio of native vs json; reported (i) as the
+  mechanism main effect in the additive model outcome ~ mechanism + information + backend + (1|prompt) and (ii) per
+  information level from the interaction model. Wald CIs (profile if it converges). If separation prevents fitting,
+  report a bias-reduced (Firth-type, brglm2) GLM with prompt as fixed effect and say so.
+- B11 (ChatSpatial vs SpatialAgent tool selection, existing cross-system data, full schema vs SpatialAgent menu):
+  paired difference in tool-selection accuracy with the 8 prompts as clusters: per-prompt difference averaged over the
+  3 LLMs; cluster bootstrap CI over prompts; exact two-sided sign-flip permutation test over the 8 prompt differences
+  (2^8 assignments); also a GLMM correct ~ system + llm + (1|prompt) as a check. Reported whatever the result.
+
+5. CHANGE LOG
+(none yet)
+2026-10-08 (before any execution of experiment-B calls; after the Anthropic invocation runs, which do not depend on these):
+ - MERFISH fixture: the squidpy MERFISH matrix is volume-normalised (non-integer), so it was preprocessed with
+   normalization='none'. Count-based SVG methods (sparkx, spatialde) can therefore refuse on a documented data
+   precondition. Such refusals stay explicit failures (not completed, not silent) and are tabulated separately.
+ - OSCC fixture: genomic positions (chromosome/start/end) added to var from the HGSOC case-study gene order file
+   (paper/data/Case1_HGSOC/Visium_replication/gene_order.txt; 14,104/15,215 genes), because ChatSpatial's CNV tool
+   requires them and does not annotate them itself.
+ - Execution environment: arseven conda env chatspatial_expB (ChatSpatial 1.5.4 from the repo at commit ba7c14b,
+   [full] extra, R 4.4 with spacexr, CellChat, SPARK, CARD), run by sbatch. A local macOS env could not be used
+   (torch_scatter binary segfaults on import of STAGATE_pyG).
+ - B11: added a random-slope GLMM (1 + system | prompt) as a sensitivity check (post hoc; primary test unchanged).
+2026-10-08 (execution harness fixes; decided by error type only, before outcome tabulation):
+ - The first execution pass (arseven job 2722275) hit two environment faults: rpy2 3.6.x needs R >= 4.5 (R_getVar),
+   so every R-backed call (rctd, cellchat_r) failed with DependencyError. rpy2 was replaced by 3.5.17, which supports the
+   env's R 4.4.3, and R is isolated from the user's ~/.Renviron library. Cache entries whose error_type is
+   DependencyError are deleted and re-executed. No other cached outcome is deleted.
+ - STAGATE on the DLPFC fixture fails (ProcessingError; child process OOM-killed even at 48 GB). Cause: this file stores
+   obsm['spatial'] as array grid coordinates (range 0-120, median nearest-neighbour distance 1.41), and ChatSpatial's
+   fixed STAGATE rad_cutoff=50 then links ~2,144 neighbours per spot (7.8 M edges). The fixture is kept as registered;
+   the failure counts as an explicit failure of the executed call, and is reported as a ChatSpatial issue (radius not
+   adapted to coordinate units). A sensitivity analysis excluding fixture/environment-driven failures is labelled
+   post hoc.
+2026-10-08 (deviation: re-execution of the calls affected by ChatSpatial fixes; decided after outcome tabulation):
+ - Experiments A and B exposed package bugs that decided three executed calls: (1) RCTD full mode stored spacexr's
+   unconstrained weights as proportions (row sums 0.48-1.05), so the rctd call failed the 2.6 check and its 180 trials
+   counted as silent failures; (2) STAGATE's fixed rad_cutoff=50 ignored coordinate units (OOM on the array-grid
+   fixture), and GraphST CPU training of the fixture exceeds ChatSpatial's 600 s default timeout. Fixed on a ChatSpatial
+   development branch (commits 60493e4, 464d3d5 on top of ba7c14b): per-spot normalisation of
+   RCTD weights (spacexr normalize_weights); STAGATE radius derived from the spot spacing; GraphST seeded inside its
+   training worker; 3600 s default timeout for stagate/graphst; schema descriptions/bounds.
+ - Re-executed only the 3 affected cached calls (rctd; spatial_domains method=stagate; method=graphst) with the
+   recorded specs (no new LLM calls), same env, threads, fixtures and 45-min limit, fixed source first on PYTHONPATH
+   (arseven jobs 2722562 re-execution, 2722563 analysis; scripts expB_reexec_fixed.py/.sbatch,
+   expB_analysis_fixed.sbatch). Validation and canonical calls still use the unmodified env (the schema the LLMs saw),
+   so call ids and trial sets are unchanged. Outcomes: rctd verified (row sums 1.000), stagate verified (447 s,
+   7.7 neighbours/spot), graphst verified (685 s). Results: data/expB/exec_fixed_20261008/ (exec/, analysis/);
+   original exec/ and analysis/ are kept unchanged for comparison.
+ - Before -> after (main arm, 1,920 trials): output-verified completion 60.6% -> 77.6%; silent failure 9.6% -> 0.3%
+   (all remaining = cellchat method substitutions); B6b closed native+full completion 72.8% [37.5, 98.8] ->
+   97.8% [93.4, 100.0]; B10 completion OR(native vs json, additive GLMM) 1.56 [1.18, 2.06], P = 0.0019 ->
+   1.32 [0.92, 1.91], P = 0.136. The silent-failure GLMM is now separated (5 events); per section 4 it must be
+   reported with the bias-reduced GLM instead.
+2026-10-09 (re-execution under ChatSpatial 1.5.5; decided before seeing 1.5.5 outcomes):
+ - ChatSpatial 1.5.5 (PyPI, released 2026-10-09) fixes the two package defects found by the 1.5.4 execution: RCTD
+   'full'-mode weights stored unnormalised as proportions, and the fixed STAGATE/GraphST radius on array-unit
+   coordinates. All 27 unique recorded calls (Anthropic and open-weight arms) are re-executed, without new LLM calls,
+   in a new arseven env chatspatial_v155 (clone of chatspatial_expB + chatspatial[full]==1.5.5, rpy2 3.5.17, R 4.4.3),
+   tag exec_v155 (paper/data/expB/exec_v155, analysis_v155). Rules, fixtures and invocation data are unchanged. The
+   1.5.4 execution (exec/, analysis/) is kept and reported alongside as the as-registered result.
+ - The Pydantic manipulation check is recomputed against the 1.5.5 models.
+ - GLMM separation: as pre-specified in section 4, when glmer fails or shows separation (|coef| > 10 or SE > 50),
+   a bias-reduced GLM (brglm2::brglmFit) with prompt as a fixed effect is fitted and reported. This threshold rule
+   is written here before the 1.5.5 analysis is run; it was not applied to the 1.5.4 analysis reported earlier.
+ - Env note: conda --clone restored conda-forge numpy 2.5.3 over the pip numpy 2.3.5 of chatspatial_expB (numba then
+   failed to import); numpy 2.3.5 was force-reinstalled so the v155 env differs from chatspatial_expB only in
+   chatspatial 1.5.5 and spagcn-modern 1.4.0 (pip freeze diff), plus brglm2 in a separate R library.
+2026-10-09 (GPT arms; written before any GPT trial of experiment B was run).
+ - Models: gpt-6-sol and gpt-6.1-sol. The planned GPT version pair gpt-5.4 -> gpt-5.5 is replaced by
+   gpt-6-sol -> gpt-6.1-sol (consecutive versions of the same tier).
+ - Request settings: identical harness (expB_invocation.py, chat-completions format, tool_choice "auto" for native,
+   max_completion_tokens 4096). temperature = 1.0 is sent and accepted; reasoning effort is not set, i.e. the provider
+   default (smoke test 2026-10-09: 0 reasoning tokens on a trivial tool call). The served model id is recorded per trial.
+ - Concurrency 3, retries with backoff on 429/5xx; runs resume from the jsonl.
+ - Arms: main 480, desc 240, bias 70 per model (JSON and native mechanisms, all information levels), executed and
+   analysed on arseven with the 1.5.5 setup (exec_v155 / analysis_v155), as for the other six backends.
+ - 2026-10-09 evening: the arseven envs chatspatial_v155 and chatspatial_expB had been removed from conda_envs
+   (not by this harness; newer envs chatspatial_v157 / chatspatial_bx156 appeared). chatspatial_v155 was rebuilt with the
+   same recipe (python 3.12, conda-forge R 4.4.3, chatspatial[full]==1.5.5, numpy<2.4, rpy2 3.5.17, R packages from the
+   existing no_user_rlib/rlib_v155), job 2725753; pip freeze saved in expB/logs/pip_freeze_chatspatial_v155_rebuilt.txt.
+   Calls already in exec_v155/exec_cache.jsonl are not re-executed; only calls new with the GPT arms are executed in
+   the rebuilt env.

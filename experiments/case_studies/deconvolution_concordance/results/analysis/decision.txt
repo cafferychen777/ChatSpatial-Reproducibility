@@ -1,0 +1,11 @@
+Primary rule (mdeconv_rules_2026-10-09.txt, section 4)
+card         Macrophage  median log2FC +1.81  q 0.0012  (+11/-0)  -> reproduced
+card         Fibroblast  median log2FC +2.60  q 0.0012  (+11/-0)  -> reproduced
+rctd         Macrophage  median log2FC +0.94  q 0.0016  (+11/-0)  -> reproduced
+rctd         Fibroblast  median log2FC +1.20  q 0.0016  (+11/-0)  -> reproduced
+flashdeconv  Macrophage  median log2FC +0.72  q 0.0098  (+10/-1)  -> reproduced
+flashdeconv  Fibroblast  median log2FC +1.77  q 0.0645  (+9/-2)  -> not reproduced
+
+DECISION: PARTLY CONSISTENT
+samples per run: {'card': 12, 'rctd': 12, 'flashdeconv': 12, 'flashdeconv_logref': 12, 'manuscript': 12}
+failed runs: 0

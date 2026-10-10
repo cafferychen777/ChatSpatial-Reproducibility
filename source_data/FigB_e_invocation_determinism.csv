@@ -1,0 +1,9 @@
+backend,modal_call_share,ci_low,ci_high,identical_call_cells,n_cells,pass_at_10
+Claude Haiku 4.5,0.9,0.75,1.0,6,8,0.75
+Claude Haiku 5.5,0.925,0.825,1.0,6,8,0.75
+Claude Sonnet 5.5,1.0,1.0,1.0,8,8,1.0
+Claude Opus 5.5,0.95,0.8500000000000001,1.0,7,8,0.875
+GPT-6 Sol,0.9625,0.9125,1.0,6,8,0.75
+GPT-6.1 Sol,0.9,0.7625,1.0,6,8,0.75
+Gemma 4 12B,0.8625,0.725,1.0,5,8,0.625
+Qwen3.8 27B,0.7875000000000001,0.625,0.95,4,8,0.5

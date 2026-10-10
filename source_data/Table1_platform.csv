@@ -1,0 +1,12 @@
+Module,Visium,Visium HD,MERFISH/Xenium,seqFISH/CosMx,Slide-seq,STARmap
+Preprocessing,supported,supported,supported,supported,supported,supported
+Multi-Sample Integration,supported,supported,supported,supported,supported,supported
+Cell Type Annotation,supported,supported,supported,supported,supported,supported
+Differential Expression,supported,supported,supported,supported,supported,supported
+Spatial Domain ID,commonly used or wrapper-recommended,supported,supported,supported,supported,supported
+Spatial Variable Genes,supported,supported,supported,supported,supported,supported
+Cell Communication,supported,supported,commonly used or wrapper-recommended,commonly used or wrapper-recommended,supported,supported
+Deconvolution,commonly used or wrapper-recommended,optional or assay-dependent,not required/not applicable,not required/not applicable,optional or assay-dependent,optional or assay-dependent
+CNV Analysis,supported,supported,supported,supported,supported,supported
+Trajectory Analysis,supported,supported,commonly used or wrapper-recommended,commonly used or wrapper-recommended,supported,supported
+RNA Velocity,supported,supported,supported,supported,supported,supported

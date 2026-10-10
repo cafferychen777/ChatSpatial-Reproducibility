@@ -1,0 +1,65 @@
+M-DECONV rules: is the OSCC leading-edge enrichment the same under CARD, RCTD and FlashDeconv?
+Written 2026-10-09, before any of the runs below were started.
+
+1. The claim being tested
+The manuscript (main.tex, OSCC Step 2; Supplementary Table 1) reports that the Leading Edge (LE) is
+enriched for macrophages (11/12 samples) and fibroblasts/CAFs (10/12) relative to the Tumor Core (TC),
+with sample-level Wilcoxon signed-rank tests over 11 patients (Sample 6 has no LE spots):
+macrophage q = 0.003, fibroblast q = 0.005, CAF q = 0.027, endothelial q = 0.003 (LE), cancer q = 0.003 (TC).
+The text calls the strongest signals "macrophage and fibroblast LE enrichment".
+
+Provenance: the per-spot proportions behind Fig. 2d/e and Supplementary Table 1 of the first
+submission (server_results/per_sample_tc_le_enrichment.csv = source_data/Fig2d_enrichment.csv, identical
+values) were produced by FlashDeconv in the original case-study pipeline. This run compares CARD, RCTD
+and FlashDeconv on the same spots and labels.
+
+2. Fixed inputs (identical for all three methods)
+- Spots and TC/LE labels: the 12 files GSE208253/processed_h5ad/s{1..12}_processed.h5ad, column
+  obs["tc_le_region"] (TC, LE, Other), exactly as used for the manuscript. No re-clustering.
+- Spatial counts: layers["counts"] of those files (raw UMI counts after the manuscript's QC).
+- Reference: Puram et al. GSE103322_HNSCC_all_data.txt.gz, cell-type labels built exactly as in
+  03_run_analysis.py (row "non-cancer cell type"; label 0 -> "Cancer"; 10 labels).
+  The GEO matrix is log2(TPM/10 + 1). CARD and RCTD in ChatSpatial 1.5.5 require integer counts,
+  so the reference given to all three methods is round(2^x - 1), i.e. TPM/10 rounded to integers.
+  The same integer matrix is given to every method.
+- Software: ChatSpatial 1.5.5 (conda env chatspatial_v155), called through
+  chatspatial.tools.deconvolution.deconvolve_spatial_data with schema defaults except method,
+  reference_data_id and cell_type_key:
+    CARD: minCountGene 100, minCountSpot 5 (defaults; same as Arora et al.).
+    RCTD: R backend (spacexr), mode "full" (default for Visium); 1.5.5 returns per-spot
+          proportions normalized to sum to one. ChatSpatial drops reference types with fewer than
+          25 cells for RCTD, so "-Fibroblast" (CAF, 18 cells) and "myocyte" (19 cells) are not
+          estimated by RCTD. This is a property of RCTD, not a failure.
+    FlashDeconv: sketch_dim 512, lambda_spatial auto, n_hvg 2000, n_markers_per_type 50 (defaults).
+- Anchor run (secondary, not part of the decision): FlashDeconv via ChatSpatial 1.5.5 with the
+  log-scale reference exactly as the manuscript pipeline used it, to check that the reported numbers
+  reproduce under 1.5.5.
+
+3. Statistics (identical to the manuscript pipeline, applied separately to each method)
+Per sample and cell type: two-sided Mann-Whitney U on spot proportions, LE spots vs TC spots;
+log2FC = log2((mean_LE + 1e-6) / (mean_TC + 1e-6)); BH-FDR over all sample x cell-type tests of that
+method (tests with all-zero proportions are excluded); a sample is LE-enriched if q < 0.05 and
+log2FC > 0.25, TC-enriched if q < 0.05 and log2FC < -0.25. Counts are reported out of 12 samples.
+Patient level: two-sided Wilcoxon signed-rank test on the nonzero per-sample log2FC over the 11
+samples with LE spots (Sample 6 excluded); BH-FDR over cell types within the method; direction from
+the median log2FC.
+
+4. Decision rule ("the leading-edge enrichment")
+Primary quantity: LE enrichment of macrophages and of fibroblasts (label "Fibroblast").
+A cell type's LE enrichment is REPRODUCED under a method if the patient-level signed-rank q < 0.05 and
+the median log2FC > 0.
+- CONSISTENT: reproduced for both macrophages and
+  fibroblasts under all three methods. Fill M-DECONV with "reproduced".
+- PARTLY CONSISTENT: reproduced for one of the two cell types under all three methods, or for both
+  under two of the three. Do not fill; report the rewrite naming what held and what did not.
+- INCONSISTENT: anything else. Any significant TC-direction result (q < 0.05, median log2FC < 0) for
+  macrophages or fibroblasts under any method is reported as a contradiction.
+Secondary (reported, not used for the decision): number of LE-enriched samples per method and
+whether it reaches the manuscript's consensus threshold (>= 10 of 12); cancer-cell TC direction;
+endothelial and CAF results (CAF not available under RCTD); per-sample sign agreement of log2FC between
+methods; spot-level Pearson correlation of proportions between methods for each shared cell type.
+
+5. What is not changed after seeing results
+The labels, the reference construction, the parameters, the tests, the thresholds and the decision
+rule above. If a method fails to run on a sample, the failure is reported and the sample is counted as
+not LE-enriched for that method; the decision is then made on the samples that ran, and this is stated.

@@ -1,0 +1,299 @@
+Experiment B analysis — backends: ['claude-haiku-4-5-20251001', 'claude-haiku-5-5', 'claude-opus-5-5', 'claude-sonnet-5-5', 'gpt-6-sol', 'gpt-6.1-sol', 'ow:Qwen/Qwen3.8-27B-FP8', 'ow:google/gemma-4-12B-it']
+main trials: 3840; per backend: {'ow:Qwen/Qwen3.8-27B-FP8': 480, 'claude-haiku-4-5-20251001': 480, 'claude-haiku-5-5': 480, 'claude-opus-5-5': 480, 'claude-sonnet-5-5': 480, 'ow:google/gemma-4-12B-it': 480, 'gpt-6-sol': 480, 'gpt-6.1-sol': 480}
+
+== Rates by backend x mechanism x information (cluster bootstrap over prompts, 2000 draws)
+                    label mechanism    info  n  tool_correct  format_failure  mis_selection  pydantic_valid  completed  silent_failure
+claude-haiku-4-5-20251001      json    bare 80         1.000           0.000          0.000           1.000      0.875           0.000
+claude-haiku-4-5-20251001      json    full 80         1.000           0.000          0.000           1.000      0.988           0.000
+claude-haiku-4-5-20251001      json minimal 80         1.000           0.000          0.000           0.012      0.012           0.012
+claude-haiku-4-5-20251001    native    bare 80         1.000           0.000          0.000           1.000      1.000           0.050
+claude-haiku-4-5-20251001    native    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+claude-haiku-4-5-20251001    native minimal 80         1.000           0.000          0.000           0.625      0.375           0.000
+         claude-haiku-5-5      json    bare 80         1.000           0.000          0.000           1.000      1.000           0.000
+         claude-haiku-5-5      json    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+         claude-haiku-5-5      json minimal 80         1.000           0.000          0.000           0.000      0.000           0.000
+         claude-haiku-5-5    native    bare 80         1.000           0.000          0.000           1.000      1.000           0.000
+         claude-haiku-5-5    native    full 80         1.000           0.000          0.000           1.000      0.912           0.000
+         claude-haiku-5-5    native minimal 80         1.000           0.000          0.000           0.625      0.375           0.000
+          claude-opus-5-5      json    bare 80         1.000           0.000          0.000           1.000      0.988           0.000
+          claude-opus-5-5      json    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+          claude-opus-5-5      json minimal 80         1.000           0.000          0.000           0.638      0.550           0.000
+          claude-opus-5-5    native    bare 80         1.000           0.000          0.000           1.000      1.000           0.000
+          claude-opus-5-5    native    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+          claude-opus-5-5    native minimal 80         1.000           0.000          0.000           0.625      0.375           0.000
+        claude-sonnet-5-5      json    bare 80         1.000           0.000          0.000           1.000      0.950           0.000
+        claude-sonnet-5-5      json    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+        claude-sonnet-5-5      json minimal 80         1.000           0.000          0.000           0.850      0.850           0.000
+        claude-sonnet-5-5    native    bare 80         1.000           0.000          0.000           1.000      1.000           0.000
+        claude-sonnet-5-5    native    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+        claude-sonnet-5-5    native minimal 80         1.000           0.000          0.000           0.625      0.375           0.000
+                gpt-6-sol      json    bare 80         1.000           0.000          0.000           1.000      1.000           0.000
+                gpt-6-sol      json    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+                gpt-6-sol      json minimal 80         1.000           0.000          0.000           0.150      0.150           0.000
+                gpt-6-sol    native    bare 80         1.000           0.000          0.000           1.000      0.875           0.000
+                gpt-6-sol    native    full 80         1.000           0.000          0.000           1.000      0.888           0.000
+                gpt-6-sol    native minimal 80         1.000           0.000          0.000           0.625      0.375           0.000
+              gpt-6.1-sol      json    bare 80         1.000           0.000          0.000           1.000      1.000           0.000
+              gpt-6.1-sol      json    full 80         1.000           0.000          0.000           1.000      1.000           0.000
+              gpt-6.1-sol      json minimal 80         1.000           0.000          0.000           0.012      0.012           0.000
+              gpt-6.1-sol    native    bare 80         1.000           0.000          0.000           1.000      0.862           0.000
+              gpt-6.1-sol    native    full 80         1.000           0.000          0.000           1.000      0.925           0.000
+              gpt-6.1-sol    native minimal 80         1.000           0.000          0.000           0.625      0.375           0.000
+  ow:Qwen/Qwen3.8-27B-FP8      json    bare 80         1.000           0.000          0.000           1.000      0.862           0.000
+  ow:Qwen/Qwen3.8-27B-FP8      json    full 80         1.000           0.000          0.000           1.000      0.925           0.000
+  ow:Qwen/Qwen3.8-27B-FP8      json minimal 80         1.000           0.000          0.000           0.038      0.038           0.000
+  ow:Qwen/Qwen3.8-27B-FP8    native    bare 80         0.975           0.025          0.000           0.975      0.900           0.000
+  ow:Qwen/Qwen3.8-27B-FP8    native    full 80         1.000           0.000          0.000           1.000      0.925           0.000
+  ow:Qwen/Qwen3.8-27B-FP8    native minimal 80         0.975           0.012          0.012           0.462      0.325           0.000
+ ow:google/gemma-4-12B-it      json    bare 80         1.000           0.000          0.000           1.000      0.862           0.000
+ ow:google/gemma-4-12B-it      json    full 80         1.000           0.000          0.000           1.000      0.875           0.000
+ ow:google/gemma-4-12B-it      json minimal 80         1.000           0.000          0.000           0.000      0.000           0.000
+ ow:google/gemma-4-12B-it    native    bare 80         1.000           0.000          0.000           1.000      0.838           0.000
+ ow:google/gemma-4-12B-it    native    full 80         1.000           0.000          0.000           1.000      0.875           0.000
+ ow:google/gemma-4-12B-it    native minimal 80         0.900           0.000          0.100           0.475      0.375           0.000
+
+== Placeholders (native + full unless stated; 10,000-draw cluster bootstrap over prompts)
+  B3 open-weight tool-selection accuracy: 100.0% [100.0%, 100.0%] (n=160)
+  B5 open-weight output-verified completion: 90.0% [71.2%, 100.0%] (n=160)
+  B6a closed tool-selection accuracy: 100.0% [100.0%, 100.0%] (n=480)
+  B6b closed output-verified completion: 95.4% [89.8%, 100.0%] (n=480)
+    claude-haiku-4-5-20251001: accuracy 100.0% [100.0%, 100.0%]; completion 100.0% [100.0%, 100.0%]
+    claude-haiku-5-5: accuracy 100.0% [100.0%, 100.0%]; completion 91.2% [73.8%, 100.0%]
+    claude-opus-5-5: accuracy 100.0% [100.0%, 100.0%]; completion 100.0% [100.0%, 100.0%]
+    claude-sonnet-5-5: accuracy 100.0% [100.0%, 100.0%]; completion 100.0% [100.0%, 100.0%]
+    gpt-6-sol: accuracy 100.0% [100.0%, 100.0%]; completion 88.8% [67.5%, 100.0%]
+    gpt-6.1-sol: accuracy 100.0% [100.0%, 100.0%]; completion 92.5% [81.2%, 100.0%]
+    ow:Qwen/Qwen3.8-27B-FP8: accuracy 100.0% [100.0%, 100.0%]; completion 92.5% [80.0%, 100.0%]
+    ow:google/gemma-4-12B-it: accuracy 100.0% [100.0%, 100.0%]; completion 87.5% [62.5%, 100.0%]
+  B7 open-weight silent failure, minimal schema, mechanism=native: 0.0% [0.0%, 0.0%] (n=160; explicit failures 58.8%)
+  B7 open-weight silent failure, minimal schema, mechanism=json: 0.0% [0.0%, 0.0%] (n=160; explicit failures 98.1%)
+  B7 open-weight silent failure, minimal schema, mechanism=both: 0.0% [0.0%, 0.0%] (n=320; explicit failures 78.4%)
+    silent failure open-weight info=full: 0.0% [0.0%, 0.0%]; completion 90.0% [70.3%, 100.0%]
+    silent failure closed-weight info=full: 0.0% [0.0%, 0.0%]; completion 97.6% [94.5%, 100.0%]
+    silent failure open-weight info=bare: 0.0% [0.0%, 0.0%]; completion 86.6% [66.2%, 100.0%]
+    silent failure closed-weight info=bare: 0.4% [0.0%, 1.6%]; completion 96.2% [88.4%, 100.0%]
+    silent failure open-weight info=minimal: 0.0% [0.0%, 0.0%]; completion 18.4% [3.7%, 34.7%]
+    silent failure closed-weight info=minimal: 0.1% [0.0%, 0.4%]; completion 31.9% [13.8%, 52.3%]
+
+== B-MIS error decomposition (counts of not-correct trials)
+mechanism    info   n  wrong  format_failure  mis_selection
+     json    bare 640      0               0              0
+     json    full 640      0               0              0
+     json minimal 640      0               0              0
+   native    bare 640      2               2              0
+   native    full 640      0               0              0
+   native minimal 640     10               1              9
+  mis-selections (label, mechanism, info, prompt -> selected):
+    ow:Qwen/Qwen3.8-27B-FP8 native minimal spatial_plot -> identify_spatial_domains
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+    ow:google/gemma-4-12B-it native minimal moran_i -> find_spatial_genes
+
+== Invocation determinism (cells = backend x prompt x condition; call = tool + sorted raw params)
+                   modal_share  identical  pass_k
+mechanism info                                   
+json      bare           0.938      0.812   0.797
+          full           0.967      0.859   0.844
+          minimal        0.772      0.406   0.125
+native    bare           0.934      0.797   0.766
+          full           0.911      0.750   0.750
+          minimal        0.925      0.781   0.344
+  B-INV per backend (native + full): modal-call share [cluster CI]; identical-call cells; pass^10
+    claude-haiku-4-5-20251001: 90.0% [75.0%, 100.0%]; identical 6/8; pass^10 75.0%
+    claude-haiku-5-5: 92.5% [82.5%, 100.0%]; identical 6/8; pass^10 75.0%
+    claude-opus-5-5: 95.0% [85.0%, 100.0%]; identical 7/8; pass^10 87.5%
+    claude-sonnet-5-5: 100.0% [100.0%, 100.0%]; identical 8/8; pass^10 100.0%
+    gpt-6-sol: 96.2% [91.2%, 100.0%]; identical 6/8; pass^10 75.0%
+    gpt-6.1-sol: 90.0% [76.2%, 100.0%]; identical 6/8; pass^10 75.0%
+    ow:Qwen/Qwen3.8-27B-FP8: 78.8% [62.5%, 95.0%]; identical 4/8; pass^10 50.0%
+    ow:google/gemma-4-12B-it: 86.2% [72.5%, 100.0%]; identical 5/8; pass^10 62.5%
+
+== Agreement on constrained parameters: sum_v pA(v) pB(v), averaged over prompts
+mechanism  info   
+json       bare       0.865
+           full       0.948
+           minimal    0.639
+native     bare       0.831
+           full       0.906
+           minimal    0.903
+  B8 version pair claude-haiku-4-5-20251001 -> claude-haiku-5-5 [native/full]: 91.2% [76.2, 100.0]
+  B8 version pair claude-haiku-4-5-20251001 -> claude-haiku-5-5 [native/bare]: 88.2% [73.0, 100.0]
+  B8 version pair claude-haiku-4-5-20251001 -> claude-haiku-5-5 [native/minimal]: 100.0% [100.0, 100.0]
+  B8 version pair claude-haiku-4-5-20251001 -> claude-haiku-5-5 [json/full]: 98.8% [96.2, 100.0]
+  B8 version pair claude-haiku-4-5-20251001 -> claude-haiku-5-5 [json/bare]: 75.0% [37.5, 100.0]
+  B8 version pair claude-haiku-4-5-20251001 -> claude-haiku-5-5 [json/minimal]: 98.8% [96.2, 100.0]
+  B8 version pair gpt-6-sol -> gpt-6.1-sol [native/full]: 92.2% [76.8, 100.0]
+  B8 version pair gpt-6-sol -> gpt-6.1-sol [native/bare]: 97.5% [93.8, 100.0]
+  B8 version pair gpt-6-sol -> gpt-6.1-sol [native/minimal]: 100.0% [100.0, 100.0]
+  B8 version pair gpt-6-sol -> gpt-6.1-sol [json/full]: 100.0% [100.0, 100.0]
+  B8 version pair gpt-6-sol -> gpt-6.1-sol [json/bare]: 100.0% [100.0, 100.0]
+  B8 version pair gpt-6-sol -> gpt-6.1-sol [json/minimal]: 86.0% [65.5, 100.0]
+
+== B-DESC description ablation (native + full); shares among trials with a parseable call to an existing tool
+           arm                     label  n  n_ok  followed_desc  followed_target
+     desc_swap claude-haiku-4-5-20251001 80    80          0.000            1.000
+     desc_swap          claude-haiku-5-5 80    80          0.000            1.000
+     desc_swap           claude-opus-5-5 80    80          0.000            1.000
+     desc_swap         claude-sonnet-5-5 80    80          0.000            1.000
+     desc_swap                 gpt-6-sol 80    80          0.000            1.000
+     desc_swap               gpt-6.1-sol 80    80          0.000            1.000
+     desc_swap   ow:Qwen/Qwen3.8-27B-FP8 80    79          0.051            0.949
+     desc_swap  ow:google/gemma-4-12B-it 80    80          0.012            0.988
+neutral_intact claude-haiku-4-5-20251001 80    80          0.000            1.000
+neutral_intact          claude-haiku-5-5 80    80          0.000            1.000
+neutral_intact           claude-opus-5-5 80    80          0.000            1.000
+neutral_intact         claude-sonnet-5-5 80    80          0.000            1.000
+neutral_intact                 gpt-6-sol 80    80          0.000            1.000
+neutral_intact               gpt-6.1-sol 80    80          0.000            1.000
+neutral_intact   ow:Qwen/Qwen3.8-27B-FP8 80    80          0.000            1.000
+neutral_intact  ow:google/gemma-4-12B-it 80    80          0.000            1.000
+  neutral_swap claude-haiku-4-5-20251001 80    80          0.000            1.000
+  neutral_swap          claude-haiku-5-5 80    80          0.000            1.000
+  neutral_swap           claude-opus-5-5 80    80          0.000            1.000
+  neutral_swap         claude-sonnet-5-5 80    80          0.000            1.000
+  neutral_swap                 gpt-6-sol 80    80          0.000            1.000
+  neutral_swap               gpt-6.1-sol 80    80          0.000            1.000
+  neutral_swap   ow:Qwen/Qwen3.8-27B-FP8 80    80          0.250            0.750
+  neutral_swap  ow:google/gemma-4-12B-it 80    80          0.250            0.750
+  desc_swap: followed edited description 0.8% [0.0%, 2.8%]; selected original target 99.2% [97.2%, 100.0%] (n=639)
+  neutral_intact: followed edited description 0.0% [0.0%, 0.0%]; selected original target 100.0% [100.0%, 100.0%] (n=640)
+  neutral_swap: followed edited description 6.2% [1.7%, 12.3%]; selected original target 93.8% [87.7%, 98.3%] (n=640)
+  desc_swap per prompt (followed description share): cellchat=0.00, cnv=0.00, deconvolution_rctd=0.00, moran_i=0.00, spatial_domains=0.00, spatial_plot=0.00, svg_detection=0.06, trajectory=0.00
+
+== B-BIAS method choice on open-ended prompts (native + full); executed method after defaults
+  bias_autocorr (schema-text default: neighborhood):
+    claude-haiku-4-5-20251001: {'moran': 10}
+    claude-haiku-5-5: {'moran': 10}
+    claude-opus-5-5: {'moran': 10}
+    claude-sonnet-5-5: {'moran': 10}
+    gpt-6-sol: {'moran': 10}
+    gpt-6.1-sol: {'moran': 10}
+    ow:Qwen/Qwen3.8-27B-FP8: {'moran': 10}
+    ow:google/gemma-4-12B-it: {'moran': 10}
+  bias_ccc (schema-text default: fastccc):
+    claude-haiku-4-5-20251001: {'(omitted)': 10}
+    claude-haiku-5-5: {'(omitted)': 10}
+    claude-opus-5-5: {'(omitted)': 10}
+    claude-sonnet-5-5: {'(omitted)': 10}
+    gpt-6-sol: {'fastccc': 10}
+    gpt-6.1-sol: {'fastccc': 10}
+    ow:Qwen/Qwen3.8-27B-FP8: {'(omitted)': 7, 'fastccc': 3}
+    ow:google/gemma-4-12B-it: {'liana': 10}
+  bias_cnv (schema-text default: infercnvpy):
+    claude-haiku-4-5-20251001: {'(omitted)': 10}
+    claude-haiku-5-5: {'(omitted)': 10}
+    claude-opus-5-5: {'(omitted)': 10}
+    claude-sonnet-5-5: {'(omitted)': 10}
+    gpt-6-sol: {'infercnvpy': 10}
+    gpt-6.1-sol: {'infercnvpy': 10}
+    ow:Qwen/Qwen3.8-27B-FP8: {'(omitted)': 10}
+    ow:google/gemma-4-12B-it: {'infercnvpy': 10}
+  bias_deconv (schema-text default: flashdeconv):
+    claude-haiku-4-5-20251001: {'(omitted)': 10}
+    claude-haiku-5-5: {'(omitted)': 10}
+    claude-opus-5-5: {'(omitted)': 10}
+    claude-sonnet-5-5: {'(omitted)': 10}
+    gpt-6-sol: {'flashdeconv': 10}
+    gpt-6.1-sol: {'flashdeconv': 10}
+    ow:Qwen/Qwen3.8-27B-FP8: {'(omitted)': 6, 'flashdeconv': 2, 'cell2location': 2}
+    ow:google/gemma-4-12B-it: {'flashdeconv': 7, 'cell2location': 2, '(omitted)': 1}
+  bias_domains (schema-text default: spagcn):
+    claude-haiku-4-5-20251001: {'(omitted)': 10}
+    claude-haiku-5-5: {'(omitted)': 10}
+    claude-opus-5-5: {'(omitted)': 10}
+    claude-sonnet-5-5: {'(omitted)': 10}
+    gpt-6-sol: {'spagcn': 10}
+    gpt-6.1-sol: {'spagcn': 10}
+    ow:Qwen/Qwen3.8-27B-FP8: {'(omitted)': 6, 'spagcn': 2, 'NO_VALID_CALL': 2}
+    ow:google/gemma-4-12B-it: {'leiden': 7, '(omitted)': 2, 'stagate': 1}
+  bias_svg (schema-text default: sparkx):
+    claude-haiku-4-5-20251001: {'(omitted)': 9, 'flashs': 1}
+    claude-haiku-5-5: {'(omitted)': 9, 'sparkx': 1}
+    claude-opus-5-5: {'(omitted)': 10}
+    claude-sonnet-5-5: {'(omitted)': 10}
+    gpt-6-sol: {'sparkx': 10}
+    gpt-6.1-sol: {'sparkx': 10}
+    ow:Qwen/Qwen3.8-27B-FP8: {'(omitted)': 4, 'sparkx': 3, 'flashs': 3}
+    ow:google/gemma-4-12B-it: {'flashs': 8, '(omitted)': 2}
+  bias_traj (schema-text default: cellrank):
+    claude-haiku-4-5-20251001: {'cellrank': 7, '(omitted)': 3}
+    claude-haiku-5-5: {'(omitted)': 10}
+    claude-opus-5-5: {'(omitted)': 10}
+    claude-sonnet-5-5: {'(omitted)': 10}
+    gpt-6-sol: {'palantir': 6, 'dpt': 2, 'cellrank': 2}
+    gpt-6.1-sol: {'palantir': 6, 'dpt': 4}
+    ow:Qwen/Qwen3.8-27B-FP8: {'(omitted)': 8, 'cellrank': 2}
+    ow:google/gemma-4-12B-it: {'(omitted)': 7, 'cellrank': 3}
+
+== GLMM (lme4::glmer, logistic): outcome ~ mechanism * information + backend + (1 | prompt)
+### outcome: completed  (mean 0.727 )
+additive: OR(native vs json) = 1.76 [1.39, 2.23], P = 2.27e-06; singular=FALSE
+                              Estimate Std. Error z value Pr(>|z|)
+(Intercept)                      3.484      0.508   6.856    0.000
+mechanismnative                  0.567      0.120   4.727    0.000
+infobare                        -0.425      0.190  -2.236    0.025
+infominimal                     -5.385      0.199 -27.016    0.000
+labelclaude-haiku-5-5            0.086      0.239   0.359    0.719
+labelclaude-opus-5-5             1.578      0.250   6.321    0.000
+labelclaude-sonnet-5-5           2.218      0.256   8.653    0.000
+labelgpt-6-sol                   0.086      0.239   0.359    0.719
+labelgpt-6.1-sol                -0.169      0.237  -0.712    0.476
+labelow:google/gemma-4-12B-it   -0.895      0.232  -3.863    0.000
+labelow:Qwen/Qwen3.8-27B-FP8    -0.597      0.234  -2.554    0.011
+interaction: OR(native vs json | info=full) = 0.40 [0.22, 0.74], P = 0.00313
+interaction: OR(native vs json | info=bare) = 0.86 [0.53, 1.39], P = 0.538
+interaction: OR(native vs json | info=minimal) = 3.63 [2.63, 5.00], P = 3.22e-15
+singular= FALSE 
+
+### outcome: tool_correct  (mean 0.997 )
+additive: OR(native vs json) = 0.00 [0.00, Inf], P = 0.998; singular=FALSE
+                              Estimate Std. Error z value Pr(>|z|)
+(Intercept)                     67.884  26406.554   0.003    0.998
+mechanismnative                -20.932   9323.211  -0.002    0.998
+infobare                       -19.471  12148.267  -0.002    0.999
+infominimal                    -21.314  12148.267  -0.002    0.999
+labelclaude-haiku-5-5           -0.006  30381.255   0.000    1.000
+labelclaude-opus-5-5             0.026  30620.249   0.000    1.000
+labelclaude-sonnet-5-5          -0.017  30292.068   0.000    1.000
+labelgpt-6-sol                  -0.043  30100.283   0.000    1.000
+labelgpt-6.1-sol                -0.069  29909.938   0.000    1.000
+labelow:google/gemma-4-12B-it  -22.245  21512.933  -0.001    0.999
+labelow:Qwen/Qwen3.8-27B-FP8   -21.404  21512.933  -0.001    0.999
+interaction: OR(native vs json | info=full) = 1.18 [0.00, Inf], P = 1
+interaction: OR(native vs json | info=bare) = 0.00 [0.00, Inf], P = 0.999
+interaction: OR(native vs json | info=minimal) = 0.00 [0.00, Inf], P = 0.999
+singular= FALSE 
+separation detected -> bias-reduced GLM (brglm2, prompt as fixed effect), as pre-specified
+brglm2 additive: OR(native vs json) = 0.03 [0.00, 0.33], P = 0.00364
+brglm2 interaction: OR(native vs json | info=full) = 1.00 [0.04, 27.61], P = 1
+brglm2 interaction: OR(native vs json | info=bare) = 0.19 [0.01, 2.52], P = 0.209
+brglm2 interaction: OR(native vs json | info=minimal) = 0.04 [0.00, 0.43], P = 0.00833
+
+### outcome: silent_failure  (mean 0.001 )
+additive: OR(native vs json) = 5.33 [0.49, 58.39], P = 0.171; singular=FALSE
+                              Estimate Std. Error z value Pr(>|z|)
+(Intercept)                    -31.966  11167.047  -0.003    0.998
+mechanismnative                  1.674      1.221   1.370    0.171
+infobare                        20.330  11167.044   0.002    0.999
+infominimal                     18.656  11167.044   0.002    0.999
+labelclaude-haiku-5-5          -26.005 174770.848   0.000    1.000
+labelclaude-opus-5-5           -26.077 181173.637   0.000    1.000
+labelclaude-sonnet-5-5         -25.025 107147.855   0.000    1.000
+labelgpt-6-sol                 -20.885  13527.460  -0.002    0.999
+labelgpt-6.1-sol               -21.939  22910.224  -0.001    0.999
+labelow:google/gemma-4-12B-it  -19.711   7519.186  -0.003    0.998
+labelow:Qwen/Qwen3.8-27B-FP8   -19.994   8663.239  -0.002    0.998
+interaction: OR(native vs json | info=full) = 0.31 [0.00, Inf], P = 1
+interaction: OR(native vs json | info=bare) = 1445138948.48 [0.00, Inf], P = 0.999
+interaction: OR(native vs json | info=minimal) = 0.00 [0.00, Inf], P = 1
+singular= FALSE 
+separation detected -> bias-reduced GLM (brglm2, prompt as fixed effect), as pre-specified
+brglm2 additive: OR(native vs json) = 3.20 [0.91, 11.24], P = 0.0697
+brglm2 interaction: OR(native vs json | info=full) = 1.00 [0.05, 19.15], P = 1
+brglm2 interaction: OR(native vs json | info=bare) = 10.39 [1.14, 95.05], P = 0.0381
+brglm2 interaction: OR(native vs json | info=minimal) = 0.32 [0.03, 3.59], P = 0.356

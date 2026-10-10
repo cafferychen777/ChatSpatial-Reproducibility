@@ -1,0 +1,13 @@
+a,b,mechanism,info,agreement,n_prompts
+Claude Haiku 4.5,Claude Haiku 5.5,json,full,0.9875,8
+Claude Haiku 4.5,Claude Haiku 5.5,json,bare,0.75,8
+Claude Haiku 4.5,Claude Haiku 5.5,json,minimal,0.9875,8
+Claude Haiku 4.5,Claude Haiku 5.5,native,full,0.9125,8
+Claude Haiku 4.5,Claude Haiku 5.5,native,bare,0.8825000000000001,8
+Claude Haiku 4.5,Claude Haiku 5.5,native,minimal,1.0,8
+GPT-6 Sol,GPT-6.1 Sol,json,full,1.0,8
+GPT-6 Sol,GPT-6.1 Sol,json,bare,1.0,8
+GPT-6 Sol,GPT-6.1 Sol,json,minimal,0.86,8
+GPT-6 Sol,GPT-6.1 Sol,native,full,0.9225,8
+GPT-6 Sol,GPT-6.1 Sol,native,bare,0.975,8
+GPT-6 Sol,GPT-6.1 Sol,native,minimal,1.0,8

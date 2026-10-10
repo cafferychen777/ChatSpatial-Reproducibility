@@ -1,0 +1,2 @@
+n_cnv_markers,n_background,cnv_mean_I,bg_mean_I,cliffs_delta,ci_lower,ci_upper,mannwhitney_U,mannwhitney_p,cnv_median_I,bg_median_I
+95,19085,0.5383,0.0331,0.9948,0.9926,0.9966,1808351.0,5.486278214412073e-63,0.5458898059229822,0.015796729396926

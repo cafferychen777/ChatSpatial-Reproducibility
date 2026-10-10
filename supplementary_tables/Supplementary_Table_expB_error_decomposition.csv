@@ -1,0 +1,7 @@
+mechanism,info,n,wrong,format_failure,mis_selection
+json,bare,640,0,0,0
+json,full,640,0,0,0
+json,minimal,640,0,0,0
+native,bare,640,2,2,0
+native,full,640,0,0,0
+native,minimal,640,10,1,9

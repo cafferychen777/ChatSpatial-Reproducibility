@@ -1,0 +1,57 @@
+prompt_id,backend,schema_default,NO_VALID_CALL,cell2location,cellrank,dpt,fastccc,flashdeconv,flashs,infercnvpy,leiden,liana,moran,palantir,spagcn,sparkx,stagate
+bias_autocorr,Claude Haiku 4.5,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_autocorr,Claude Haiku 5.5,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_autocorr,Claude Opus 5.5,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_autocorr,Claude Sonnet 5.5,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_autocorr,GPT-6 Sol,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_autocorr,GPT-6.1 Sol,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_autocorr,Qwen3.8 27B (FP8),0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_autocorr,Gemma 4 12B,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0
+bias_ccc,Claude Haiku 4.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_ccc,Claude Haiku 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_ccc,Claude Opus 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_ccc,Claude Sonnet 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_ccc,GPT-6 Sol,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0
+bias_ccc,GPT-6.1 Sol,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0
+bias_ccc,Qwen3.8 27B (FP8),7,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0
+bias_ccc,Gemma 4 12B,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0
+bias_cnv,Claude Haiku 4.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_cnv,Claude Haiku 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_cnv,Claude Opus 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_cnv,Claude Sonnet 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_cnv,GPT-6 Sol,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0
+bias_cnv,GPT-6.1 Sol,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0
+bias_cnv,Qwen3.8 27B (FP8),10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_cnv,Gemma 4 12B,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0
+bias_deconv,Claude Haiku 4.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_deconv,Claude Haiku 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_deconv,Claude Opus 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_deconv,Claude Sonnet 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_deconv,GPT-6 Sol,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0
+bias_deconv,GPT-6.1 Sol,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0
+bias_deconv,Qwen3.8 27B (FP8),6,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0
+bias_deconv,Gemma 4 12B,1,0,2,0,0,0,7,0,0,0,0,0,0,0,0,0
+bias_domains,Claude Haiku 4.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_domains,Claude Haiku 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_domains,Claude Opus 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_domains,Claude Sonnet 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_domains,GPT-6 Sol,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0
+bias_domains,GPT-6.1 Sol,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0
+bias_domains,Qwen3.8 27B (FP8),6,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0
+bias_domains,Gemma 4 12B,2,0,0,0,0,0,0,0,0,7,0,0,0,0,0,1
+bias_svg,Claude Haiku 4.5,9,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+bias_svg,Claude Haiku 5.5,9,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+bias_svg,Claude Opus 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_svg,Claude Sonnet 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_svg,GPT-6 Sol,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0
+bias_svg,GPT-6.1 Sol,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0
+bias_svg,Qwen3.8 27B (FP8),4,0,0,0,0,0,0,3,0,0,0,0,0,0,3,0
+bias_svg,Gemma 4 12B,2,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0
+bias_traj,Claude Haiku 4.5,3,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0
+bias_traj,Claude Haiku 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_traj,Claude Opus 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_traj,Claude Sonnet 5.5,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+bias_traj,GPT-6 Sol,0,0,0,2,2,0,0,0,0,0,0,0,6,0,0,0
+bias_traj,GPT-6.1 Sol,0,0,0,0,4,0,0,0,0,0,0,0,6,0,0,0
+bias_traj,Qwen3.8 27B (FP8),8,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0
+bias_traj,Gemma 4 12B,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0

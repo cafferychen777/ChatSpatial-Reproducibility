@@ -1,0 +1,42 @@
+sheet,rows,columns,source,description
+README,3,2,generated,Notes for source-data workbook.
+Table1_platform,11,7,main.tex,Main text platform compatibility table.
+Fig2_spatial_maps,4776,7,source_data/Fig2_spatial_maps.csv,"Figure 2a-c,g spot-level overlays."
+Fig2d_enrichment,120,8,source_data/Fig2d_enrichment.csv,Figure 2d heatmap.
+Fig2e_consensus,10,6,source_data/Fig2e_consensus.csv,Figure 2e bars.
+Fig2e_consensus_CI,20,7,source_data/Fig2e_consensus_CI.csv,Figure 2e confidence intervals.
+Fig2f_cellchat,105,11,source_data/Fig2f_cellchat.csv,Figure 2f dot plot.
+Fig2h_morans,189274,14,source_data/Fig2h_morans.csv,Figure 2h Moran's I values.
+Fig2i_marker_genes,63,10,source_data/Fig2i_marker_genes.csv,Figure 2i marker gene source.
+Fig2i_DE_all_genes,11000,8,source_data/Fig2i_DE_all_genes.csv,Differential expression table underlying marker summaries.
+Fig3_spatial_maps,19990,8,source_data/Fig3_spatial_maps.csv,Figure 3a-b per-spot maps.
+Fig3cd_summary,8,26,source_data/Fig3cd_summary.csv,Figure 3c-d summary values.
+Fig3ef_svg_results,19180,14,source_data/Fig3ef_svg_results.csv,Figure 3e-f Moran's I values.
+Fig3f_effect_size,1,11,source_data/Fig3f_effect_size.csv,Figure 3f effect size.
+Fig4a_invocation,72,10,ablation_invocation_results.csv,Figure 4a invocation ablation.
+Fig4bc_ablation_e2e,27,9,ablation_e2e_results.csv,Figure 4b-c execution rates.
+Fig4c_concordance,35,18,ablation_metrics_bootstrap.csv,Figure 4c concordance.
+Fig4de_sensitivity,75,8,prompt_sensitivity_results.csv,Figure 4d-e prompt sensitivity summary.
+Fig4de_sens_raw,375,8,prompt_sensitivity_raw.jsonl,Figure 4d-e raw prompt sensitivity trials.
+Fig4fg_cross_system,120,8,cross_system_metrics.csv,Figure 4f-g cross-system metrics.
+Fig4h_e2e_summary,9,9,e2e_benchmark_results.csv,Figure 4h end-to-end benchmark summary.
+Fig4jk_h2h_trials,480,10,fig4jk_trials.csv,Figure 4j-k DLPFC head-to-head: per-trial ARI and NMI for the four arms (12 sections x 10 replicates).
+Fig4jk_h2h_sections,48,6,fig4jk_sections.csv,Figure 4j-k DLPFC head-to-head: per-section mean ARI (points in j) and cross-replicate ARI.
+Fig4k_h2h_summary,4,8,fig4k_summary.csv,Figure 4k: system means with 95% section-bootstrap intervals.
+FigA_a_sensitivity,72,7,source_data/FigA_a_sensitivity.csv,Figure A (parameter robustness).
+FigA_b_strategies,14,7,source_data/FigA_b_strategies.csv,Figure A (parameter robustness).
+FigA_c_noise,10,6,source_data/FigA_c_noise.csv,Figure A (parameter robustness).
+FigA_d_platforms,72,4,source_data/FigA_d_platforms.csv,Figure A (parameter robustness).
+FigB_a_backends,8,6,source_data/FigB_a_backends.csv,Figure B (backend study).
+FigB_b_outcomes,6,8,source_data/FigB_b_outcomes.csv,Figure B (backend study).
+FigB_c_native_vs_json,4,4,source_data/FigB_c_native_vs_json.csv,Figure B (backend study).
+FigB_d_description_ablation,4,4,source_data/FigB_d_description_ablation.csv,Figure B (backend study).
+FigB_e_invocation_determinism,8,7,source_data/FigB_e_invocation_determinism.csv,Figure B (backend study).
+FigB_f_method_choice,8,6,source_data/FigB_f_method_choice.csv,Figure B (backend study).
+Supp_Table_1,10,14,supplementary_tables/Supplementary_Table_1_Effect_Sizes.csv,Supplementary Table 1.
+Supp_Table_2,65,4,supplementary_tables/Supplementary_Table_2_Integrated_Methods.csv,Supplementary Table 2.
+Supp_Table_3,31,8,supplementary_tables/Supplementary_Table_3_Test_Scenarios.csv,Supplementary Table 3.
+Supp_Table_4,5,4,supplementary_tables/Supplementary_Table_4_AI_Agent_Comparison.csv,Supplementary Table 4.
+Supp_Table_5,7,4,supplementary_tables/Supplementary_Table_5_Analysis_Paradigm_Comparison.csv,Supplementary Table 5.
+Supp_Table_6,6,6,supplementary_tables/Supplementary_Table_6_Representative_Failure_Cases.csv,Supplementary Table 6.
+Supp_Table_7,10,10,supplementary_tables/Supplementary_Table_7_Deconvolution_Method_Concordance.csv,Supplementary Table 7.

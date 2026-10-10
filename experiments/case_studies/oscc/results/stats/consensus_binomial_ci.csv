@@ -1,0 +1,21 @@
+cell_type,direction,k,n,proportion,ci_lower,ci_upper
+-Fibroblast,LE,10,12,0.8333,0.5159,0.9791
+-Fibroblast,TC,1,12,0.0833,0.0021,0.3848
+Fibroblast,LE,10,12,0.8333,0.5159,0.9791
+Fibroblast,TC,1,12,0.0833,0.0021,0.3848
+Macrophage,LE,8,12,0.6667,0.3489,0.9008
+Macrophage,TC,0,12,0.0,0.0,0.2646
+Endothelial,LE,8,12,0.6667,0.3489,0.9008
+Endothelial,TC,0,12,0.0,0.0,0.2646
+myocyte,LE,7,12,0.5833,0.2767,0.8483
+myocyte,TC,0,12,0.0,0.0,0.2646
+B cell,LE,1,12,0.0833,0.0021,0.3848
+B cell,TC,0,12,0.0,0.0,0.2646
+T cell,LE,1,12,0.0833,0.0021,0.3848
+T cell,TC,0,12,0.0,0.0,0.2646
+Dendritic,LE,0,12,0.0,0.0,0.2646
+Dendritic,TC,0,12,0.0,0.0,0.2646
+Cancer,LE,0,12,0.0,0.0,0.2646
+Cancer,TC,8,12,0.6667,0.3489,0.9008
+Mast,LE,0,12,0.0,0.0,0.2646
+Mast,TC,0,12,0.0,0.0,0.2646

@@ -1,0 +1,49 @@
+run,cell_type,samples_run,le_enriched,tc_enriched
+card,-Fibroblast,12,11,0
+card,B cell,12,11,0
+card,Cancer,12,0,6
+card,Dendritic,12,9,0
+card,Endothelial,12,10,0
+card,Fibroblast,12,9,0
+card,Macrophage,12,11,0
+card,Mast,12,11,0
+card,T cell,12,10,0
+card,myocyte,12,10,0
+rctd,B cell,12,8,0
+rctd,Cancer,12,0,10
+rctd,Dendritic,12,4,2
+rctd,Endothelial,12,10,0
+rctd,Fibroblast,12,10,0
+rctd,Macrophage,12,11,0
+rctd,Mast,12,7,0
+rctd,T cell,12,8,0
+flashdeconv,-Fibroblast,12,8,2
+flashdeconv,B cell,12,2,0
+flashdeconv,Cancer,12,0,8
+flashdeconv,Dendritic,12,2,1
+flashdeconv,Endothelial,12,9,1
+flashdeconv,Fibroblast,12,9,1
+flashdeconv,Macrophage,12,9,0
+flashdeconv,Mast,12,0,0
+flashdeconv,T cell,12,2,1
+flashdeconv,myocyte,12,6,3
+flashdeconv_logref,-Fibroblast,12,10,1
+flashdeconv_logref,B cell,12,1,0
+flashdeconv_logref,Cancer,12,0,8
+flashdeconv_logref,Dendritic,12,0,0
+flashdeconv_logref,Endothelial,12,8,0
+flashdeconv_logref,Fibroblast,12,10,1
+flashdeconv_logref,Macrophage,12,8,0
+flashdeconv_logref,Mast,12,0,0
+flashdeconv_logref,T cell,12,1,0
+flashdeconv_logref,myocyte,12,7,0
+manuscript,-Fibroblast,12,10,1
+manuscript,B cell,12,1,0
+manuscript,Cancer,12,0,8
+manuscript,Dendritic,12,0,0
+manuscript,Endothelial,12,8,0
+manuscript,Fibroblast,12,10,1
+manuscript,Macrophage,12,8,0
+manuscript,Mast,12,0,0
+manuscript,T cell,12,1,0
+manuscript,myocyte,12,7,0

@@ -1,0 +1,2 @@
+n_cnv_markers,n_background,cnv_mean_I,bg_mean_I,cliffs_delta,ci_lower,ci_upper,mannwhitney_U,mannwhitney_p,cnv_median_I,bg_median_I,background
+95,19082,0.5383,0.033,0.9948,0.9927,0.9966,1808070.0,5.481306772293085e-63,0.5458898059229822,0.01579610981988445,"excluding CD14, KRT7, CDH5 (Fig. 3f boxplot)"

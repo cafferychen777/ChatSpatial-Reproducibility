@@ -1,0 +1,132 @@
+{
+ "arms": {
+  "chatspatial": {
+   "silent": "0 of 40",
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "silent_judged_unaudited": "0 of 40",
+   "per_probe": {
+    "P1_rctd_no_counts": "0/5",
+    "P2_card_no_counts": "0/5",
+    "P3_spark_no_counts": "0/5",
+    "P4_human_lr_on_mouse": "0/5",
+    "P5_method_unavailable": "0/5",
+    "P6_more_domains_than_spots": "0/5",
+    "P7_no_spatial_coordinates": "0/5",
+    "P8_missing_label_column": "0/5"
+   },
+   "correct_behaviour": "40 of 40"
+  },
+  "stagent": {
+   "silent": "0 of 40",
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "silent_judged_unaudited": "0 of 40",
+   "per_probe": {
+    "P1_rctd_no_counts": "0/5",
+    "P2_card_no_counts": "0/5",
+    "P3_spark_no_counts": "0/5",
+    "P4_human_lr_on_mouse": "0/5",
+    "P5_method_unavailable": "0/5",
+    "P6_more_domains_than_spots": "0/5",
+    "P7_no_spatial_coordinates": "0/5",
+    "P8_missing_label_column": "0/5"
+   },
+   "correct_behaviour": "37 of 40"
+  },
+  "spatialagent": {
+   "silent": "0 of 40",
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "silent_judged_unaudited": "0 of 40",
+   "per_probe": {
+    "P1_rctd_no_counts": "0/5",
+    "P2_card_no_counts": "0/5",
+    "P3_spark_no_counts": "0/5",
+    "P4_human_lr_on_mouse": "0/5",
+    "P5_method_unavailable": "0/5",
+    "P6_more_domains_than_spots": "0/5",
+    "P7_no_spatial_coordinates": "0/5",
+    "P8_missing_label_column": "0/5"
+   },
+   "correct_behaviour": "40 of 40"
+  },
+  "agents_pooled": {
+   "silent": "0 of 80",
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "silent_judged_unaudited": "0 of 80",
+   "per_probe": {
+    "P1_rctd_no_counts": "0/10",
+    "P2_card_no_counts": "0/10",
+    "P3_spark_no_counts": "0/10",
+    "P4_human_lr_on_mouse": "0/10",
+    "P5_method_unavailable": "0/10",
+    "P6_more_domains_than_spots": "0/10",
+    "P7_no_spatial_coordinates": "0/10",
+    "P8_missing_label_column": "0/10"
+   },
+   "correct_behaviour": "77 of 80"
+  }
+ },
+ "diff": {
+  "chatspatial-stagent": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "p_signflip": 1.0
+  },
+  "chatspatial-spatialagent": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "p_signflip": 1.0
+  },
+  "chatspatial-agents_pooled": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "p_signflip": 1.0
+  }
+ },
+ "class_table": {
+  "disclosed_deviation": {
+   "chatspatial": 0,
+   "spatialagent": 15,
+   "stagent": 7
+  },
+  "explicit_refusal": {
+   "chatspatial": 40,
+   "spatialagent": 18,
+   "stagent": 26
+  },
+  "unflagged_failure": {
+   "chatspatial": 0,
+   "spatialagent": 0,
+   "stagent": 3
+  },
+  "valid_completion": {
+   "chatspatial": 0,
+   "spatialagent": 7,
+   "stagent": 4
+  }
+ }
+}

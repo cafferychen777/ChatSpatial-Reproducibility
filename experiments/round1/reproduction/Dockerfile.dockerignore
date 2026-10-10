@@ -1,0 +1,7 @@
+*
+!scripts/*.py
+!reproduction/*.py
+!reproduction/compat/*.py
+!results/dlpfc_benchmark/*.csv
+!results/dlpfc_benchmark/ground_truth/*.csv
+!results/casestudy_reproducibility/*.csv

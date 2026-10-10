@@ -1,0 +1,5 @@
+level,odds_ratio,ci_low,ci_high
+All levels,1.76,1.39,2.23
+Full,0.4,0.22,0.74
+Bare,0.86,0.53,1.39
+Minimal,3.63,2.63,5.0

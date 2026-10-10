@@ -1,0 +1,93 @@
+run_a,run_b,cell_type,samples_sign_agree,samples_compared,median_spot_pearson_r
+card,rctd,B cell,10,11,0.6147516918359694
+card,rctd,Cancer,11,11,0.8718608607148319
+card,rctd,Dendritic,10,11,0.4724716151924152
+card,rctd,Endothelial,10,11,0.6407108729113051
+card,rctd,Fibroblast,11,11,0.8220420970172806
+card,rctd,Macrophage,11,11,0.6407646031507065
+card,rctd,Mast,11,11,0.28894203318032496
+card,rctd,T cell,9,11,0.5214436203571331
+card,flashdeconv,-Fibroblast,9,11,0.14199032365546935
+card,flashdeconv,B cell,3,11,0.40861999222896556
+card,flashdeconv,Cancer,11,11,0.7363288848774826
+card,flashdeconv,Dendritic,7,11,0.4315550026108972
+card,flashdeconv,Endothelial,11,11,0.47640026058376955
+card,flashdeconv,Fibroblast,9,11,0.6979772374408372
+card,flashdeconv,Macrophage,10,11,0.40149687039510573
+card,flashdeconv,Mast,5,11,0.11147745843207503
+card,flashdeconv,T cell,5,11,0.25409260818542195
+card,flashdeconv,myocyte,7,11,0.7983756511138365
+card,manuscript,-Fibroblast,10,11,0.21516187993543995
+card,manuscript,B cell,3,11,0.3344670136576943
+card,manuscript,Cancer,11,11,0.7902512465540061
+card,manuscript,Dendritic,4,11,0.19295819761102556
+card,manuscript,Endothelial,11,11,0.44430232770967004
+card,manuscript,Fibroblast,10,11,0.7521971072633378
+card,manuscript,Macrophage,10,11,0.2789184425503792
+card,manuscript,Mast,4,11,0.2953834216645622
+card,manuscript,T cell,4,11,0.2623277248212792
+card,manuscript,myocyte,7,11,0.9079031123969589
+card,flashdeconv_logref,-Fibroblast,10,11,0.2148720127711539
+card,flashdeconv_logref,B cell,3,11,0.3344670136576943
+card,flashdeconv_logref,Cancer,11,11,0.7888008457009197
+card,flashdeconv_logref,Dendritic,4,11,0.19846923361559973
+card,flashdeconv_logref,Endothelial,11,11,0.44430232770967004
+card,flashdeconv_logref,Fibroblast,10,11,0.752092582085289
+card,flashdeconv_logref,Macrophage,10,11,0.2801785240578846
+card,flashdeconv_logref,Mast,4,11,0.3062113425559
+card,flashdeconv_logref,T cell,3,11,0.26553502940670193
+card,flashdeconv_logref,myocyte,7,11,0.9079031123969589
+rctd,flashdeconv,B cell,3,11,0.3010448862511372
+rctd,flashdeconv,Cancer,11,11,0.7516873182734439
+rctd,flashdeconv,Dendritic,8,11,0.4151330942640423
+rctd,flashdeconv,Endothelial,10,11,0.5056230188904255
+rctd,flashdeconv,Fibroblast,9,11,0.6967442704640567
+rctd,flashdeconv,Macrophage,10,11,0.617015652394461
+rctd,flashdeconv,Mast,5,11,0.2062865396207419
+rctd,flashdeconv,T cell,6,11,0.22963107329241644
+rctd,manuscript,B cell,3,11,0.33446443803979325
+rctd,manuscript,Cancer,11,11,0.7406969556031613
+rctd,manuscript,Dendritic,4,11,0.17201380287663318
+rctd,manuscript,Endothelial,10,11,0.36329662964844484
+rctd,manuscript,Fibroblast,10,11,0.7300706815360313
+rctd,manuscript,Macrophage,10,11,0.43433357201158346
+rctd,manuscript,Mast,4,11,0.27023420317719127
+rctd,manuscript,T cell,5,11,0.21221160097201308
+rctd,flashdeconv_logref,B cell,3,11,0.3336267075167014
+rctd,flashdeconv_logref,Cancer,11,11,0.7388398696085033
+rctd,flashdeconv_logref,Dendritic,4,11,0.16909559554222814
+rctd,flashdeconv_logref,Endothelial,10,11,0.36329662964844484
+rctd,flashdeconv_logref,Fibroblast,10,11,0.7295623183170521
+rctd,flashdeconv_logref,Macrophage,10,11,0.4352411496236839
+rctd,flashdeconv_logref,Mast,4,11,0.27023420317719127
+rctd,flashdeconv_logref,T cell,4,11,0.22050458772179374
+flashdeconv,manuscript,-Fibroblast,10,11,0.5577653302617751
+flashdeconv,manuscript,B cell,9,11,0.6917902029911454
+flashdeconv,manuscript,Cancer,11,11,0.8599641140703154
+flashdeconv,manuscript,Dendritic,5,11,0.30216011741399984
+flashdeconv,manuscript,Endothelial,11,11,0.7082874473730985
+flashdeconv,manuscript,Fibroblast,10,11,0.8473558108188248
+flashdeconv,manuscript,Macrophage,11,11,0.6362661865801207
+flashdeconv,manuscript,Mast,10,11,0.3109294676117189
+flashdeconv,manuscript,T cell,7,11,0.5157921772076974
+flashdeconv,manuscript,myocyte,7,11,0.9638054181608948
+flashdeconv,flashdeconv_logref,-Fibroblast,10,11,0.558490762877665
+flashdeconv,flashdeconv_logref,B cell,9,11,0.6904622051017586
+flashdeconv,flashdeconv_logref,Cancer,11,11,0.8591567184555104
+flashdeconv,flashdeconv_logref,Dendritic,5,11,0.3035624121722811
+flashdeconv,flashdeconv_logref,Endothelial,11,11,0.7082874473730985
+flashdeconv,flashdeconv_logref,Fibroblast,10,11,0.8473558108188248
+flashdeconv,flashdeconv_logref,Macrophage,11,11,0.6347652466542528
+flashdeconv,flashdeconv_logref,Mast,10,11,0.3114959101558985
+flashdeconv,flashdeconv_logref,T cell,7,11,0.5166958880875911
+flashdeconv,flashdeconv_logref,myocyte,7,11,0.9638054181608948
+manuscript,flashdeconv_logref,-Fibroblast,11,11,0.9999770177165095
+manuscript,flashdeconv_logref,B cell,11,11,0.9999999999999999
+manuscript,flashdeconv_logref,Cancer,11,11,0.9999981379875207
+manuscript,flashdeconv_logref,Dendritic,11,11,0.9999999999999991
+manuscript,flashdeconv_logref,Endothelial,11,11,0.9999999999999998
+manuscript,flashdeconv_logref,Fibroblast,11,11,0.9999976111522899
+manuscript,flashdeconv_logref,Macrophage,11,11,0.9999936202229132
+manuscript,flashdeconv_logref,Mast,11,11,0.9999999999999998
+manuscript,flashdeconv_logref,T cell,10,11,0.9999999999999999
+manuscript,flashdeconv_logref,myocyte,11,11,0.9999999999999998

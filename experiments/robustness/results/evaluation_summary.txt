@@ -1,0 +1,88 @@
+stages: main=dlpfc155 noise=noise155 platforms=platforms155
+A4 configurations per section: 2724.0
+A5 median ARI range per method: {'banksy': 0.493, 'graphst': 0.321, 'leiden': 0.525, 'louvain': 0.48, 'spagcn': 0.247, 'stagate': 0.401}
+A6 default within delta of oracle: 22% (16 of 72)
+rule     mean ARI over sections: 0.441 (95% CI 0.382-0.498)
+default  mean ARI over sections: 0.420 (95% CI 0.393-0.448)
+expert   mean ARI over sections: 0.434 (95% CI 0.398-0.467)
+oracle   mean ARI over sections: 0.565 (95% CI 0.534-0.602)
+rule - default: 0.020 (95% CI -0.032-0.072)
+A10 matched-or-exceeded: 8 of 12; A-GAP 14%
+A12 SpaGCN default: 0.418 (95% CI 0.365-0.465)  A13 SpaGCN rule: 0.432 (95% CI 0.376-0.485)
+SpaGCN default, array coords, unrefined (May-2026 scoring): {'151507': 0.4099, '151508': 0.3704, '151509': 0.3424, '151510': 0.3799, '151669': 0.2719, '151670': 0.2428, '151671': 0.4725, '151672': 0.5309, '151673': 0.4523, '151674': 0.409, '151675': 0.3666, '151676': 0.3264} mean 0.381
+A11 candidates (rule > delta below default):
+strategy         default  expert  oracle   rule
+section method                                 
+151507  graphst    0.538   0.578   0.579  0.467
+151508  leiden     0.420   0.413   0.476  0.272
+        stagate    0.505   0.494   0.540  0.316
+151509  louvain    0.410   0.267   0.412  0.351
+151510  louvain    0.391   0.387   0.535  0.334
+151671  spagcn     0.522   0.548   0.566  0.428
+151672  louvain    0.627   0.468   0.627  0.576
+151673  stagate    0.636   0.647   0.648  0.238
+151674  leiden     0.426   0.408   0.454  0.256
+        spagcn     0.437   0.437   0.487  0.369
+        stagate    0.530   0.529   0.592  0.363
+151675  banksy     0.472   0.499   0.574  0.326
+        graphst    0.424   0.441   0.526  0.166
+        leiden     0.462   0.409   0.494  0.187
+        stagate    0.529   0.521   0.532  0.275
+151676  banksy     0.352   0.374   0.512  0.269
+        graphst    0.342   0.557   0.618  0.176
+        leiden     0.309   0.349   0.402  0.162
+        louvain    0.396   0.333   0.396  0.345
+        stagate    0.508   0.508   0.548  0.239
+GATE: ADJUST
+noise drop0.1: paired retention {'default': 0.996, 'expert': 1.001, 'oracle': 0.866, 'rule': 0.971}; failed calls 0
+noise drop0.1: retention {'default': 0.996, 'expert': 1.001, 'oracle': 0.866, 'rule': 0.971}; rule-default 0.009 (95% CI -0.035-0.052)
+noise drop0.3: paired retention {'default': 0.953, 'expert': 0.999, 'oracle': 0.787, 'rule': 0.916}; failed calls 0
+noise drop0.3: retention {'default': 0.953, 'expert': 0.999, 'oracle': 0.787, 'rule': 0.916}; rule-default 0.003 (95% CI -0.047-0.052)
+noise umi0.1: paired retention {'default': 0.682, 'expert': 0.604, 'oracle': 0.442, 'rule': 0.608}; failed calls 0
+noise umi0.1: retention {'default': 0.682, 'expert': 0.604, 'oracle': 0.442, 'rule': 0.608}; rule-default -0.019 (95% CI -0.040-0.005)
+noise umi0.25: paired retention {'default': 0.744, 'expert': 0.768, 'oracle': 0.56, 'rule': 0.699}; failed calls 0
+noise umi0.25: retention {'default': 0.744, 'expert': 0.768, 'oracle': 0.56, 'rule': 0.699}; rule-default -0.005 (95% CI -0.040-0.034)
+noise umi0.5: paired retention {'default': 0.862, 'expert': 0.888, 'oracle': 0.683, 'rule': 0.833}; failed calls 0
+noise umi0.5: retention {'default': 0.862, 'expert': 0.888, 'oracle': 0.683, 'rule': 0.833}; rule-default 0.005 (95% CI -0.029-0.039)
+A14 Kendall's W (rule) = 0.37, permutation P = 0.4237
+method    banksy  graphst  leiden  louvain  spagcn  stagate
+platform                                                   
+MERFISH    0.436    0.398   0.334    0.286   0.568    0.547
+STARmap    0.319    0.408   0.536    0.364   0.571    0.576
+Visium     0.479    0.430   0.421    0.442   0.432    0.440
+A14 Kendall's W (default) = 0.29, permutation P = 0.5673
+method    banksy  graphst  leiden  louvain  spagcn  stagate
+platform                                                   
+MERFISH    0.362    0.559   0.535    0.423   0.443    0.531
+STARmap    0.538    0.611   0.411    0.414   0.551    0.528
+Visium     0.358    0.387   0.415    0.450   0.418    0.491
+-> $CHATSPATIAL_WORK_DIR/chatspatial_expA/results/dlpfc155/strategy_scores.csv
+strategy             default  expert  oracle   rule
+dataset     method                                 
+abc_merfish banksy     0.362   0.449   0.598  0.436
+            graphst    0.559   0.593   0.619  0.398
+            leiden     0.535   0.315   0.582  0.334
+            louvain    0.423   0.288   0.549  0.286
+            spagcn     0.443   0.443   0.574  0.568
+            stagate    0.531   0.528   0.611  0.547
+starmap     banksy     0.538   0.433   0.576  0.319
+            graphst    0.611   0.550   0.650  0.408
+            leiden     0.411   0.349   0.635  0.536
+            louvain    0.414   0.255   0.598  0.364
+            spagcn     0.551   0.551   0.602  0.571
+            stagate    0.528   0.520   0.623  0.576
+DLPFC per method:
+strategy  default  expert  oracle   rule  rule-default
+method                                                
+banksy      0.358   0.412   0.608  0.479         0.121
+graphst     0.387   0.511   0.577  0.430         0.043
+leiden      0.415   0.393   0.560  0.421         0.006
+louvain     0.450   0.360   0.534  0.442        -0.008
+spagcn      0.418   0.431   0.499  0.432         0.014
+stagate     0.491   0.498   0.611  0.440        -0.051
+rule 0.441 (95% CI 0.391-0.491)
+default 0.430 (95% CI 0.403-0.457)
+expert 0.435 (95% CI 0.403-0.463)
+oracle 0.570 (95% CI 0.541-0.602)
+14 samples: rule-default 0.011 (95% CI -0.034-0.059) matched 8 of 14 gap 0.078
+A6 14 samples: 19 of 84

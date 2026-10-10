@@ -1,0 +1,7 @@
+information,mechanism,n_trials,completed_without_silent_failure,explicit_failure,not_executed,silent_failure,n_silent
+full,json,640,0.9734375,0.0265625,4.5102810375396984e-17,0.0,0
+full,native,640,0.940625,0.059375,0.0,0.0,0
+bare,json,640,0.9421875,0.0578125,4.163336342344337e-17,0.0,0
+bare,native,640,0.928125,0.0625,0.003125,0.00625,4
+minimal,json,640,0.2,0.7984375,0.0,0.0015625,1
+minimal,native,640,0.36875,0.615625,0.015625,0.0,0

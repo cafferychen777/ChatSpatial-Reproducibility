@@ -1,0 +1,11 @@
+cell_type,direction,n_all,mean_abs_r_all,n_significant,mean_abs_r_sig,consensus_pct
+-Fibroblast,LE,11,0.3332,11,0.3332,83.3
+B cell,LE,3,0.0226,1,0.0603,8.3
+Cancer,TC,11,0.729,11,0.729,66.7
+Dendritic,--,4,0.0053,0,,0.0
+Endothelial,LE,11,0.0383,8,0.049,66.7
+Fibroblast,LE,11,0.5198,11,0.5198,83.3
+Macrophage,LE,11,0.2337,8,0.3101,66.7
+Mast,--,4,0.0035,0,,0.0
+T cell,LE,6,0.0255,1,0.1335,8.3
+myocyte,LE,7,0.3441,7,0.3441,58.3
