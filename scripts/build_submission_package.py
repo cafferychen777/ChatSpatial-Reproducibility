@@ -244,54 +244,65 @@ def source_data_sheets() -> list[tuple[str, pd.DataFrame, str, str]]:
                 "note": "Conceptual architecture schematic; no quantitative plotted source data.",
             },
             {
-                "item": "Figure 2 H&E backgrounds",
-                "note": "Histology image files are figure image sources; plotted spot coordinates and quantitative overlays are provided in Fig2_spatial_maps.",
+                "item": "Figure 5 H&E backgrounds",
+                "note": "Histology image files are figure image sources; plotted spot coordinates and quantitative overlays are provided in Fig5_spatial_maps.",
             },
             {
-                "item": "Figure 3 spatial maps",
-                "note": "Per-spot coordinates, tumor fractions, CNV scores, and CNV subclone labels are provided in Fig3_spatial_maps.",
+                "item": "Figure 6 spatial maps",
+                "note": "Per-spot coordinates, tumor fractions, CNV scores, and CNV subclone labels are provided in Fig6_spatial_maps.",
             },
         ]
     )
     sheets.append(("README", notes, "generated", "Notes for source-data workbook."))
 
     sheets.append(("Table1_platform", table1_dataframe(), "main.tex", "Main text platform compatibility table."))
-    # Figures 2 and 3 come from the recorded ChatSpatial runs of the case studies
+
+    # Sheets are labelled by the figure numbers of the manuscript: Figure 2 DLPFC
+    # head-to-head (a-b), ablation and cross-system (c-k); Figure 3 backend study; Figure 4 parameter
+    # robustness; Figure 5 OSCC case study; Figure 6 HGSOC case study.
+    sheets.append(("Fig2ab_h2h_trials", pd.read_csv(require_path(H2H / "fig2ab_trials.csv")), "fig2ab_trials.csv", "Figure 2a-b DLPFC head-to-head: per-trial ARI and NMI for the four arms (12 sections x 10 replicates)."))
+    sheets.append(("Fig2ab_h2h_sections", pd.read_csv(require_path(H2H / "fig2ab_sections.csv")), "fig2ab_sections.csv", "Figure 2a-b DLPFC head-to-head: per-section mean ARI (points in a) and cross-replicate ARI."))
+    sheets.append(("Fig2b_h2h_summary", pd.read_csv(require_path(H2H / "fig2b_summary.csv")), "fig2b_summary.csv", "Figure 2b: system means with 95% section-bootstrap intervals."))
+    sheets.append(("Fig2c_invocation", pd.read_csv(require_path(ROUND1 / "ablation" / "invocation" / "ablation_invocation_results.csv")), "ablation_invocation_results.csv", "Figure 2c invocation ablation."))
+    sheets.append(("Fig2de_ablation_e2e", pd.read_csv(require_path(ROUND1 / "ablation" / "e2e" / "ablation_e2e_results.csv")), "ablation_e2e_results.csv", "Figure 2d-e execution rates."))
+    sheets.append(("Fig2e_concordance", pd.read_csv(require_path(ROUND1 / "ablation" / "analysis" / "ablation_metrics_bootstrap.csv")), "ablation_metrics_bootstrap.csv", "Figure 2e concordance."))
+    sheets.append(("Fig2fg_sensitivity", pd.read_csv(require_path(ROUND1 / "sensitivity" / "prompt_sensitivity_results.csv")), "prompt_sensitivity_results.csv", "Figure 2f-g prompt sensitivity summary."))
+    sheets.append(("Fig2fg_sens_raw", read_jsonl_summary(ROUND1 / "sensitivity" / "prompt_sensitivity_raw.jsonl"), "prompt_sensitivity_raw.jsonl", "Figure 2f-g raw prompt sensitivity trials."))
+    sheets.append(("Fig2hi_cross_system", pd.read_csv(require_path(ROUND1 / "cross_system" / "analysis" / "cross_system_metrics.csv")), "cross_system_metrics.csv", "Figure 2h-i cross-system metrics."))
+    sheets.append(("Fig2j_e2e_summary", pd.read_csv(require_path(ROUND1 / "e2e_benchmark" / "e2e_benchmark_results.csv")), "e2e_benchmark_results.csv", "Figure 2j end-to-end benchmark summary."))
+
+    # Figures 3 and 4 source data are written by figures/figureB_backends.py and
+    # figures/figureA_robustness.py into source_data/ and are read here unchanged.
+    # Figures 5 and 6 come from the recorded ChatSpatial runs of the case studies
     # (experiments/case_studies/oscc, experiments/case_studies/hgsoc). Their source-data CSVs
-    # were written from those outputs (Figure 2: oscc/scripts/oscc157_postrun.py) and are read
+    # were written from those outputs (Figure 5: oscc/scripts/oscc157_postrun.py) and are read
     # here unchanged.
     for name, description in [
-        ("Fig2_spatial_maps", "Figure 2a-c,g spot-level overlays."),
-        ("Fig2d_enrichment", "Figure 2d heatmap."),
-        ("Fig2e_consensus", "Figure 2e bars."),
-        ("Fig2e_consensus_CI", "Figure 2e confidence intervals."),
-        ("Fig2f_cellchat", "Figure 2f dot plot."),
-        ("Fig2h_morans", "Figure 2h Moran's I values."),
-        ("Fig2i_marker_genes", "Figure 2i marker gene source."),
-        ("Fig2i_DE_all_genes", "Differential expression table underlying marker summaries."),
-        ("Fig3_spatial_maps", "Figure 3a-b per-spot maps."),
-        ("Fig3cd_summary", "Figure 3c-d summary values."),
-        ("Fig3ef_svg_results", "Figure 3e-f Moran's I values."),
-        ("Fig3f_effect_size", "Figure 3f effect size."),
+        ("Fig3a_backends", "Figure 3a output-verified completion and tool-selection accuracy per backend."),
+        ("Fig3b_outcomes", "Figure 3b trial outcomes by schema information and constraint mechanism."),
+        ("Fig3c_native_vs_json", "Figure 3c odds ratios for native tool calling versus JSON output."),
+        ("Fig3d_description_ablation", "Figure 3d description ablation."),
+        ("Fig3e_invocation_determinism", "Figure 3e invocation determinism."),
+        ("Fig3f_method_choice", "Figure 3f method choice for open-ended requests."),
+        ("Fig4a_sensitivity", "Figure 4a ARI range across schema-valid configurations."),
+        ("Fig4b_strategies", "Figure 4b mean ARI under four strategies."),
+        ("Fig4c_noise", "Figure 4c ARI retained under count thinning and spot removal."),
+        ("Fig4d_platforms", "Figure 4d mean ARI of each method on each platform."),
+        ("Fig5_spatial_maps", "Figure 5a-c,g spot-level overlays."),
+        ("Fig5d_enrichment", "Figure 5d heatmap."),
+        ("Fig5e_consensus", "Figure 5e bars."),
+        ("Fig5e_consensus_CI", "Figure 5e confidence intervals."),
+        ("Fig5f_cellchat", "Figure 5f dot plot."),
+        ("Fig5h_morans", "Figure 5h Moran's I values."),
+        ("Fig5i_marker_genes", "Figure 5i marker gene source."),
+        ("Fig5i_DE_all_genes", "Differential expression table underlying marker summaries."),
+        ("Fig6_spatial_maps", "Figure 6a-b per-spot maps."),
+        ("Fig6cd_summary", "Figure 6c-d summary values."),
+        ("Fig6ef_svg_results", "Figure 6e-f Moran's I values."),
+        ("Fig6f_effect_size", "Figure 6f effect size."),
     ]:
         path = require_path(SOURCE_DIR / f"{name}.csv")
         sheets.append((name, pd.read_csv(path), str(path.relative_to(PAPER_DIR)), description))
-
-    sheets.append(("Fig4a_invocation", pd.read_csv(require_path(ROUND1 / "ablation" / "invocation" / "ablation_invocation_results.csv")), "ablation_invocation_results.csv", "Figure 4a invocation ablation."))
-    sheets.append(("Fig4bc_ablation_e2e", pd.read_csv(require_path(ROUND1 / "ablation" / "e2e" / "ablation_e2e_results.csv")), "ablation_e2e_results.csv", "Figure 4b-c execution rates."))
-    sheets.append(("Fig4c_concordance", pd.read_csv(require_path(ROUND1 / "ablation" / "analysis" / "ablation_metrics_bootstrap.csv")), "ablation_metrics_bootstrap.csv", "Figure 4c concordance."))
-    sheets.append(("Fig4de_sensitivity", pd.read_csv(require_path(ROUND1 / "sensitivity" / "prompt_sensitivity_results.csv")), "prompt_sensitivity_results.csv", "Figure 4d-e prompt sensitivity summary."))
-    sheets.append(("Fig4de_sens_raw", read_jsonl_summary(ROUND1 / "sensitivity" / "prompt_sensitivity_raw.jsonl"), "prompt_sensitivity_raw.jsonl", "Figure 4d-e raw prompt sensitivity trials."))
-    sheets.append(("Fig4fg_cross_system", pd.read_csv(require_path(ROUND1 / "cross_system" / "analysis" / "cross_system_metrics.csv")), "cross_system_metrics.csv", "Figure 4f-g cross-system metrics."))
-    sheets.append(("Fig4h_e2e_summary", pd.read_csv(require_path(ROUND1 / "e2e_benchmark" / "e2e_benchmark_results.csv")), "e2e_benchmark_results.csv", "Figure 4h end-to-end benchmark summary."))
-    sheets.append(("Fig4jk_h2h_trials", pd.read_csv(require_path(H2H / "fig4jk_trials.csv")), "fig4jk_trials.csv", "Figure 4j-k DLPFC head-to-head: per-trial ARI and NMI for the four arms (12 sections x 10 replicates)."))
-    sheets.append(("Fig4jk_h2h_sections", pd.read_csv(require_path(H2H / "fig4jk_sections.csv")), "fig4jk_sections.csv", "Figure 4j-k DLPFC head-to-head: per-section mean ARI (points in j) and cross-replicate ARI."))
-    sheets.append(("Fig4k_h2h_summary", pd.read_csv(require_path(H2H / "fig4k_summary.csv")), "fig4k_summary.csv", "Figure 4k: system means with 95% section-bootstrap intervals."))
-
-    for path in sorted(SOURCE_DIR.glob("FigA_*.csv")):
-        sheets.append((path.stem, pd.read_csv(path), str(path.relative_to(PAPER_DIR)), "Figure A (parameter robustness)."))
-    for path in sorted(SOURCE_DIR.glob("FigB_*.csv")):
-        sheets.append((path.stem, pd.read_csv(path), str(path.relative_to(PAPER_DIR)), "Figure B (backend study)."))
 
     for idx in range(1, 8):
         filename = f"Supplementary_Table_{idx}_" + {

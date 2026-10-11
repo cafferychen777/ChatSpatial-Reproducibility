@@ -8,7 +8,7 @@ Outputs (OUTDIR):
   qc_statistics.csv                     spots/genes before and after preprocess_data, medians
   tc_le_domain_scores.csv               per section and Leiden domain: TC/LE scores and assignment
   spots/{sid}.csv                       barcode, Leiden domain, tc_le_region, FN1 (log-normalized X)
-  proportions/{sid}.csv                 FlashDeconv proportions + tc_le_region (input of the Fig. 2d,e statistics)
+  proportions/{sid}.csv                 FlashDeconv proportions + tc_le_region (input of the Fig. 5d,e statistics)
   deg_tc_vs_le_top500.csv               find_markers results (top 500 genes per direction, scanpy statistics)
   consensus_le_upregulated_genes.csv    genes with q < 0.05 and log2FC > 0.5 in >= 9 sections (case-study rule)
   consensus_tc_upregulated_genes.csv

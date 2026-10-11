@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-"""Statistics of the HGSOC case study (Figure 3c,d,f and text), computed on the tables of the ChatSpatial runs.
+"""Statistics of the HGSOC case study (Figure 6c,d,f and text), computed on the tables of the ChatSpatial runs.
 
 The two-sample statistics are those of ../../compute_case_study_stats.py (cliffs_delta,
 bootstrap_ci with seed 42 and 10,000 resamples, two-sided Mann-Whitney U), copied here unchanged.
 Usage: hgsoc157_stats.py TABLE_DIR OUT_DIR [FOLLOWUP_PATIENT]
 Inputs (TABLE_DIR, written by hgsoc157_collect.py): spots/{pid}.csv, moranI_{pid}.csv, cnv_cluster_markers_{pid}.csv
 Outputs (OUT_DIR):
-  cnv_score_per_patient_stats.csv        mean, SD (ddof=1), median, IQR of the per-spot CNV score (Fig. 3d)
+  cnv_score_per_patient_stats.csv        mean, SD (ddof=1), median, IQR of the per-spot CNV score (Fig. 6d)
   hgsoc_patient_summary.csv              spots, tumor-enriched spots (%), CNV clusters, mean RCTD proportions
   cliffs_delta_cnv_vs_background.csv     Moran's I of CNV-cluster marker genes versus all other tested genes
   celltype_marker_moran_ranks.csv        Moran's I rank of CD14, KRT7, CDH5
@@ -94,10 +94,10 @@ def main(tables: Path, out: Path, followup: str = "P3") -> None:
     res = marker_vs_background(moran["I"], markers)
     res_fig = marker_vs_background(moran["I"], markers, exclude=CT_MARKERS)
     pd.DataFrame([res]).to_csv(out / "cliffs_delta_cnv_vs_background.csv", index=False)
-    pd.DataFrame([{**res_fig, "background": "excluding CD14, KRT7, CDH5 (Fig. 3f boxplot)"}]).to_csv(
+    pd.DataFrame([{**res_fig, "background": "excluding CD14, KRT7, CDH5 (Fig. 6f boxplot)"}]).to_csv(
         out / "cnv_vs_background_fig3f.csv", index=False)
     print("CNV markers vs background:", res)
-    print("Figure 3f version:", res_fig)
+    print("Figure 6f version:", res_fig)
     ranked = moran["I"].dropna().sort_values(ascending=False)
     n = len(ranked)
     ct = [{"gene": g, "I": float(ranked[g]), "rank": int(ranked.index.get_loc(g)) + 1, "n_genes": n,

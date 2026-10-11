@@ -1,5 +1,5 @@
 """
-Figure B: dependence of ChatSpatial on the language-model backend (experiment B).
+Figure 3: dependence of ChatSpatial on the language-model backend (experiment B).
 
 All panels are computed from the experiment-B tables produced on the cluster
 (ChatSpatial 1.5.5 execution, tag exec_v155):
@@ -113,7 +113,7 @@ def main() -> None:
     ax.plot([], [], "|", color="black", ms=7, mew=1.0, label="Correct tool")
     ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(-0.02, 1.0), ncol=1, handletextpad=0.3)
     add_panel_label(ax, "a", x=-0.62, y=1.22)
-    pd.DataFrame(rows_a).to_csv(SOURCE_DIR / "FigB_a_backends.csv", index=False)
+    pd.DataFrame(rows_a).to_csv(SOURCE_DIR / "Fig3a_backends.csv", index=False)
 
     # b: outcome composition by mechanism x information, pooled over backends
     ax = fig.add_subplot(gs[0, 1])
@@ -171,7 +171,7 @@ def main() -> None:
         columnspacing=0.6,
     )
     add_panel_label(ax, "b", x=-0.3, y=1.22)
-    pd.DataFrame(rows_b).to_csv(SOURCE_DIR / "FigB_b_outcomes.csv", index=False)
+    pd.DataFrame(rows_b).to_csv(SOURCE_DIR / "Fig3b_outcomes.csv", index=False)
 
     # c: native vs JSON odds ratio for completion (GLMM)
     ax = fig.add_subplot(gs[0, 2])
@@ -190,7 +190,7 @@ def main() -> None:
     ax.set_yticklabels(ors.level.iloc[::-1])
     ax.set_xlabel("Odds ratio, native vs JSON\n(output-verified completion)")
     add_panel_label(ax, "c", x=-0.45, y=1.22)
-    ors.to_csv(SOURCE_DIR / "FigB_c_native_vs_json.csv", index=False)
+    ors.to_csv(SOURCE_DIR / "Fig3c_native_vs_json.csv", index=False)
 
     # d: description ablation
     ax = fig.add_subplot(gs[1, 0])
@@ -215,7 +215,7 @@ def main() -> None:
     ax.set_ylabel("Selections following\nthe moved description")
     ax.legend(frameon=False, loc="upper left", handlelength=0.8)
     add_panel_label(ax, "d", x=-0.32, y=1.22)
-    pd.DataFrame(rows_d).to_csv(SOURCE_DIR / "FigB_d_description_ablation.csv", index=False)
+    pd.DataFrame(rows_d).to_csv(SOURCE_DIR / "Fig3d_description_ablation.csv", index=False)
 
     # e: invocation determinism per backend (native + full)
     ax = fig.add_subplot(gs[1, 1])
@@ -246,7 +246,7 @@ def main() -> None:
     ax.plot([], [], "x", color="black", ms=4, mew=0.8, label="pass$^{10}$")
     ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(-0.02, 1.0), handletextpad=0.3)
     add_panel_label(ax, "e", x=-0.62, y=1.22)
-    pd.DataFrame(rows_e).to_csv(SOURCE_DIR / "FigB_e_invocation_determinism.csv", index=False)
+    pd.DataFrame(rows_e).to_csv(SOURCE_DIR / "Fig3e_invocation_determinism.csv", index=False)
 
     # f: method choice on open-ended requests
     ax = fig.add_subplot(gs[1, 2])
@@ -317,7 +317,7 @@ def main() -> None:
         columnspacing=0.6,
     )
     add_panel_label(ax, "f", x=-0.62, y=1.22)
-    pd.DataFrame(rows_f).to_csv(SOURCE_DIR / "FigB_f_method_choice.csv", index=False)
+    pd.DataFrame(rows_f).to_csv(SOURCE_DIR / "Fig3f_method_choice.csv", index=False)
 
     fig.savefig(FIG_DIR / "figureB.pdf")
     fig.savefig(FIG_DIR / "figureB.png", dpi=300)

@@ -1,7 +1,7 @@
 # Experiment B: tool selection and execution across eight language-model backends
 
 Manuscript: Results section "Tool selection is determined by the typed interface and holds across eight language
-models", Methods "Backend dependence", Figure B (`figures/figureB_backends.py`), Supplementary Table 8 and the
+models", Methods "Backend dependence", Figure 3 (`figures/figureB_backends.py`), Supplementary Table 8 and the
 `Supplementary_Table_expB_*.csv` files.
 
 The evaluation rules were written before the runs and are in `expB_rules_2026-10-08.txt` (design, per-trial outcome
@@ -53,7 +53,7 @@ Set `CHATSPATIAL_WORK_DIR` to a cluster work directory; invocation records, fixt
    - Open-weight: `MODEL_KEY=gemma4-12b DRIVER_CMD='bash expB_ow_driver.sh' sbatch expB_vllm_job.sbatch`, and
      `MODEL_KEY=qwen38-27b` (one H100, 8 CPUs, 64 GB, about 2 h each).
 4. `sbatch expB_rerun_v155.sbatch` (12 CPUs, 64 GB, up to 12 h; GPU not required).
-5. Figure B and the Supplementary Table 8 values: `python figures/figureB_backends.py` from the repository root.
+5. Figure 3 and the Supplementary Table 8 values: `python figures/figureB_backends.py` from the repository root.
 
 `python scripts/expB_analysis.py` with no environment variables reruns the analysis from the tables in `results/`
 (R with lme4 and brglm2 is needed for the GLMM section) and writes to `results/analysis/`.
@@ -64,13 +64,13 @@ Set `CHATSPATIAL_WORK_DIR` to a cluster work directory; invocation records, fixt
 |---|---|
 | `trial_outcomes.csv.gz` | One row per trial (6,320 rows: 3,840 main, 1,920 description ablation, 560 method choice): backend, arm, mechanism, schema level, prompt, repetition, parse status, raw and validated parameters, tool correctness, execution outcome, completion, silent failure, explicit failure. |
 | `exec_cache.jsonl.gz` | One record per unique executed call with its outcome and the output check details. |
-| `analysis/rates_by_backend_condition.csv` | Rates per backend, mechanism and schema level with cluster-bootstrap intervals (Fig. B a,b; Supplementary Table 8). |
+| `analysis/rates_by_backend_condition.csv` | Rates per backend, mechanism and schema level with cluster-bootstrap intervals (Fig. 3a,b; Supplementary Table 8). |
 | `analysis/bmis_decomposition.csv` | Format failures versus genuine mis-selections. |
-| `analysis/invocation_determinism_cells.csv`, `analysis/binv_per_backend.csv` | Modal-call share and pass^10 (Fig. B e; Supplementary Table 8). |
+| `analysis/invocation_determinism_cells.csv`, `analysis/binv_per_backend.csv` | Modal-call share and pass^10 (Fig. 3e; Supplementary Table 8). |
 | `analysis/cross_backend_agreement.csv` | Agreement on constrained parameters, including the two version pairs. |
-| `analysis/bdesc_by_backend.csv` | Description ablation (Fig. B d; Supplementary Table 8). |
-| `analysis/bbias_method_counts.csv` | Method choice on open-ended prompts (Fig. B f). |
-| `analysis/glmm_input.csv`, `analysis/expB_summary.txt` | GLMM input and the full printed analysis, including the odds ratios of Fig. B c. |
+| `analysis/bdesc_by_backend.csv` | Description ablation (Fig. 3d; Supplementary Table 8). |
+| `analysis/bbias_method_counts.csv` | Method choice on open-ended prompts (Fig. 3f). |
+| `analysis/glmm_input.csv`, `analysis/expB_summary.txt` | GLMM input and the full printed analysis, including the odds ratios of Fig. 3c. |
 
 The full per-trial model responses (about 40 MB of JSONL) are not stored here; `trial_outcomes.csv.gz` holds the
 parsed call and every outcome of each trial, and `expB_invocation.py` regenerates the responses.

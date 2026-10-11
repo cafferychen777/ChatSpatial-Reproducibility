@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export the small tables of Figure A (results/*.csv) from the final stages dlpfc155, platforms155, noise155."""
+"""Export the small tables of Figure 4 (results/*.csv) from the final stages dlpfc155, platforms155, noise155."""
 import sys
 from pathlib import Path
 import numpy as np, pandas as pd

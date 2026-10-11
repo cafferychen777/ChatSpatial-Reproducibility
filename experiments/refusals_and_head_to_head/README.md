@@ -3,7 +3,7 @@
 This directory holds the code and result tables of two analyses in the manuscript:
 
 - **Assumption-violation probes** (Results, "ChatSpatial refuses analyses the data cannot support and states the reason"; Methods, "Assumption-violation probes"). Eight requests that each violate a documented precondition, sent five times to ChatSpatial, STAgent and SpatialAgent, driven by Claude Sonnet 5.5, Gemma 4 12B or Qwen3.8 27B. ChatSpatial 1.5.6.
-- **DLPFC head-to-head** (Results, "ChatSpatial matches the accuracy of code-generating agents and returns far more reproducible results"; Figure 4j,k; Methods, "Ground-truth benchmark"). All 12 DLPFC sections, ten replicates per section, Claude Sonnet 5.5. ChatSpatial 1.5.9 as an agent with all 20 tools and as a single `identify_spatial_domains` call; STAgent (git 054cc64) and SpatialAgent (git e51ec0f) with their original configuration.
+- **DLPFC head-to-head** (Results, "ChatSpatial matches the accuracy of code-generating agents and returns far more reproducible results"; Figure 2a,b; Methods, "Ground-truth benchmark"). All 12 DLPFC sections, ten replicates per section, Claude Sonnet 5.5. ChatSpatial 1.5.9 as an agent with all 20 tools and as a single `identify_spatial_domains` call; STAgent (git 054cc64) and SpatialAgent (git e51ec0f) with their original configuration.
 
 The rules were written before any run and are in `expBX_rules_2026-10-09.txt`, with a dated change log in its section 6. Two entries matter for reading the versions: the ChatSpatial arms ran on 1.5.6 instead of the planned 1.5.5 (a fix that lets tool error text reach the MCP client), and the two ChatSpatial arms of the head-to-head were re-run in full on 1.5.9 after a bug fix in the Gaussian mixture that replaces R mclust (tag `v159`). The competitor arms of the head-to-head were not re-run.
 
@@ -11,10 +11,10 @@ The rules were written before any run and are in `expBX_rules_2026-10-09.txt`, w
 
 | Path | Content | Manuscript |
 |---|---|---|
-| `h2h_v159/h2h_per_run.csv` | one row per run (480): ARI, NMI, method, labels column, coverage | Figure 4j,k; head-to-head text |
-| `h2h_v159/h2h_cross_rep.csv` | cross-replicate ARI per section and system | Figure 4k; cross-replicate ARI |
+| `h2h_v159/h2h_per_run.csv` | one row per run (480): ARI, NMI, method, labels column, coverage | Figure 2a,b; head-to-head text |
+| `h2h_v159/h2h_cross_rep.csv` | cross-replicate ARI per section and system | Figure 2b; cross-replicate ARI |
 | `h2h_v159/h2h_summary.json` | system means, section-bootstrap CIs, paired differences, sign-flip P, method counts | mean ARI 0.461 / 0.445 / 0.404 / 0.378; cross-replicate ARI 0.776 / 0.538 / 0.625 / 0.990; paired differences; SpaGCN 66 and STAGATE 53 runs |
-| `h2h_v159/fig4jk_trials.csv`, `fig4jk_sections.csv`, `fig4k_summary.csv` | tables written by `figures/figure4.py` for panels j and k | Figure 4j,k source data |
+| `h2h_v159/fig2ab_trials.csv`, `fig2ab_sections.csv`, `fig2b_summary.csv` | tables written by `figures/figure4.py` for panels a and b | Figure 2a,b source data |
 | `probes_sonnet/probe_per_run.csv`, `probe_summary.json` | per-run judged and audited class; silent failures per arm with probe-bootstrap CI; differences and sign-flip tests | Claude Sonnet 5.5: 0 of 40 in every arm; 40 refusals by ChatSpatial; 11 valid completions by the agents |
 | `probes_gemma4/...` | same, Gemma 4 12B | ChatSpatial 3 of 40, STAgent 1, SpatialAgent 21; difference -45 points (-78 to -10), P = 0.094 |
 | `probes_qwen38/...` | same, Qwen3.8 27B | ChatSpatial 1 of 40, STAgent 2, SpatialAgent 3 |

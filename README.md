@@ -15,11 +15,11 @@ Zenodo (https://doi.org/10.5281/zenodo.23273054).
 
 ```
 experiments/
-  robustness/                 Schema-derived parameter robustness (Figure A)
-  backends/                   Tool selection and execution across eight LLM backends (Figure B, Supplementary Table 8)
-  refusals_and_head_to_head/  Assumption-violation probes; 12-section DLPFC head-to-head (Figure 4j,k)
-  case_studies/               OSCC (Figure 2) and HGSOC (Figure 3) case studies; deconvolution concordance (Supplementary Table 7)
-  round1/                     Schema ablation, prompt sensitivity, cross-system and lymph-node benchmarks (Figure 4a-i),
+  robustness/                 Schema-derived parameter robustness (Figure 4)
+  backends/                   Tool selection and execution across eight LLM backends (Figure 3, Supplementary Table 8)
+  refusals_and_head_to_head/  Assumption-violation probes; 12-section DLPFC head-to-head (Figure 2a,b)
+  case_studies/               OSCC (Figure 5) and HGSOC (Figure 6) case studies; deconvolution concordance (Supplementary Table 7)
+  round1/                     Schema ablation, prompt sensitivity, cross-system and lymph-node benchmarks (Figure 2c-k),
                               CARD concordance, and the LLM-free reproduction (round1/reproduction/)
 figures/                      Figure scripts and the Figure 1 schematic (figure1.svg)
 source_data/                  Source Data of every figure panel and table (one CSV per sheet; Index.csv lists them)
@@ -37,11 +37,11 @@ Rules that were fixed before the runs are kept next to the code (`robustness/PRE
 | Analysis | ChatSpatial |
 |---|---|
 | Schema ablation, prompt sensitivity, cross-system comparison, lymph-node benchmark, CARD concordance (round 1) | 1.2.10 |
-| Backend study (Figure B); deconvolution method concordance (Supplementary Table 7) | 1.5.5 |
+| Backend study (Figure 3); deconvolution method concordance (Supplementary Table 7) | 1.5.5 |
 | Assumption-violation probes | 1.5.6 |
-| OSCC and HGSOC case studies (Figures 2 and 3) | 1.5.7 |
-| Parameter robustness (Figure A) | 1.5.5 environment; units that use the Gaussian-mixture substitute for mclust re-run with the 1.5.9 code (see `experiments/robustness/README.md`) |
-| DLPFC head-to-head (Figure 4j,k); reproduction image | 1.5.9 |
+| OSCC and HGSOC case studies (Figures 5 and 6) | 1.5.7 |
+| Parameter robustness (Figure 4) | 1.5.5 environment; units that use the Gaussian-mixture substitute for mclust re-run with the 1.5.9 code (see `experiments/robustness/README.md`) |
+| DLPFC head-to-head (Figure 2a,b); reproduction image | 1.5.9 |
 
 Install a release with `pip install "chatspatial[full]==<version>"` (or `uv pip install`). STAgent (git 054cc64)
 and SpatialAgent (git e51ec0f) were run with their original configuration; the client changes needed for the
@@ -56,31 +56,33 @@ default `https://api.openai.com/v1`) and `GEMINI_API_KEY`.
 ## Figures and tables
 
 Paths are relative to the repository root. `E/` stands for `experiments/`.
+The figure scripts keep the file names of earlier drafts: `figures/figure4.py` draws Figure 2, `figureB_backends.py`
+Figure 3, `figureA_robustness.py` Figure 4, `figure2_oscc.py` Figure 5 and `figure3_hgsoc.py` Figure 6.
 
 | Manuscript item | Script | Input tables |
 |---|---|---|
 | Figure 1 (schematic) | none (`figures/figure1.svg`) | none |
 | Table 1 (platform compatibility) | `scripts/build_submission_package.py` (writes `source_data/Table1_platform.csv`) | curated content in the script |
-| Figure 2a-c,g | `figures/figure2_oscc.py` | `E/case_studies/oscc/results/tables/spots/`, `proportions/s1.csv`; H&E images and spot positions from GEO GSE208253 (`OSCC_GEO_DIR`) |
-| Figure 2d,e | `figures/figure2_oscc.py`; statistics `E/case_studies/compute_case_study_stats.py` | `E/case_studies/oscc/results/stats/per_sample_tc_le_enrichment.csv`, `consensus_tc_le_patterns.csv`, `consensus_binomial_ci.csv` |
-| Figure 2f | `figures/figure2_oscc.py` | `E/case_studies/oscc/results/tables/cellchat_tc_le_caf_cancer_interactions.csv`, `cellchat_tc_le_lr_pairs.csv` |
-| Figure 2h,i | `figures/figure2_oscc.py`; `E/case_studies/compute_case_study_stats.py` | `E/case_studies/oscc/results/stats/svg_target_genes_summary.csv`, `moranI_cross_sample_stats.csv`; `source_data/Fig2h_morans.csv` |
-| Figure 3a-d | `figures/figure3_hgsoc.py`; statistics `E/case_studies/hgsoc/scripts/hgsoc157_stats.py` | `E/case_studies/hgsoc/results/tables/spots/`; `E/case_studies/hgsoc/results/stats/hgsoc_patient_summary.csv`, `cnv_score_per_patient_stats.csv` |
-| Figure 3e,f | `figures/figure3_hgsoc.py`; `hgsoc157_stats.py` | `E/case_studies/hgsoc/results/tables/moranI_P3.csv`, `cnv_cluster_markers_P3.csv`; `results/stats/cliffs_delta_cnv_vs_background.csv`, `celltype_marker_moran_ranks.csv` |
-| Figure A (a-d) | `figures/figureA_robustness.py`; tables from `E/robustness/scripts/export_figA.py`; numbers from `E/robustness/scripts/evaluate.py` and `pooled.py` | `E/robustness/results/strategy_scores_all.csv`, `sensitivity_dlpfc.csv`, `noise_retention.csv`, `platform_method_means.csv`; per-configuration tables `configurations_*.csv.gz`; `evaluation_summary.txt` |
-| Figure 4a | `figures/figure4.py`; `E/round1/scripts/ablation_invocation.py` | `E/round1/results/ablation/invocation/ablation_invocation_results.csv`, `ablation_invocation_raw.jsonl` |
-| Figure 4b,c | `figures/figure4.py`; `E/round1/scripts/ablation_e2e.py`, `ablation_analysis.py` | `E/round1/results/ablation/e2e/ablation_e2e_results.csv`; `ablation/analysis/ablation_metrics_bootstrap.csv` |
-| Figure 4d,e | `figures/figure4.py`; `E/round1/scripts/prompt_sensitivity.py`, `prompt_sensitivity_analysis.py` | `E/round1/results/sensitivity/prompt_sensitivity_raw.jsonl`, `prompt_sensitivity_results.csv` |
-| Figure 4f,g | `figures/figure4.py`; `E/round1/scripts/cross_system_comparison.py`, `cross_system_analysis.py` | `E/round1/results/cross_system/analysis/cross_system_metrics.csv` |
-| Figure 4h,i | `figures/figure4.py`; `E/round1/scripts/e2e_benchmark.py`, `e2e_benchmark_analysis.py`, `e2e_pairwise_concordance.py` | `E/round1/results/e2e_benchmark/e2e_benchmark_raw.jsonl`, `e2e_benchmark_results.csv`, `e2e_pairwise_concordance.csv` |
-| Figure 4j,k | `figures/figure4.py`; `E/refusals_and_head_to_head/scripts/expBX_analysis.py` | `E/refusals_and_head_to_head/results/h2h_v159/h2h_per_run.csv`, `h2h_cross_rep.csv`, `h2h_summary.json` |
-| Figure B (a-f) | `figures/figureB_backends.py`; `E/backends/scripts/expB_analysis.py` | `E/backends/results/analysis/*.csv`, `expB_summary.txt`; `E/backends/results/trial_outcomes.csv.gz` |
+| Figure 2a,b | `figures/figure4.py`; `E/refusals_and_head_to_head/scripts/expBX_analysis.py` | `E/refusals_and_head_to_head/results/h2h_v159/h2h_per_run.csv`, `h2h_cross_rep.csv`, `h2h_summary.json` |
+| Figure 2c | `figures/figure4.py`; `E/round1/scripts/ablation_invocation.py` | `E/round1/results/ablation/invocation/ablation_invocation_results.csv`, `ablation_invocation_raw.jsonl` |
+| Figure 2d,e | `figures/figure4.py`; `E/round1/scripts/ablation_e2e.py`, `ablation_analysis.py` | `E/round1/results/ablation/e2e/ablation_e2e_results.csv`; `ablation/analysis/ablation_metrics_bootstrap.csv` |
+| Figure 2f,g | `figures/figure4.py`; `E/round1/scripts/prompt_sensitivity.py`, `prompt_sensitivity_analysis.py` | `E/round1/results/sensitivity/prompt_sensitivity_raw.jsonl`, `prompt_sensitivity_results.csv` |
+| Figure 2h,i | `figures/figure4.py`; `E/round1/scripts/cross_system_comparison.py`, `cross_system_analysis.py` | `E/round1/results/cross_system/analysis/cross_system_metrics.csv` |
+| Figure 2j,k | `figures/figure4.py`; `E/round1/scripts/e2e_benchmark.py`, `e2e_benchmark_analysis.py`, `e2e_pairwise_concordance.py` | `E/round1/results/e2e_benchmark/e2e_benchmark_raw.jsonl`, `e2e_benchmark_results.csv`, `e2e_pairwise_concordance.csv` |
+| Figure 3a-f | `figures/figureB_backends.py`; `E/backends/scripts/expB_analysis.py` | `E/backends/results/analysis/*.csv`, `expB_summary.txt`; `E/backends/results/trial_outcomes.csv.gz` |
+| Figure 4a-d | `figures/figureA_robustness.py`; tables from `E/robustness/scripts/export_figA.py`; numbers from `E/robustness/scripts/evaluate.py` and `pooled.py` | `E/robustness/results/strategy_scores_all.csv`, `sensitivity_dlpfc.csv`, `noise_retention.csv`, `platform_method_means.csv`; per-configuration tables `configurations_*.csv.gz`; `evaluation_summary.txt` |
+| Figure 5a-c,g | `figures/figure2_oscc.py` | `E/case_studies/oscc/results/tables/spots/`, `proportions/s1.csv`; H&E images and spot positions from GEO GSE208253 (`OSCC_GEO_DIR`) |
+| Figure 5d,e | `figures/figure2_oscc.py`; statistics `E/case_studies/compute_case_study_stats.py` | `E/case_studies/oscc/results/stats/per_sample_tc_le_enrichment.csv`, `consensus_tc_le_patterns.csv`, `consensus_binomial_ci.csv` |
+| Figure 5f | `figures/figure2_oscc.py` | `E/case_studies/oscc/results/tables/cellchat_tc_le_caf_cancer_interactions.csv`, `cellchat_tc_le_lr_pairs.csv` |
+| Figure 5h,i | `figures/figure2_oscc.py`; `E/case_studies/compute_case_study_stats.py` | `E/case_studies/oscc/results/stats/svg_target_genes_summary.csv`, `moranI_cross_sample_stats.csv`; `source_data/Fig5h_morans.csv` |
+| Figure 6a-d | `figures/figure3_hgsoc.py`; statistics `E/case_studies/hgsoc/scripts/hgsoc157_stats.py` | `E/case_studies/hgsoc/results/tables/spots/`; `E/case_studies/hgsoc/results/stats/hgsoc_patient_summary.csv`, `cnv_score_per_patient_stats.csv` |
+| Figure 6e,f | `figures/figure3_hgsoc.py`; `hgsoc157_stats.py` | `E/case_studies/hgsoc/results/tables/moranI_P3.csv`, `cnv_cluster_markers_P3.csv`; `results/stats/cliffs_delta_cnv_vs_background.csv`, `celltype_marker_moran_ranks.csv` |
 | Supplementary Table 1 | `scripts/build_supplementary_tables.py` | `E/case_studies/oscc/results/stats/sample_level_tests.csv`, `effect_size_summary.csv` |
 | Supplementary Tables 2, 3, 4 | `scripts/build_supplementary_tables.py` | curated content in the script (method inventory of release 1.5.9; 31 test scenarios; comparison of agents) |
 | Supplementary Tables 5, 6 | `scripts/build_submission_package.py` | curated content in the script; cases 2-4 of Table 6 are observed in `E/round1/results/ablation/e2e/ablation_e2e_raw.jsonl` |
 | Supplementary Table 7 | `E/case_studies/oscc/scripts/oscc157_postrun.py` (step C) with `E/case_studies/deconvolution_concordance/scripts/mdeconv_analyze.py` | `E/case_studies/deconvolution_concordance/results/runs/`, `results/analysis/` |
 | Supplementary Table 8 | `scripts/build_expB_supplementary_tables.py`; `E/backends/scripts/expB_analysis.py` | `E/backends/results/analysis/` |
-| Source Data | `scripts/build_submission_package.py` (Figure 2 sheets: `oscc157_postrun.py`, step D; Figure A and B sheets: the figure scripts) | `source_data/` |
+| Source Data | `scripts/build_submission_package.py` (Figure 5 sheets: `oscc157_postrun.py`, step D; Figure 3 and 4 sheets: the figure scripts) | `source_data/` |
 
 Numbers given only in the text come from the same tables:
 
@@ -96,7 +98,7 @@ Numbers given only in the text come from the same tables:
 
 ## Rerunning
 
-Figures (from the repository root; written to `figures/`, Figure A and B source data to `source_data/`):
+Figures (from the repository root; written to `figures/`, Figure 3 and 4 source data to `source_data/`):
 
 ```
 cd figures
@@ -134,13 +136,13 @@ All datasets are public.
 
 | Dataset | Source | Used in |
 |---|---|---|
-| OSCC Visium, 12 sections | GEO GSE208253 (Arora et al. 2023) | Case study (Figure 2), schema ablation, CARD concordance, backend study, deconvolution concordance |
+| OSCC Visium, 12 sections | GEO GSE208253 (Arora et al. 2023) | Case study (Figure 5), schema ablation, CARD concordance, backend study, deconvolution concordance |
 | HNSCC single-cell reference | GEO GSE103322 (Puram et al. 2017) | OSCC deconvolution |
-| HGSOC Visium, 8 sections, and single-cell reference | GEO GSE211956 (Denisenko et al. 2024) | Case study (Figure 3) |
+| HGSOC Visium, 8 sections, and single-cell reference | GEO GSE211956 (Denisenko et al. 2024) | Case study (Figure 6) |
 | DLPFC Visium, 12 sections | spatialLIBD (Maynard et al. 2021), `spatialLIBD::fetch_data("sce")` | Head-to-head, parameter robustness, backend study, reproduction |
 | STARmap mouse visual cortex, section 20180505_BY3_1kgenes | Wang et al. 2018 | Parameter robustness |
 | MERFISH, Allen Brain Cell Atlas C57BL6J-638850, section 47 | Yao et al. 2023 | Parameter robustness |
-| Human lymph node Visium | 10x Genomics public datasets | Lymph-node benchmark (Figure 4h,i) |
+| Human lymph node Visium | 10x Genomics public datasets | Lymph-node benchmark (Figure 2j,k) |
 | MERFISH mouse hypothalamus slice; pancreas endocrinogenesis | squidpy and scVelo example datasets | Backend study (spatially variable genes; trajectory) |
 
 Scripts that download or prepare these inputs are named in each experiment README

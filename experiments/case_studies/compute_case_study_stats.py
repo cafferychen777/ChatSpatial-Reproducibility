@@ -2,28 +2,28 @@
 """
 Compute the statistics of the case-study figures.
 
-OSCC (Figure 2, Supplementary Table 1): inputs are the tables of the ChatSpatial 1.5.7 run, in which every
+OSCC (Figure 5, Supplementary Table 1): inputs are the tables of the ChatSpatial 1.5.7 run, in which every
 analysis step was a ChatSpatial MCP tool call (oscc/results/tables/, written by
 oscc/scripts/oscc157_collect.py from the tools' exports):
   proportions/{sid}.csv                FlashDeconv proportions (deconvolve_data) + TC/LE label
   moranI_results_all_samples.csv       Moran's I per section (analyze_spatial_statistics); this table is
-                                       committed as source_data/Fig2h_morans.csv and read from there
+                                       committed as source_data/Fig5h_morans.csv and read from there
                                        when it is not present in OSCC_RUN_DIR
   deg_tc_vs_le_top500.csv              TC vs LE marker genes (find_markers)
   cellchat_tc_le_lr_pairs.csv          CellChat interactions (analyze_cell_communication)
 Set OSCC_RUN_DIR / OSCC_OUT_DIR to point the OSCC part at other inputs or outputs.
 
 Outputs (OSCC_OUT_DIR, default oscc/results/stats/):
-  - per_sample_tc_le_enrichment.csv, consensus_tc_le_patterns.csv   (Fig. 2d,e)
+  - per_sample_tc_le_enrichment.csv, consensus_tc_le_patterns.csv   (Fig. 5d,e)
   - effect_sizes_enrichment.csv, consensus_binomial_ci.csv
   - sample_level_tests.csv, effect_size_summary.csv                (Supplementary Table 1)
-  - moranI_cross_sample_stats.csv, svg_target_genes_summary.csv    (Fig. 2h, Moran's I text)
+  - moranI_cross_sample_stats.csv, svg_target_genes_summary.csv    (Fig. 5h, Moran's I text)
   - consensus_le_upregulated_genes.csv, consensus_tc_upregulated_genes.csv
-  - cellchat_summary.csv                                           (Fig. 2f text)
+  - cellchat_summary.csv                                           (Fig. 5f text)
 HGSOC (inputs in hgsoc/results/tables/, outputs in hgsoc/results/stats/; the same statistics are also written
 by hgsoc/scripts/hgsoc157_stats.py, which the figure reads):
-  - cliffs_delta_cnv_vs_background.csv                              (Fig. 3e,f)
-  - cnv_score_per_patient_stats.csv                                 (Fig. 3d)
+  - cliffs_delta_cnv_vs_background.csv                              (Fig. 6e,f)
+  - cnv_score_per_patient_stats.csv                                 (Fig. 6d)
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ REPO_DIR = SCRIPT_DIR.parents[1]
 OSCC_RUN_DIR = Path(os.environ.get(
     "OSCC_RUN_DIR", SCRIPT_DIR / "oscc" / "results" / "tables"))
 OSCC_OUT_DIR = Path(os.environ.get("OSCC_OUT_DIR", SCRIPT_DIR / "oscc" / "results" / "stats"))
-OSCC_MORAN_FALLBACK = REPO_DIR / "source_data" / "Fig2h_morans.csv"
+OSCC_MORAN_FALLBACK = REPO_DIR / "source_data" / "Fig5h_morans.csv"
 
 # HGSOC inputs are the outputs of the recorded ChatSpatial tool calls
 # (hgsoc/results/tables/).
@@ -123,7 +123,7 @@ def cliffs_delta(x: np.ndarray, y: np.ndarray) -> float:
 
 
 # ═══════════════════════════════════════════════════════════════
-# 0. OSCC: per-sample TC vs LE enrichment of deconvolved proportions (Fig. 2d,e)
+# 0. OSCC: per-sample TC vs LE enrichment of deconvolved proportions (Fig. 5d,e)
 # ═══════════════════════════════════════════════════════════════
 
 def load_oscc_proportions() -> dict[str, pd.DataFrame]:
@@ -314,7 +314,7 @@ def compute_oscc_effect_size_summary(effect_df: pd.DataFrame):
 
 
 # ═══════════════════════════════════════════════════════════════
-# 5. OSCC: Moran's I — Sample 1 ranks and cross-sample statistics (Fig. 2h)
+# 5. OSCC: Moran's I — Sample 1 ranks and cross-sample statistics (Fig. 5h)
 # ═══════════════════════════════════════════════════════════════
 
 def compute_oscc_moranI_stats(moran_path: Path | None = None, sample_path: Path | None = None):

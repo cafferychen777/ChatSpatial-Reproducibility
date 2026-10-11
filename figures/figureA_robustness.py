@@ -1,5 +1,5 @@
 """
-Figure A: schema-derived parameter spaces make robustness analysis and
+Figure 4: schema-derived parameter spaces make robustness analysis and
 label-free parameter selection systematic (experiment A).
 
 Inputs are small tables exported from the final experiment-A
@@ -86,7 +86,7 @@ def main() -> None:
     ax.set_ylabel("ARI range across\nschema-valid settings")
     ax.set_ylim(0, 0.8)
     add_panel_label(ax, "a", x=-0.28, y=1.08)
-    pd.DataFrame(rows_a).to_csv(SOURCE_DIR / "FigA_a_sensitivity.csv", index=False)
+    pd.DataFrame(rows_a).to_csv(SOURCE_DIR / "Fig4a_sensitivity.csv", index=False)
 
     # b: mean ARI over methods per sample for each strategy
     ax = fig.add_subplot(gs[0, 1])
@@ -107,7 +107,7 @@ def main() -> None:
               columnspacing=0.8)
     add_panel_label(ax, "b", x=-0.16, y=1.24)
     by[["dataset", "section", "label", "expert", "default", "rule", "oracle"]].to_csv(
-        SOURCE_DIR / "FigA_b_strategies.csv", index=False)
+        SOURCE_DIR / "Fig4b_strategies.csv", index=False)
 
     # c: retention of ARI under data degradation (paired with the clean data)
     ax = fig.add_subplot(gs[1, 0])
@@ -129,7 +129,7 @@ def main() -> None:
     ax.set_ylim(0, 1.15)
     ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(0, 1.0), ncol=2, handletextpad=0.3)
     add_panel_label(ax, "c", x=-0.28, y=1.18)
-    pd.DataFrame(rows_c).to_csv(SOURCE_DIR / "FigA_c_noise.csv", index=False)
+    pd.DataFrame(rows_c).to_csv(SOURCE_DIR / "Fig4c_noise.csv", index=False)
 
     # d: mean ARI of each method on each platform with the label-free rule; ranks annotated
     ax = fig.add_subplot(gs[1, 1])
@@ -149,7 +149,7 @@ def main() -> None:
     cb = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.02)
     cb.set_label("Mean ARI (label-free rule)")
     add_panel_label(ax, "d", x=-0.16, y=1.18)
-    plat.rename(columns={"ari": "mean_ari"}).to_csv(SOURCE_DIR / "FigA_d_platforms.csv", index=False)
+    plat.rename(columns={"ari": "mean_ari"}).to_csv(SOURCE_DIR / "Fig4d_platforms.csv", index=False)
 
     for ext in ("pdf", "png"):
         fig.savefig(FIG_DIR / f"figureA.{ext}", dpi=300, bbox_inches="tight")

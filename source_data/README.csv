@@ -1,4 +1,4 @@
 item,note
 Figure 1,Conceptual architecture schematic; no quantitative plotted source data.
-Figure 2 H&E backgrounds,Histology image files are figure image sources; plotted spot coordinates and quantitative overlays are provided in Fig2_spatial_maps.
-Figure 3 spatial maps,"Per-spot coordinates, tumor fractions, CNV scores, and CNV subclone labels are provided in Fig3_spatial_maps."
+Figure 5 H&E backgrounds,Histology image files are figure image sources; plotted spot coordinates and quantitative overlays are provided in Fig5_spatial_maps.
+Figure 6 spatial maps,"Per-spot coordinates, tumor fractions, CNV scores, and CNV subclone labels are provided in Fig6_spatial_maps."

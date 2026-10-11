@@ -1,5 +1,5 @@
 """
-Figure 2: OSCC spatial transcriptomics case study
+Figure 5: OSCC spatial transcriptomics case study
 Nature Communications style, double-column (183 mm)
 
 Layout: 3x3 grid (a-i), 183 mm x ~160 mm
@@ -71,7 +71,7 @@ GEO_DIR = Path(os.environ.get("OSCC_GEO_DIR", REPO_DIR / "raw_data" / "GSE208253
 CASE_DIR = REPO_DIR / "experiments" / "case_studies" / "oscc" / "results"
 # Every panel reads the ChatSpatial 1.5.7 run, in which each analysis step was an MCP tool call
 # (oscc/results/oscc157_tool_calls.jsonl): spot labels, FN1 expression, proportions, Moran's I and CellChat
-# tables written by oscc/scripts/oscc157_collect.py; Fig. 2d,e statistics and the Sample 1 Moran's I
+# tables written by oscc/scripts/oscc157_collect.py; Fig. 5d,e statistics and the Sample 1 Moran's I
 # summary written by experiments/case_studies/compute_case_study_stats.py.
 RUN_DIR = CASE_DIR / "tables"
 ANALYSIS_DIR = CASE_DIR / "stats"
@@ -666,7 +666,7 @@ def draw_panel_i(ax: plt.Axes) -> None:
 # ── Main ──────────────────────────────────────────────────────────
 
 def main() -> None:
-    print("Building Figure 2: OSCC case study")
+    print("Building Figure 5: OSCC case study")
     print(f"  Data dir: {GEO_DIR}")
     print(f"  ChatSpatial run: {RUN_DIR}")
     print()

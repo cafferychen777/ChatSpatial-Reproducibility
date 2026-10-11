@@ -1,5 +1,5 @@
 """
-Figure 3: Spatial transcriptomics reveals tumor heterogeneity in HGSOC
+Figure 6: Spatial transcriptomics reveals tumor heterogeneity in HGSOC
 Nature Communications style, double-column (183 mm)
 
 Panels:

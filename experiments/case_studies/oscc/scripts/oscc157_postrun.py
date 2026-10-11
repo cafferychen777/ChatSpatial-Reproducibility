@@ -7,12 +7,12 @@ Usage: oscc157_postrun.py WORKDIR REPO [MDECONV_RUNS]
   MDECONV_RUNS            proportions written by the method-concordance runs (deconvolution_concordance/scripts/
                           mdeconv_run.py); default $CHATSPATIAL_WORK_DIR/mdeconv/runs_final
 Steps
-  A  Fig. 2 statistics           experiments/case_studies/compute_case_study_stats.py (OSCC part)
+  A  Fig. 5 statistics           experiments/case_studies/compute_case_study_stats.py (OSCC part)
                                  -> experiments/case_studies/oscc/results/stats
   B  Supplementary Table 1       scripts/build_supplementary_tables.py write_effect_sizes()
   C  Supplementary Table 7       CARD / RCTD / FlashDeconv proportions of the method-concordance runs
                                  with the TC/LE labels of this run, then mdeconv_analyze.py
-  D  Source data                 Fig. 2 sheets, Supp_Table_1, Index; source_data.xlsx and source_data.zip
+  D  Source data                 Fig. 5 sheets, Supp_Table_1, Index; source_data.xlsx and source_data.zip
 """
 import importlib.util
 import json
@@ -138,16 +138,16 @@ for sid in ("s1", "s9"):
     out["FN1_expression"] = spots["FN1_lognorm"].reindex(out["barcode"]).values
     spatial_rows.append(out)
 sheets = {
-    "Fig2_spatial_maps": (pd.concat(spatial_rows, ignore_index=True),
+    "Fig5_spatial_maps": (pd.concat(spatial_rows, ignore_index=True),
                           "ChatSpatial 1.5.7 run: tissue positions, TC/LE labels, FlashDeconv proportions, FN1"),
-    "Fig2d_enrichment": (pd.read_csv(CASE / "per_sample_tc_le_enrichment.csv"), "per_sample_tc_le_enrichment.csv"),
-    "Fig2e_consensus": (pd.read_csv(CASE / "consensus_tc_le_patterns.csv"), "consensus_tc_le_patterns.csv"),
-    "Fig2e_consensus_CI": (pd.read_csv(CASE / "consensus_binomial_ci.csv"), "consensus_binomial_ci.csv"),
-    "Fig2f_cellchat": (pd.read_csv(T / "cellchat_tc_le_caf_cancer_interactions.csv"),
+    "Fig5d_enrichment": (pd.read_csv(CASE / "per_sample_tc_le_enrichment.csv"), "per_sample_tc_le_enrichment.csv"),
+    "Fig5e_consensus": (pd.read_csv(CASE / "consensus_tc_le_patterns.csv"), "consensus_tc_le_patterns.csv"),
+    "Fig5e_consensus_CI": (pd.read_csv(CASE / "consensus_binomial_ci.csv"), "consensus_binomial_ci.csv"),
+    "Fig5f_cellchat": (pd.read_csv(T / "cellchat_tc_le_caf_cancer_interactions.csv"),
                        "cellchat_tc_le_caf_cancer_interactions.csv (analyze_cell_communication, cellchat_r)"),
-    "Fig2h_morans": (pd.read_csv(T / "moranI_results_all_samples.csv"),
+    "Fig5h_morans": (pd.read_csv(T / "moranI_results_all_samples.csv"),
                      "moranI_results_all_samples.csv (analyze_spatial_statistics, moran)"),
-    "Fig2i_DE_all_genes": (pd.read_csv(T / "deg_tc_vs_le_top500.csv"),
+    "Fig5i_DE_all_genes": (pd.read_csv(T / "deg_tc_vs_le_top500.csv"),
                            "deg_tc_vs_le_top500.csv (find_markers, top 500 genes per direction)"),
 }
 mk = []
@@ -159,7 +159,7 @@ for g in ("tc", "le"):
 svg = pd.read_csv(CASE / "svg_target_genes_summary.csv").rename(columns={"category": "region"})
 svg["source_category"] = "moranI_sample1"
 mk.append(svg)
-sheets["Fig2i_marker_genes"] = (pd.concat(mk, ignore_index=True, sort=False),
+sheets["Fig5i_marker_genes"] = (pd.concat(mk, ignore_index=True, sort=False),
                                 "consensus gene lists and Sample 1 Moran's I summary")
 sheets["Supp_Table_1"] = (pd.read_csv(P / "supplementary_tables" / "Supplementary_Table_1_Effect_Sizes.csv"),
                           "supplementary_tables/Supplementary_Table_1_Effect_Sizes.csv")
@@ -170,8 +170,8 @@ for name, (df, source) in sheets.items():
     idx.loc[m, "rows"] = len(df)
     idx.loc[m, "columns"] = df.shape[1]
     idx.loc[m, "source"] = source
-idx.loc[idx["sheet"] == "Fig2h_morans", "description"] = "Figure 2h Moran's I values (all sections; panel shows Sample 1)."
-idx.loc[idx["sheet"] == "Fig2i_DE_all_genes", "description"] = "TC vs LE marker genes underlying the consensus lists."
+idx.loc[idx["sheet"] == "Fig5h_morans", "description"] = "Figure 5h Moran's I values (all sections; panel shows Sample 1)."
+idx.loc[idx["sheet"] == "Fig5i_DE_all_genes", "description"] = "TC vs LE marker genes underlying the consensus lists."
 idx.to_csv(SD / "Index.csv", index=False)
 with pd.ExcelWriter(P / "source_data.xlsx", engine="openpyxl") as w:
     for name in idx["sheet"]:

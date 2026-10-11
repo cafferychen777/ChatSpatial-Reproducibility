@@ -2,7 +2,7 @@
 """Write the backend-study tables of the Supplementary Information
 (supplementary_tables/Supplementary_Table_expB_*.csv) from the analysis tables of
 experiments/backends/results/analysis/. The values are unchanged; model identifiers
-are replaced by the display names used in Figure B and in Supplementary Table 8.
+are replaced by the display names used in Figure 3 and in Supplementary Table 8.
 """
 from pathlib import Path
 

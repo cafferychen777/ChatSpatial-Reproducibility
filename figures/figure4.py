@@ -1,27 +1,25 @@
 """
-Figure 4: Ablation, sensitivity, and system comparison (3x3)
-Nature Communications style, double-column (183 mm)
+Figure 2 (file name figure4): DLPFC head-to-head, ablation, sensitivity, and
+system comparison. Nature Communications style, double-column (183 mm)
 
-Follows narrative order of §2.4:
+Row 1 — DLPFC ground-truth benchmark:
+  [a] ARI against expert-annotated cortical layers (strip plot)
+  [b] Accuracy–consistency tradeoff (scatter)
 
-Row 1 — Schema-enforcement ablation:
-  [a] Pydantic validation rate (3 models x 3 conditions)
-  [b] E2E execution success (3 tasks x 3 conditions)
-  [c] Output concordance (3 tasks x 3 conditions, with survivor-bias hatch)
+Row 2 — Schema-enforcement ablation:
+  [c] Pydantic validation rate (3 models x 3 conditions)
+  [d] E2E execution success (3 tasks x 3 conditions)
+  [e] Output concordance (3 tasks x 3 conditions, with survivor-bias hatch)
 
-Row 2 — Prompt sensitivity + cross-system (tool selection):
-  [d] Cross-paraphrase tool accuracy (5 groups x 3 models)
-  [e] Within vs cross-paraphrase parameter concordance
-  [f] Cross-system tool selection accuracy (5 conditions x 3 models)
+Row 3 — Prompt sensitivity + cross-system (tool selection):
+  [f] Cross-paraphrase tool accuracy (5 groups x 3 models)
+  [g] Within vs cross-paraphrase parameter concordance
+  [h] Cross-system tool selection accuracy (5 conditions x 3 models)
 
-Row 3 — Cross-system (consistency) + E2E benchmark:
-  [g] Cross-system tool consistency (5 conditions x 3 models)
-  [h] E2E execution success (3 systems x 2 tasks)
-  [i] E2E pairwise concordance (strip plot)
-
-Row 4 — DLPFC ground-truth benchmark:
-  [j] ARI against expert-annotated cortical layers (strip plot)
-  [k] Accuracy–consistency tradeoff (scatter)
+Row 4 — Cross-system (consistency) + E2E benchmark:
+  [i] Cross-system tool consistency (5 conditions x 3 models)
+  [j] E2E execution success (3 systems x 2 tasks)
+  [k] E2E pairwise concordance (strip plot)
 """
 
 from __future__ import annotations
@@ -44,7 +42,7 @@ apply_style()
 # ── Paths ────────────────────────────────────────────────────────
 FIGURE_DIR = Path(__file__).resolve().parent
 REPO_DIR = FIGURE_DIR.parent
-# Rows 1-3: round-1 experiments; row 4: DLPFC head-to-head (ChatSpatial 1.5.9)
+# Rows 2-4: round-1 experiments; row 1: DLPFC head-to-head (ChatSpatial 1.5.9)
 DATA_DIR = REPO_DIR / "experiments" / "round1" / "results"
 
 # Ablation
@@ -205,7 +203,7 @@ inv_df = pd.read_csv(ABL_DATA_DIR / "invocation" / "ablation_invocation_results.
 e2e_abl_df = pd.read_csv(ABL_DATA_DIR / "e2e" / "ablation_e2e_results.csv")
 conc_df = pd.read_csv(ABL_DATA_DIR / "analysis" / "ablation_metrics_bootstrap.csv")
 
-# Panel (a): per-model Pydantic validation rate
+# Panel (c): per-model Pydantic validation rate
 pydantic_data = {}
 for cond in ABL_CONDITIONS:
     for model in ABL_MODELS:
@@ -220,7 +218,7 @@ pydantic_means = {}
 for cond in ABL_CONDITIONS:
     pydantic_means[cond] = np.mean([pydantic_data[(cond, m)] for m in ABL_MODELS])
 
-# Panel (b): per-task E2E execution success
+# Panel (d): per-task E2E execution success
 abl_exec_data = {}
 abl_exec_n = {}
 for cond in ABL_CONDITIONS:
@@ -231,7 +229,7 @@ for cond in ABL_CONDITIONS:
         abl_exec_data[(cond, task)] = (successes / total * 100) if total > 0 else 0
         abl_exec_n[(cond, task)] = (int(round(successes)), int(total))
 
-# Panel (c): cross-model concordance
+# Panel (e): cross-model concordance
 abl_conc_data = {}
 for cond in ABL_CONDITIONS:
     for task in ABL_TASKS:
@@ -383,16 +381,22 @@ for gid in SENS_GROUPS:
 
 
 # ═════════════════════════════════════════════════════════════════
-# Figure: 4-row grid (3×3 + ground-truth row)
+# Figure: 4-row grid (ground-truth row + 3×3)
 # ═════════════════════════════════════════════════════════════════
 
 FIG_W = FULL_WIDTH
-FIG_H = FULL_WIDTH * 1.12  # ~8.1 in for 4 rows
+FIG_H = FULL_WIDTH * 1.10  # ~7.9 in for 4 rows
 
 fig = plt.figure(figsize=(FIG_W, FIG_H))
-gs = gridspec.GridSpec(4, 3, figure=fig, hspace=0.50, wspace=0.45,
-                       height_ratios=[1, 1, 1, 0.80],
-                       left=0.07, right=0.96, top=0.95, bottom=0.05)
+# Outer grid: DLPFC head-to-head row on top, then the 3x3 block. The extra gap
+# between them holds the shared ablation legend.
+gs_outer = gridspec.GridSpec(2, 1, figure=fig, hspace=0.26,
+                             height_ratios=[0.80, 4.0],
+                             left=0.07, right=0.96, top=0.975, bottom=0.06)
+gs_top = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs_outer[0],
+                                          wspace=0.45)
+gs = gridspec.GridSpecFromSubplotSpec(3, 3, subplot_spec=gs_outer[1],
+                                      hspace=0.50, wspace=0.45)
 
 # ── Bar geometry ─────────────────────────────────────────────────
 BAR_W_3 = 0.22
@@ -400,64 +404,64 @@ GAP_3 = 0.03
 OFFSETS_3 = np.array([-(BAR_W_3 + GAP_3), 0, BAR_W_3 + GAP_3])
 
 # ═══════════════════════════════════════════════════════════════
-# Row 1: Schema-enforcement ablation
+# Row 2: Schema-enforcement ablation
 # ═══════════════════════════════════════════════════════════════
 
-# Panel (a): Pydantic validation rate per model
-ax_a = fig.add_subplot(gs[0, 0])
-x_a = np.arange(len(ABL_MODELS))
+# Panel (c): Pydantic validation rate per model
+ax_c = fig.add_subplot(gs[0, 0])
+x_c = np.arange(len(ABL_MODELS))
 for i, cond in enumerate(ABL_CONDITIONS):
     vals = [pydantic_data[(cond, m)] for m in ABL_MODELS]
-    bars = ax_a.bar(x_a + OFFSETS_3[i], vals, BAR_W_3,
+    bars = ax_c.bar(x_c + OFFSETS_3[i], vals, BAR_W_3,
                     color=ABL_COND_COLORS[cond], edgecolor="white", linewidth=0.3,
                     label=ABL_COND_LABELS[cond], zorder=3)
     for bar, v in zip(bars, vals):
         if v > 0:
-            ax_a.text(bar.get_x() + bar.get_width() / 2, v + 1.5,
+            ax_c.text(bar.get_x() + bar.get_width() / 2, v + 1.5,
                       f"{v:.0f}", ha="center", va="bottom", fontsize=4)
 
-ax_a.text(0.97, 0.42,
+ax_c.text(0.97, 0.50,
           f"Mean\n"
           f"Full: {pydantic_means['full_schema']:.0f}%\n"
           f"Bare: {pydantic_means['bare_schema']:.0f}%\n"
           f"None: {pydantic_means['no_schema']:.0f}%",
-          transform=ax_a.transAxes, fontsize=4.5, va="top", ha="right",
+          transform=ax_c.transAxes, fontsize=4.5, va="top", ha="right",
           linespacing=1.3,
           bbox=dict(boxstyle="round,pad=0.3", fc="#f7f7f7", ec="#cccccc", lw=0.4))
 
-ax_a.set_xticks(x_a)
-ax_a.set_xticklabels([ABL_MODEL_DISPLAY[m] for m in ABL_MODELS])
-ax_a.set_ylabel("Pydantic validation (%)")
-ax_a.set_ylim(0, 118)
-ax_a.set_yticks([0, 25, 50, 75, 100])
-ax_a.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
-add_panel_label(ax_a, "a")
+ax_c.set_xticks(x_c)
+ax_c.set_xticklabels([ABL_MODEL_DISPLAY[m] for m in ABL_MODELS])
+ax_c.set_ylabel("Pydantic validation (%)")
+ax_c.set_ylim(0, 118)
+ax_c.set_yticks([0, 25, 50, 75, 100])
+ax_c.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
+add_panel_label(ax_c, "c")
 
-# Panel (b): Ablation E2E execution success
-ax_b = fig.add_subplot(gs[0, 1])
-x_b = np.arange(len(ABL_TASKS))
+# Panel (d): Ablation E2E execution success
+ax_d = fig.add_subplot(gs[0, 1])
+x_d = np.arange(len(ABL_TASKS))
 for i, cond in enumerate(ABL_CONDITIONS):
     vals = [abl_exec_data[(cond, t)] for t in ABL_TASKS]
-    bars = ax_b.bar(x_b + OFFSETS_3[i], vals, BAR_W_3,
+    bars = ax_d.bar(x_d + OFFSETS_3[i], vals, BAR_W_3,
                     color=ABL_COND_COLORS[cond], edgecolor="white", linewidth=0.3,
                     zorder=3)
     for bar, v, t in zip(bars, vals, ABL_TASKS):
         n_s, n_t = abl_exec_n[(cond, t)]
-        ax_b.text(bar.get_x() + bar.get_width() / 2, v + 1.5,
+        ax_d.text(bar.get_x() + bar.get_width() / 2, v + 1.5,
                   f"{n_s}/{n_t}", ha="center", va="bottom",
-                  fontsize=4, color="#444444")
+                  fontsize=3.5, color="#444444")
 
-ax_b.set_xticks(x_b)
-ax_b.set_xticklabels([ABL_TASK_DISPLAY[t] for t in ABL_TASKS])
-ax_b.set_ylabel("Execution success (%)")
-ax_b.set_ylim(0, 118)
-ax_b.set_yticks([0, 25, 50, 75, 100])
-ax_b.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
-add_panel_label(ax_b, "b")
+ax_d.set_xticks(x_d)
+ax_d.set_xticklabels([ABL_TASK_DISPLAY[t] for t in ABL_TASKS])
+ax_d.set_ylabel("Execution success (%)")
+ax_d.set_ylim(0, 118)
+ax_d.set_yticks([0, 25, 50, 75, 100])
+ax_d.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
+add_panel_label(ax_d, "d")
 
-# Panel (c): Ablation output concordance
-ax_c = fig.add_subplot(gs[0, 2])
-x_c_abl = np.arange(len(ABL_TASKS))
+# Panel (e): Ablation output concordance
+ax_e = fig.add_subplot(gs[0, 2])
+x_e_abl = np.arange(len(ABL_TASKS))
 for i, cond in enumerate(ABL_CONDITIONS):
     means = []
     ci_lo_err = []
@@ -476,13 +480,13 @@ for i, cond in enumerate(ABL_CONDITIONS):
 
     for j, t in enumerate(ABL_TASKS):
         hatch = "///" if hatches[j] else None
-        ax_c.bar(x_c_abl[j] + OFFSETS_3[i], means_arr[j], BAR_W_3,
+        ax_e.bar(x_e_abl[j] + OFFSETS_3[i], means_arr[j], BAR_W_3,
                  color=ABL_COND_COLORS[cond],
                  edgecolor="#666666" if hatch else "white",
                  linewidth=0.5 if hatch else 0.3,
                  hatch=hatch, zorder=3)
 
-    ax_c.errorbar(x_c_abl + OFFSETS_3[i], means_arr, yerr=errs,
+    ax_e.errorbar(x_e_abl + OFFSETS_3[i], means_arr, yerr=errs,
                   fmt="none", ecolor="#333333", elinewidth=0.5,
                   capsize=1.5, capthick=0.4, zorder=4)
 
@@ -494,176 +498,177 @@ for i, cond in enumerate(ABL_CONDITIONS):
             label = f"n={n}"
             if hatches[j]:
                 label += "*"
-            ax_c.text(x_c_abl[j] + OFFSETS_3[i], y_pos, label,
+            ax_e.text(x_e_abl[j] + OFFSETS_3[i], y_pos, label,
                       ha="center", va="bottom", fontsize=3.5, color="#555555")
 
-task_labels_c = [f"{ABL_TASK_DISPLAY[t]}\n({ABL_CONC_METRIC_LABEL[t]})" for t in ABL_TASKS]
-ax_c.set_xticks(x_c_abl)
-ax_c.set_xticklabels(task_labels_c, fontsize=5)
-ax_c.set_ylabel("Output concordance")
-ax_c.set_ylim(0, 1.22)
-ax_c.set_yticks([0, 0.25, 0.50, 0.75, 1.0])
-ax_c.axhline(y=1.0, color="#dddddd", linewidth=0.3, zorder=1)
-ax_c.text(0.98, -0.02, "* exec. < 50%; survivor bias",
-          transform=ax_c.transAxes, fontsize=3.8, color="#888888",
+task_labels_e = [f"{ABL_TASK_DISPLAY[t]}\n({ABL_CONC_METRIC_LABEL[t]})" for t in ABL_TASKS]
+ax_e.set_xticks(x_e_abl)
+ax_e.set_xticklabels(task_labels_e, fontsize=5)
+ax_e.set_ylabel("Output concordance")
+ax_e.set_ylim(0, 1.22)
+ax_e.set_yticks([0, 0.25, 0.50, 0.75, 1.0])
+ax_e.axhline(y=1.0, color="#dddddd", linewidth=0.3, zorder=1)
+ax_e.text(0.98, -0.02, "* exec. < 50%; survivor bias",
+          transform=ax_e.transAxes, fontsize=3.8, color="#888888",
           ha="right", va="top", style="italic")
-add_panel_label(ax_c, "c")
+add_panel_label(ax_e, "e")
 
-# Shared ablation legend above row 1
+# Shared ablation legend above row 2 (ablation)
 handles_abl = [plt.Rectangle((0, 0), 1, 1, fc=ABL_COND_COLORS[c], ec="white", lw=0.3)
                for c in ABL_CONDITIONS]
 fig.legend(handles_abl, [ABL_COND_LABELS[c] for c in ABL_CONDITIONS],
-           loc="upper center", bbox_to_anchor=(0.5, 0.99),
+           loc="lower center",
+           bbox_to_anchor=(0.5, ax_d.get_position().y1 + 0.022),
            ncol=3, frameon=False, fontsize=6,
            handlelength=1.2, handletextpad=0.4, columnspacing=1.5)
 
 # ═══════════════════════════════════════════════════════════════
-# Row 2: Prompt sensitivity + cross-system tool accuracy
+# Row 3: Prompt sensitivity + cross-system tool accuracy
 # ═══════════════════════════════════════════════════════════════
 
-# Panel (d): Cross-paraphrase tool accuracy
-ax_d = fig.add_subplot(gs[1, 0])
-x_d = np.arange(len(SENS_GROUPS))
+# Panel (f): Cross-paraphrase tool accuracy
+ax_f = fig.add_subplot(gs[1, 0])
+x_f = np.arange(len(SENS_GROUPS))
 for i, model in enumerate(MODELS):
     means = [sens_tool_accuracy[(g, model)][0] for g in SENS_GROUPS]
     ci_lo = [sens_tool_accuracy[(g, model)][0] - sens_tool_accuracy[(g, model)][1]
              for g in SENS_GROUPS]
     ci_hi = [sens_tool_accuracy[(g, model)][2] - sens_tool_accuracy[(g, model)][0]
              for g in SENS_GROUPS]
-    ax_d.bar(x_d + OFFSETS_3[i], means, BAR_W_3,
+    ax_f.bar(x_f + OFFSETS_3[i], means, BAR_W_3,
              color=MODEL_COLORS[model], edgecolor="white", linewidth=0.3,
              label=MODEL_LABELS[model], zorder=3)
-    ax_d.errorbar(x_d + OFFSETS_3[i], means, yerr=[ci_lo, ci_hi],
-                  fmt="none", ecolor="#333333", elinewidth=0.5,
-                  capsize=1.2, capthick=0.4, zorder=4)
-
-ax_d.set_xticks(x_d)
-ax_d.set_xticklabels([SENS_GROUP_DISPLAY[g] for g in SENS_GROUPS], fontsize=5)
-ax_d.set_ylabel("Tool accuracy (%)")
-ax_d.set_ylim(0, 115)
-ax_d.set_yticks([0, 25, 50, 75, 100])
-ax_d.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
-ax_d.legend(loc="lower right", fontsize=4, frameon=False, ncol=1)
-add_panel_label(ax_d, "d")
-
-# Panel (e): Within vs cross-paraphrase concordance
-ax_e = fig.add_subplot(gs[1, 1])
-x_e = np.arange(len(SENS_GROUPS))
-BAR_W_E = 0.30
-PAIR_OFFSET = np.array([-BAR_W_E / 2 - 0.02, BAR_W_E / 2 + 0.02])
-
-for gidx, gid in enumerate(SENS_GROUPS):
-    comp = sens_concordance[gid]
-    w_mean, w_lo, w_hi = comp["within"]
-    ax_e.bar(x_e[gidx] + PAIR_OFFSET[0], w_mean, BAR_W_E,
-             color=OI["blue"], edgecolor="white", linewidth=0.3, zorder=3,
-             label="Within-paraphrase" if gidx == 0 else "")
-    if not np.isnan(w_lo):
-        ax_e.errorbar(x_e[gidx] + PAIR_OFFSET[0], w_mean,
-                      yerr=[[w_mean - w_lo], [w_hi - w_mean]],
-                      fmt="none", ecolor="#333333", elinewidth=0.5,
-                      capsize=1.5, capthick=0.4, zorder=4)
-    c_mean, c_lo, c_hi = comp["cross"]
-    ax_e.bar(x_e[gidx] + PAIR_OFFSET[1], c_mean, BAR_W_E,
-             color=OI["orange"], edgecolor="white", linewidth=0.3, zorder=3,
-             label="Cross-paraphrase" if gidx == 0 else "")
-    if not np.isnan(c_lo):
-        ax_e.errorbar(x_e[gidx] + PAIR_OFFSET[1], c_mean,
-                      yerr=[[c_mean - c_lo], [c_hi - c_mean]],
-                      fmt="none", ecolor="#333333", elinewidth=0.5,
-                      capsize=1.5, capthick=0.4, zorder=4)
-
-ax_e.set_xticks(x_e)
-ax_e.set_xticklabels([SENS_GROUP_DISPLAY[g] for g in SENS_GROUPS], fontsize=5)
-ax_e.set_ylabel("Param. concordance (%)")
-ax_e.set_ylim(0, 115)
-ax_e.set_yticks([0, 25, 50, 75, 100])
-ax_e.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
-ax_e.legend(loc="lower left", fontsize=4, frameon=False)
-add_panel_label(ax_e, "e")
-
-# Panel (f): Cross-system tool selection accuracy
-ax_f = fig.add_subplot(gs[1, 2])
-x_f = np.arange(len(CS_CONDITIONS))
-for i, model in enumerate(MODELS):
-    means = [cs_accuracy[(c, model)][0] for c in CS_CONDITIONS]
-    ci_lo = [cs_accuracy[(c, model)][0] - cs_accuracy[(c, model)][1] for c in CS_CONDITIONS]
-    ci_hi = [cs_accuracy[(c, model)][2] - cs_accuracy[(c, model)][0] for c in CS_CONDITIONS]
-    ax_f.bar(x_f + OFFSETS_3[i], means, BAR_W_3,
-             color=MODEL_COLORS[model], edgecolor="white", linewidth=0.3, zorder=3)
     ax_f.errorbar(x_f + OFFSETS_3[i], means, yerr=[ci_lo, ci_hi],
                   fmt="none", ecolor="#333333", elinewidth=0.5,
                   capsize=1.2, capthick=0.4, zorder=4)
 
 ax_f.set_xticks(x_f)
-ax_f.set_xticklabels([CS_CONDITION_LABELS[c] for c in CS_CONDITIONS], fontsize=5)
+ax_f.set_xticklabels([SENS_GROUP_DISPLAY[g] for g in SENS_GROUPS], fontsize=5)
 ax_f.set_ylabel("Tool accuracy (%)")
 ax_f.set_ylim(0, 115)
 ax_f.set_yticks([0, 25, 50, 75, 100])
 ax_f.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
-ax_f.axvline(x=2.5, color="#cccccc", linewidth=0.4, linestyle="--", zorder=1)
-ax_f.text(1.0, -0.28, "ChatSpatial", ha="center", va="top",
-          fontsize=4.5, transform=ax_f.get_xaxis_transform(), color="#555555")
-ax_f.text(3.5, -0.28, "Competitors", ha="center", va="top",
-          fontsize=4.5, transform=ax_f.get_xaxis_transform(), color="#555555")
+ax_f.legend(loc="lower right", fontsize=4, frameon=False, ncol=1)
 add_panel_label(ax_f, "f")
 
+# Panel (g): Within vs cross-paraphrase concordance
+ax_g = fig.add_subplot(gs[1, 1])
+x_g = np.arange(len(SENS_GROUPS))
+BAR_W_G = 0.30
+PAIR_OFFSET = np.array([-BAR_W_G / 2 - 0.02, BAR_W_G / 2 + 0.02])
+
+for gidx, gid in enumerate(SENS_GROUPS):
+    comp = sens_concordance[gid]
+    w_mean, w_lo, w_hi = comp["within"]
+    ax_g.bar(x_g[gidx] + PAIR_OFFSET[0], w_mean, BAR_W_G,
+             color=OI["blue"], edgecolor="white", linewidth=0.3, zorder=3,
+             label="Within-paraphrase" if gidx == 0 else "")
+    if not np.isnan(w_lo):
+        ax_g.errorbar(x_g[gidx] + PAIR_OFFSET[0], w_mean,
+                      yerr=[[w_mean - w_lo], [w_hi - w_mean]],
+                      fmt="none", ecolor="#333333", elinewidth=0.5,
+                      capsize=1.5, capthick=0.4, zorder=4)
+    c_mean, c_lo, c_hi = comp["cross"]
+    ax_g.bar(x_g[gidx] + PAIR_OFFSET[1], c_mean, BAR_W_G,
+             color=OI["orange"], edgecolor="white", linewidth=0.3, zorder=3,
+             label="Cross-paraphrase" if gidx == 0 else "")
+    if not np.isnan(c_lo):
+        ax_g.errorbar(x_g[gidx] + PAIR_OFFSET[1], c_mean,
+                      yerr=[[c_mean - c_lo], [c_hi - c_mean]],
+                      fmt="none", ecolor="#333333", elinewidth=0.5,
+                      capsize=1.5, capthick=0.4, zorder=4)
+
+ax_g.set_xticks(x_g)
+ax_g.set_xticklabels([SENS_GROUP_DISPLAY[g] for g in SENS_GROUPS], fontsize=5)
+ax_g.set_ylabel("Param. concordance (%)")
+ax_g.set_ylim(0, 115)
+ax_g.set_yticks([0, 25, 50, 75, 100])
+ax_g.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
+ax_g.legend(loc="lower left", fontsize=4, frameon=False)
+add_panel_label(ax_g, "g")
+
+# Panel (h): Cross-system tool selection accuracy
+ax_h = fig.add_subplot(gs[1, 2])
+x_h = np.arange(len(CS_CONDITIONS))
+for i, model in enumerate(MODELS):
+    means = [cs_accuracy[(c, model)][0] for c in CS_CONDITIONS]
+    ci_lo = [cs_accuracy[(c, model)][0] - cs_accuracy[(c, model)][1] for c in CS_CONDITIONS]
+    ci_hi = [cs_accuracy[(c, model)][2] - cs_accuracy[(c, model)][0] for c in CS_CONDITIONS]
+    ax_h.bar(x_h + OFFSETS_3[i], means, BAR_W_3,
+             color=MODEL_COLORS[model], edgecolor="white", linewidth=0.3, zorder=3)
+    ax_h.errorbar(x_h + OFFSETS_3[i], means, yerr=[ci_lo, ci_hi],
+                  fmt="none", ecolor="#333333", elinewidth=0.5,
+                  capsize=1.2, capthick=0.4, zorder=4)
+
+ax_h.set_xticks(x_h)
+ax_h.set_xticklabels([CS_CONDITION_LABELS[c] for c in CS_CONDITIONS], fontsize=5)
+ax_h.set_ylabel("Tool accuracy (%)")
+ax_h.set_ylim(0, 115)
+ax_h.set_yticks([0, 25, 50, 75, 100])
+ax_h.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
+ax_h.axvline(x=2.5, color="#cccccc", linewidth=0.4, linestyle="--", zorder=1)
+ax_h.text(1.0, -0.28, "ChatSpatial", ha="center", va="top",
+          fontsize=4.5, transform=ax_h.get_xaxis_transform(), color="#555555")
+ax_h.text(3.5, -0.28, "Competitors", ha="center", va="top",
+          fontsize=4.5, transform=ax_h.get_xaxis_transform(), color="#555555")
+add_panel_label(ax_h, "h")
+
 # ═══════════════════════════════════════════════════════════════
-# Row 3: Cross-system consistency + E2E benchmark
+# Row 4: Cross-system consistency + E2E benchmark
 # ═══════════════════════════════════════════════════════════════
 
-# Panel (g): Cross-system tool consistency
-ax_g = fig.add_subplot(gs[2, 0])
+# Panel (i): Cross-system tool consistency
+ax_i = fig.add_subplot(gs[2, 0])
 for i, model in enumerate(MODELS):
     means = [cs_consistency[(c, model)][0] for c in CS_CONDITIONS]
     ci_lo = [cs_consistency[(c, model)][0] - cs_consistency[(c, model)][1] for c in CS_CONDITIONS]
     ci_hi = [cs_consistency[(c, model)][2] - cs_consistency[(c, model)][0] for c in CS_CONDITIONS]
-    ax_g.bar(x_f + OFFSETS_3[i], means, BAR_W_3,
+    ax_i.bar(x_h + OFFSETS_3[i], means, BAR_W_3,
              color=MODEL_COLORS[model], edgecolor="white", linewidth=0.3, zorder=3)
-    ax_g.errorbar(x_f + OFFSETS_3[i], means, yerr=[ci_lo, ci_hi],
+    ax_i.errorbar(x_h + OFFSETS_3[i], means, yerr=[ci_lo, ci_hi],
                   fmt="none", ecolor="#333333", elinewidth=0.5,
                   capsize=1.2, capthick=0.4, zorder=4)
 
-ax_g.set_xticks(x_f)
-ax_g.set_xticklabels([CS_CONDITION_LABELS[c] for c in CS_CONDITIONS], fontsize=5)
-ax_g.set_ylabel("Consistency (%)")
-ax_g.set_ylim(0, 115)
-ax_g.set_yticks([0, 25, 50, 75, 100])
-ax_g.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
-ax_g.axvline(x=2.5, color="#cccccc", linewidth=0.4, linestyle="--", zorder=1)
-ax_g.text(1.0, -0.28, "ChatSpatial", ha="center", va="top",
-          fontsize=4.5, transform=ax_g.get_xaxis_transform(), color="#555555")
-ax_g.text(3.5, -0.28, "Competitors", ha="center", va="top",
-          fontsize=4.5, transform=ax_g.get_xaxis_transform(), color="#555555")
-add_panel_label(ax_g, "g")
+ax_i.set_xticks(x_h)
+ax_i.set_xticklabels([CS_CONDITION_LABELS[c] for c in CS_CONDITIONS], fontsize=5)
+ax_i.set_ylabel("Consistency (%)")
+ax_i.set_ylim(0, 115)
+ax_i.set_yticks([0, 25, 50, 75, 100])
+ax_i.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
+ax_i.axvline(x=2.5, color="#cccccc", linewidth=0.4, linestyle="--", zorder=1)
+ax_i.text(1.0, -0.28, "ChatSpatial", ha="center", va="top",
+          fontsize=4.5, transform=ax_i.get_xaxis_transform(), color="#555555")
+ax_i.text(3.5, -0.28, "Competitors", ha="center", va="top",
+          fontsize=4.5, transform=ax_i.get_xaxis_transform(), color="#555555")
+add_panel_label(ax_i, "i")
 
-# Panel (h): E2E execution success
-ax_h = fig.add_subplot(gs[2, 1])
-x_h = np.arange(len(E2E_TASKS))
+# Panel (j): E2E execution success
+ax_j = fig.add_subplot(gs[2, 1])
+x_j = np.arange(len(E2E_TASKS))
 for i, sys in enumerate(E2E_SYSTEMS):
     offset = (i - 1) * (BAR_W_3 + 0.04)
     ok_vals = [e2e_counts[(sys, t)]["ok"] / e2e_counts[(sys, t)]["total"] * 100
                for t in E2E_TASKS]
-    ax_h.bar(x_h + offset, ok_vals, BAR_W_3,
+    ax_j.bar(x_j + offset, ok_vals, BAR_W_3,
              color=SYSTEM_COLORS[sys], edgecolor="white", linewidth=0.3,
              label=SYSTEM_LABELS[sys], zorder=3)
     for j, t in enumerate(E2E_TASKS):
         c = e2e_counts[(sys, t)]
-        ax_h.text(x_h[j] + offset, ok_vals[j] + 2,
+        ax_j.text(x_j[j] + offset, ok_vals[j] + 2,
                   f"{c['ok']}/{c['total']}", ha="center", va="bottom",
                   fontsize=4, color="#333333")
 
-ax_h.set_xticks(x_h)
-ax_h.set_xticklabels([E2E_TASK_LABELS[t] for t in E2E_TASKS])
-ax_h.set_ylabel("Execution success (%)")
-ax_h.set_ylim(0, 118)
-ax_h.set_yticks([0, 25, 50, 75, 100])
-ax_h.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
-ax_h.legend(fontsize=4, frameon=False, loc="lower right")
-add_panel_label(ax_h, "h")
+ax_j.set_xticks(x_j)
+ax_j.set_xticklabels([E2E_TASK_LABELS[t] for t in E2E_TASKS])
+ax_j.set_ylabel("Execution success (%)")
+ax_j.set_ylim(0, 118)
+ax_j.set_yticks([0, 25, 50, 75, 100])
+ax_j.axhline(y=100, color="#dddddd", linewidth=0.3, zorder=1)
+ax_j.legend(fontsize=4, frameon=False, loc="lower right")
+add_panel_label(ax_j, "j")
 
-# Panel (i): E2E pairwise concordance (strip plot)
-ax_i = fig.add_subplot(gs[2, 2])
+# Panel (k): E2E pairwise concordance (strip plot)
+ax_k = fig.add_subplot(gs[2, 2])
 JITTER_W = 0.18
 for j, task in enumerate(E2E_TASKS):
     for i, sys in enumerate(E2E_SYSTEMS):
@@ -671,7 +676,7 @@ for j, task in enumerate(E2E_TASKS):
         pairs = e2e_concordance.get((sys, task), [])
 
         if len(pairs) == 0:
-            ax_i.text(j + offset, 0.05, "n = 1", ha="center", va="bottom",
+            ax_k.text(j + offset, 0.05, "n = 1", ha="center", va="bottom",
                       fontsize=4.5, color="#999999", style="italic")
             continue
 
@@ -679,11 +684,11 @@ for j, task in enumerate(E2E_TASKS):
         jitter = rng.uniform(-JITTER_W * 0.5, JITTER_W * 0.5, len(pairs))
         xs = np.full(len(pairs), j + offset) + jitter
 
-        ax_i.scatter(xs, pairs, s=12, c=SYSTEM_COLORS[sys],
+        ax_k.scatter(xs, pairs, s=12, c=SYSTEM_COLORS[sys],
                      alpha=0.6, edgecolors="none", zorder=4)
 
         mean_val = np.mean(pairs)
-        ax_i.plot([j + offset - JITTER_W * 0.7, j + offset + JITTER_W * 0.7],
+        ax_k.plot([j + offset - JITTER_W * 0.7, j + offset + JITTER_W * 0.7],
                   [mean_val, mean_val], color=SYSTEM_COLORS[sys],
                   linewidth=1.2, zorder=5)
 
@@ -692,30 +697,30 @@ for j, task in enumerate(E2E_TASKS):
                 high = [p for p in pairs if p > 0.5]
                 low = [p for p in pairs if p <= 0.5]
                 if high and low:
-                    ax_i.text(j + offset + JITTER_W * 0.8, 0.95, "within\nmethod",
+                    ax_k.text(j + offset + JITTER_W * 0.8, 0.95, "within\nmethod",
                               ha="left", va="top", fontsize=3.2,
                               color=SYSTEM_COLORS[sys], linespacing=0.85)
-                    ax_i.text(j + offset + JITTER_W * 0.8, 0.08, "across\nmethod",
+                    ax_k.text(j + offset + JITTER_W * 0.8, 0.17, "across\nmethod",
                               ha="left", va="bottom", fontsize=3.2,
                               color=SYSTEM_COLORS[sys], linespacing=0.85)
                     continue
-            ax_i.text(j + offset, mean_val + 0.04, f"{mean_val:.2f}",
+            ax_k.text(j + offset, mean_val + 0.04, f"{mean_val:.2f}",
                       ha="center", va="bottom", fontsize=3.8,
                       color=SYSTEM_COLORS[sys])
 
-ax_i.text(0, 1.08, "ARI", ha="center", fontsize=5, color="#666666")
-ax_i.text(1, 1.08, "Jaccard@100", ha="center", fontsize=5, color="#666666")
-ax_i.text(2, 1.08, "Jaccard@50", ha="center", fontsize=5, color="#666666")
-ax_i.set_xticks(range(len(E2E_TASKS)))
-ax_i.set_xticklabels([E2E_TASK_LABELS[t] for t in E2E_TASKS])
-ax_i.set_ylabel("Pairwise concordance")
-ax_i.set_ylim(-0.05, 1.15)
-ax_i.set_yticks([0, 0.25, 0.50, 0.75, 1.0])
-ax_i.axhline(y=1.0, color="#dddddd", linewidth=0.3, zorder=1)
-add_panel_label(ax_i, "i")
+ax_k.text(0, 1.08, "ARI", ha="center", fontsize=5, color="#666666")
+ax_k.text(1, 1.08, "Jaccard@100", ha="center", fontsize=5, color="#666666")
+ax_k.text(2, 1.08, "Jaccard@50", ha="center", fontsize=5, color="#666666")
+ax_k.set_xticks(range(len(E2E_TASKS)))
+ax_k.set_xticklabels([E2E_TASK_LABELS[t] for t in E2E_TASKS])
+ax_k.set_ylabel("Pairwise concordance")
+ax_k.set_ylim(-0.05, 1.15)
+ax_k.set_yticks([0, 0.25, 0.50, 0.75, 1.0])
+ax_k.axhline(y=1.0, color="#dddddd", linewidth=0.3, zorder=1)
+add_panel_label(ax_k, "k")
 
 # ═══════════════════════════════════════════════════════════════
-# Row 4: DLPFC ground-truth benchmark (12 sections, Claude Sonnet 5.5,
+# Row 1: DLPFC ground-truth benchmark (12 sections, Claude Sonnet 5.5,
 # ChatSpatial 1.5.9; experiments/refusals_and_head_to_head/results/h2h_v159)
 # ═══════════════════════════════════════════════════════════════
 H2H_DIR = REPO_DIR / "experiments" / "refusals_and_head_to_head" / "results" / "h2h_v159"
@@ -731,69 +736,71 @@ H2H_LABELS = {
 }
 section_means = (h2h_runs.groupby(["system", "section"]).ari.mean().reset_index())
 
-# Panel (j): per-section mean ARI for each system (spans 2 columns)
-ax_j = fig.add_subplot(gs[3, 0:2])
-JITTER_W_J = 0.28
+# Panel (a): per-section mean ARI for each system (spans 2 columns)
+ax_a = fig.add_subplot(gs_top[0, 0:2])
+JITTER_W_A = 0.28
 for i, sys in enumerate(H2H_SYSTEMS):
     vals = section_means[section_means["system"] == sys]["ari"].values
     rng = np.random.default_rng(42 + i)
-    xs = i + rng.uniform(-JITTER_W_J * 0.5, JITTER_W_J * 0.5, len(vals))
-    ax_j.scatter(xs, vals, s=14, c=H2H_COLORS[sys], alpha=0.7,
+    xs = i + rng.uniform(-JITTER_W_A * 0.5, JITTER_W_A * 0.5, len(vals))
+    ax_a.scatter(xs, vals, s=14, c=H2H_COLORS[sys], alpha=0.7,
                  edgecolors="none", zorder=4)
     mean_val = vals.mean()
-    ax_j.plot([i - JITTER_W_J * 0.85, i + JITTER_W_J * 0.85],
+    ax_a.plot([i - JITTER_W_A * 0.85, i + JITTER_W_A * 0.85],
               [mean_val, mean_val], color=H2H_COLORS[sys],
               linewidth=1.5, zorder=5)
-    ax_j.text(i + JITTER_W_J * 0.9, mean_val, f"{mean_val:.3f}", ha="left",
+    ax_a.text(i + JITTER_W_A * 0.9, mean_val, f"{mean_val:.3f}", ha="left",
               va="center", fontsize=4.5, color=H2H_COLORS[sys],
               fontweight="bold")
-ax_j.set_xticks(range(len(H2H_SYSTEMS)))
-ax_j.set_xticklabels([H2H_LABELS[s] for s in H2H_SYSTEMS])
-ax_j.set_ylabel("ARI (ground truth)")
-ax_j.set_ylim(0.2, 0.65)
-ax_j.set_yticks([0.2, 0.3, 0.4, 0.5, 0.6])
-add_panel_label(ax_j, "j")
+ax_a.set_xticks(range(len(H2H_SYSTEMS)))
+ax_a.set_xticklabels([H2H_LABELS[s] for s in H2H_SYSTEMS])
+ax_a.set_ylabel("ARI (ground truth)")
+ax_a.set_ylim(0.2, 0.65)
+ax_a.set_yticks([0.2, 0.3, 0.4, 0.5, 0.6])
+# Align label "a" with the labels of the single-column panels below it
+add_panel_label(ax_a, "a",
+                x=-0.12 * ax_c.get_position().width / ax_a.get_position().width)
 
-# Panel (k): accuracy against reproducibility (bootstrap over sections)
-ax_k = fig.add_subplot(gs[3, 2])
-rng_k = np.random.default_rng(42)
-k_rows = []
+# Panel (b): accuracy against reproducibility (bootstrap over sections)
+ax_b = fig.add_subplot(gs_top[0, 2])
+rng_b = np.random.default_rng(42)
+b_rows = []
 for sys in H2H_SYSTEMS:
     acc = section_means[section_means["system"] == sys].set_index("section")["ari"]
     rep = h2h_xrep[h2h_xrep["system"] == sys].set_index("section")["xrep_ari"]
     secs = acc.index.values
     boots_a, boots_r = [], []
     for _ in range(10_000):
-        r = rng_k.choice(secs, len(secs), replace=True)
+        r = rng_b.choice(secs, len(secs), replace=True)
         boots_a.append(acc.loc[r].mean())
         boots_r.append(rep.loc[r].mean())
     a, c = acc.mean(), rep.mean()
     a_lo, a_hi = np.percentile(boots_a, [2.5, 97.5])
     c_lo, c_hi = np.percentile(boots_r, [2.5, 97.5])
-    k_rows.append({"system": sys, "n_sections": len(secs),
+    b_rows.append({"system": sys, "n_sections": len(secs),
                    "mean_ari": a, "mean_ari_ci_lo": a_lo, "mean_ari_ci_hi": a_hi,
                    "xrep_ari": c, "xrep_ari_ci_lo": c_lo, "xrep_ari_ci_hi": c_hi})
-    ax_k.errorbar(a, c, xerr=[[a - a_lo], [a_hi - a]],
+    ax_b.errorbar(a, c, xerr=[[a - a_lo], [a_hi - a]],
                   yerr=[[c - c_lo], [c_hi - c]], fmt="o", ms=6,
                   color=H2H_COLORS[sys], ecolor=H2H_COLORS[sys],
                   elinewidth=0.8, capsize=2.5, capthick=0.6, zorder=4)
-    ax_k.text(a + 0.006, c + 0.025, H2H_LABELS[sys].replace("\n", " "),
+    ax_b.text(a + 0.006, c + 0.025, H2H_LABELS[sys].replace("\n", " "),
               fontsize=4.5, color=H2H_COLORS[sys], ha="left", va="bottom")
-ax_k.axhline(y=1.0, color="#dddddd", linewidth=0.3, zorder=1)
-ax_k.set_xlabel("Mean ARI (ground truth)")
-ax_k.set_ylabel("Cross-replicate ARI")
-ax_k.set_xlim(0.32, 0.52)
-ax_k.set_ylim(0.4, 1.12)
-ax_k.set_xticks([0.35, 0.40, 0.45, 0.50])
-ax_k.set_yticks([0.4, 0.6, 0.8, 1.0])
-add_panel_label(ax_k, "k")
+ax_b.axhline(y=1.0, color="#dddddd", linewidth=0.3, zorder=1)
+ax_b.set_xlabel("Mean ARI (ground truth)")
+ax_b.set_ylabel("Cross-replicate ARI")
+ax_b.set_xlim(0.32, 0.52)
+ax_b.set_ylim(0.4, 1.12)
+ax_b.set_xticks([0.35, 0.40, 0.45, 0.50])
+ax_b.set_yticks([0.4, 0.6, 0.8, 1.0])
+add_panel_label(ax_b, "b")
 
-# Source data for panels j and k, written from the values plotted above
+# Source data for panels a and b, written from the values plotted above
 h2h_runs[h2h_runs["system"].isin(H2H_SYSTEMS)][
     ["system", "section", "rep", "finished", "timed_out", "verified",
      "method", "ari", "nmi", "n_scored"]
 ].sort_values(["system", "section", "rep"]).to_csv(
-    H2H_DIR / "fig4jk_trials.csv", index=False)
+    H2H_DIR / "fig2ab_trials.csv", index=False)
 (section_means
  .merge(h2h_runs.groupby(["system", "section"]).ari.count()
         .rename("n_scored_runs").reset_index(), on=["system", "section"])
@@ -801,8 +808,8 @@ h2h_runs[h2h_runs["system"].isin(H2H_SYSTEMS)][
  .rename(columns={"ari": "mean_ari", "n_pairs": "xrep_n_pairs"})
  .query("system in @H2H_SYSTEMS")
  .sort_values(["system", "section"])
- .to_csv(H2H_DIR / "fig4jk_sections.csv", index=False))
-pd.DataFrame(k_rows).to_csv(H2H_DIR / "fig4k_summary.csv", index=False)
+ .to_csv(H2H_DIR / "fig2ab_sections.csv", index=False))
+pd.DataFrame(b_rows).to_csv(H2H_DIR / "fig2b_summary.csv", index=False)
 
 # ── Save ─────────────────────────────────────────────────────────
 for ext in ("pdf", "png"):
