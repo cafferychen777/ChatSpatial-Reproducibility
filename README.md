@@ -30,6 +30,7 @@ scripts/                      Builders of the supplementary tables and of the So
 Each directory under `experiments/` has a README with its scripts, run order, cluster resources and result tables.
 Rules that were fixed before the runs are kept next to the code (`robustness/PREREGISTRATION.md`,
 `backends/expB_rules_2026-10-08.txt`, `refusals_and_head_to_head/expBX_rules_2026-10-09.txt`,
+`refusals_and_head_to_head/h2h_qwen_rules_2026-10-10.txt`,
 `case_studies/deconvolution_concordance/mdeconv_rules_2026-10-09.txt`).
 
 ## Software versions
@@ -93,6 +94,7 @@ Numbers given only in the text come from the same tables:
 | Eight backends: 1,280 of 1,280 correct tools under full schemas, 5 silent failures in 3,840 trials, description ablation, odds ratios, method choice | `E/backends/results/analysis/expB_summary.txt`, `rates_by_backend_condition.csv`, `bbias_method_counts.csv`, `trial_outcomes.csv.gz` |
 | Assumption-violation probes (0, 21 and 3 of 40 silent failures for SpatialAgent; 0 to 3 of 40 for ChatSpatial) | `E/refusals_and_head_to_head/results/probes_{sonnet,gemma4,qwen38}/probe_summary.json`, `probe_per_run.csv`; judge and audit records in `results/judge/` |
 | DLPFC head-to-head (mean ARI 0.461, 0.445, 0.404, 0.378; cross-replicate ARI 0.776, 0.538, 0.625, 0.990) | `E/refusals_and_head_to_head/results/h2h_v159/h2h_summary.json` |
+| DLPFC head-to-head with Qwen3.8 27B (runs with labels 120, 58, 98 of 120; mean ARI with no labels counted as 0: 0.312, 0.106, 0.215; cross-replicate ARI 0.550, 0.264, 0.361; single call 0.375) | `E/refusals_and_head_to_head/results/h2h_qwen38/h2h_summary.json` |
 | Parameter robustness (2,724 configurations per section; default 0.420, rule 0.441, best 0.565; Kendall's W) | `E/robustness/results/evaluation_summary.txt` |
 | OSCC and HGSOC numbers | `E/case_studies/README.md` |
 

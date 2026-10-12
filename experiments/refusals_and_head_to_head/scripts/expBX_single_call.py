@@ -9,6 +9,8 @@ fresh copy of the section's input. Changes from May 2026 (rules file): model cla
 with provider-default sampling (no temperature) and default thinking; max_tokens 16000 (512 in
 May; thinking tokens count against max_tokens); full-resolution pixel coordinates.
 Scored label = domain_key (unrefined), as in May 2026; refined labels kept when produced.
+Open-weight arm (EXPBX_BACKEND=openai, rules addendum h2h_qwen_rules_2026-10-10.txt, 2026-10-11): the same
+system/user text, parser and execution; the call goes to the local vLLM OpenAI-compatible endpoint (openai_call).
 
 Usage: python expBX_single_call.py --sid 151673 --out_dir DIR
 """
@@ -64,6 +66,40 @@ class BenchCtx:
         pass
 
 
+def openai_call(system_text: str, user_text: str, tlog: Path, result: dict) -> str | None:
+    """Open-weight arm (rules addendum h2h_qwen_rules_2026-10-10.txt): the same single call against the
+    OpenAI-compatible local vLLM endpoint, client settings as in expBX_chatspatial_agent.openai_loop
+    (no temperature sent, served defaults, thinking off by the server's chat-template default, max_tokens
+    16000, OpenAI chat format, up to 3 attempts on 5xx). No tools are offered, so there is no tool result
+    to return to the model (and no image to replace by a note). Returns the reply text, or None on an HTTP error."""
+    import httpx
+    body = {"model": C.MODEL, "messages": [{"role": "system", "content": system_text},
+                                           {"role": "user", "content": user_text}],
+            "max_tokens": C.MAX_TOKENS}
+    http = httpx.Client(timeout=1800)
+    for _ in range(3):
+        r = http.post(C.BASE_URL.rstrip("/") + "/chat/completions", json=body)
+        if r.status_code < 500:
+            break
+        time.sleep(10)
+    if r.status_code != 200:
+        C.append_jsonl(tlog, {"event": "api_error", "status": r.status_code, "text": r.text[:3000]})
+        result["error"] = f"http_{r.status_code}"
+        return None
+    d = r.json()
+    ch = d["choices"][0]
+    msg = ch["message"]
+    u = d.get("usage") or {}
+    C.append_jsonl(tlog, {"event": "api_response", "id": d.get("id"), "model": d.get("model"),
+                          "stop_reason": ch.get("finish_reason"), "usage": u,
+                          "content": [{"type": "text", "text": msg.get("content") or ""}],
+                          "reasoning": (msg.get("reasoning_content") or msg.get("reasoning") or "")[:6000]})
+    result["usage"] = {"input_tokens": u.get("prompt_tokens") or 0, "output_tokens": u.get("completion_tokens") or 0}
+    result["cost_usd"] = 0.0
+    result["stop_reason"] = ch.get("finish_reason")
+    return msg.get("content") or ""
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sid", required=True)
@@ -75,20 +111,27 @@ def main():
     result = {"system": "chatspatial_single", "model": C.MODEL, "success": False, "error": "",
               "temperature": "provider_default", "thinking": "provider_default"}
     t0 = time.time()
+    if C.BACKEND == "openai":
+        result.update(backend=C.BACKEND, temperature="server_default", thinking="server_default")
     try:
-        import anthropic
         from ablation_invocation import RESPONSE_INSTRUCTION, SCHEMA_FULL, parse_json, resolve_tool_name
-        client = anthropic.Anthropic(api_key=C.anthropic_key(), max_retries=6, timeout=600)
-        resp = client.messages.create(model=C.MODEL, max_tokens=C.MAX_TOKENS,
-                                      system=SCHEMA_FULL + RESPONSE_INSTRUCTION,
-                                      messages=[{"role": "user", "content": C.DLPFC_PROMPT}])
-        rd = resp.model_dump()
-        C.append_jsonl(tlog, {"event": "api_response", "id": rd.get("id"), "model": rd.get("model"),
-                              "stop_reason": rd.get("stop_reason"), "usage": rd.get("usage"),
-                              "content": rd.get("content")})
-        result["usage"] = rd.get("usage")
-        result["cost_usd"] = C.usage_cost(rd.get("usage") or {})
-        text = "\n".join(b.text for b in resp.content if b.type == "text")
+        if C.BACKEND == "openai":
+            text = openai_call(SCHEMA_FULL + RESPONSE_INSTRUCTION, C.DLPFC_PROMPT, tlog, result)
+            if text is None:
+                raise SystemExit
+        else:
+            import anthropic
+            client = anthropic.Anthropic(api_key=C.anthropic_key(), max_retries=6, timeout=600)
+            resp = client.messages.create(model=C.MODEL, max_tokens=C.MAX_TOKENS,
+                                          system=SCHEMA_FULL + RESPONSE_INSTRUCTION,
+                                          messages=[{"role": "user", "content": C.DLPFC_PROMPT}])
+            rd = resp.model_dump()
+            C.append_jsonl(tlog, {"event": "api_response", "id": rd.get("id"), "model": rd.get("model"),
+                                  "stop_reason": rd.get("stop_reason"), "usage": rd.get("usage"),
+                                  "content": rd.get("content")})
+            result["usage"] = rd.get("usage")
+            result["cost_usd"] = C.usage_cost(rd.get("usage") or {})
+            text = "\n".join(b.text for b in resp.content if b.type == "text")
         result["llm_response"] = text
         parsed = parse_json(text)
         if parsed is None:

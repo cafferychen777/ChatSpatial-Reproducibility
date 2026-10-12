@@ -193,6 +193,9 @@ def main():
                 cmd += ["-v", b]
         for k, v in {**cenv, "HOME": str(tmp)}.items():
             cmd += ["-e", f"{k}={v}"]
+        # optional extra docker flags (Qwen head-to-head on the GPU host: --oom-score-adj so that under memory pressure the
+        # kernel kills a run container, not the shared vLLM server)
+        cmd += os.environ.get("EXPBX_DOCKER_EXTRA", "").split()
         cmd += [DOCKER_IMAGE] + prefix + command(task, rd)
     else:
         cname = None

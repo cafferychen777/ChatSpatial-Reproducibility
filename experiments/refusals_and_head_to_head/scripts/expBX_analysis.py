@@ -133,7 +133,7 @@ def h2h(tasks):
         if sysn in ("chatspatial", "chatspatial_single"):
             f = rd / "labels.csv"
             if sysn == "chatspatial":
-                row["success"] = (not res.get("harness_error")) and res.get("stop_reason") == "end_turn" and not st.get("timed_out")
+                row["success"] = (not res.get("harness_error")) and res.get("stop_reason") in ("end_turn", "stop") and not st.get("timed_out")
                 row["method"] = res.get("method")
                 row["domain_params"] = json.dumps(res.get("domain_params"))
                 row["n_domain_calls"] = len(res.get("domain_calls") or [])

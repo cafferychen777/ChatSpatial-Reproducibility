@@ -62,6 +62,48 @@ async def call_tool(mcpc, name: str, args: dict):
     return blocks, is_error, raw
 
 
+async def export_h2h_labels(result: dict, tool_calls: list, server, out: Path) -> None:
+    """Head-to-head: labels of the last successful identify_spatial_domains call (both backends)."""
+    # labels of the last successful identify_spatial_domains call
+    dom = [t for t in tool_calls if t["name"] == "identify_spatial_domains" and not t["is_error"]]
+    result["domain_calls"] = [{"input": t["input"], "is_error": t["is_error"]} for t in tool_calls
+                              if t["name"] == "identify_spatial_domains"]
+    if dom:
+        last = dom[-1]
+        try:
+            info = json.loads(last["result_text"])
+        except Exception:
+            info = {}
+        data_id = (last["input"] or {}).get("data_id")
+        params = (last["input"] or {}).get("params") or {}
+        if isinstance(params, str):  # open-weight models may send the nested params object JSON-encoded (accepted by the server)
+            try:
+                params = json.loads(params)
+            except Exception:
+                params = {"_unparsed": params}
+        params = params if isinstance(params, dict) else {"_unparsed": params}
+        result["method"] = params.get("method", "default")
+        result["domain_params"] = params
+        key = info.get("domain_key")
+        rkey = info.get("refined_domain_key")
+        result["domain_key"], result["refined_domain_key"] = key, rkey
+        try:
+            ds = await server.data_manager.get_dataset(data_id)
+            ad_ = ds["adata"] if isinstance(ds, dict) else ds.adata
+            if key and key in ad_.obs:
+                # primary label = the tool's final output (refined labels when the call produced
+                # them, the experiment-A convention); unrefined labels kept for sensitivity
+                prim = rkey if (rkey and rkey in ad_.obs) else key
+                df = ad_.obs[[prim]].rename(columns={prim: "label"}).astype(str)
+                df["label_unrefined"] = ad_.obs[key].astype(str).values
+                df.to_csv(out / "labels.csv")
+                result["labels_file"] = str(out / "labels.csv")
+                result["label_column_used"] = prim
+                result["n_labels"] = int(df["label"].nunique())
+        except Exception as e:
+            result["label_export_error"] = f"{type(e).__name__}: {e}"
+
+
 async def main_async(args) -> dict:
     if C.BACKEND == "anthropic":
         import anthropic
@@ -156,38 +198,7 @@ async def main_async(args) -> dict:
               "temperature": "provider_default", "thinking": "provider_default", "mcp_protocol": protocol}
 
     if args.h2h:
-        # labels of the last successful identify_spatial_domains call
-        dom = [t for t in tool_calls if t["name"] == "identify_spatial_domains" and not t["is_error"]]
-        result["domain_calls"] = [{"input": t["input"], "is_error": t["is_error"]} for t in tool_calls
-                                  if t["name"] == "identify_spatial_domains"]
-        if dom:
-            last = dom[-1]
-            try:
-                info = json.loads(last["result_text"])
-            except Exception:
-                info = {}
-            data_id = (last["input"] or {}).get("data_id")
-            params = (last["input"] or {}).get("params") or {}
-            result["method"] = params.get("method", "default")
-            result["domain_params"] = params
-            key = info.get("domain_key")
-            rkey = info.get("refined_domain_key")
-            result["domain_key"], result["refined_domain_key"] = key, rkey
-            try:
-                ds = await server.data_manager.get_dataset(data_id)
-                ad_ = ds["adata"] if isinstance(ds, dict) else ds.adata
-                if key and key in ad_.obs:
-                    # primary label = the tool's final output (refined labels when the call produced
-                    # them, the experiment-A convention); unrefined labels kept for sensitivity
-                    prim = rkey if (rkey and rkey in ad_.obs) else key
-                    df = ad_.obs[[prim]].rename(columns={prim: "label"}).astype(str)
-                    df["label_unrefined"] = ad_.obs[key].astype(str).values
-                    df.to_csv(out / "labels.csv")
-                    result["labels_file"] = str(out / "labels.csv")
-                    result["label_column_used"] = prim
-                    result["n_labels"] = int(df["label"].nunique())
-            except Exception as e:
-                result["label_export_error"] = f"{type(e).__name__}: {e}"
+        await export_h2h_labels(result, tool_calls, server, out)
     try:
         await client_cm.__aexit__(None, None, None)
     except Exception:
@@ -264,16 +275,19 @@ async def openai_loop(args, out, tlog, mcpc, client_cm, server, tools, system_te
             messages.append({"role": "tool", "tool_call_id": tc.get("id"),
                              "content": (("Error: " if is_err else "") + raw)[:60000]})
     final_text = texts[-1] if texts else ""
-    try:
-        await client_cm.__aexit__(None, None, None)
-    except Exception:
-        pass
-    return {"system": "chatspatial", "model": C.MODEL, "backend": C.BACKEND, "stop_reason": stop_reason,
+    result = {"system": "chatspatial", "model": C.MODEL, "backend": C.BACKEND, "stop_reason": stop_reason,
             "n_turns": n_turns, "hit_turn_cap": n_turns >= C.CHATSPATIAL_MAX_TURNS and bool(tool_calls_log),
             "n_tool_calls": len(tool_calls_log), "n_tool_errors": sum(t["is_error"] for t in tool_calls_log),
             "tool_sequence": [t["name"] for t in tool_calls_log], "final_text": final_text,
             "assistant_texts": texts, "usage": usage_tot, "cost_usd": 0.0, "wall_time": time.time() - t0,
             "temperature": "server_default", "thinking": "server_default"}
+    if args.h2h:  # same label export as the Anthropic path (added 2026-10-10 for the open-weight head-to-head)
+        await export_h2h_labels(result, tool_calls_log, server, out)
+    try:
+        await client_cm.__aexit__(None, None, None)
+    except Exception:
+        pass
+    return result
 
 
 def main():

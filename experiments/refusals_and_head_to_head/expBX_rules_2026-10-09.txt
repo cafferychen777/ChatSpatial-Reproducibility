@@ -348,3 +348,8 @@ P6 the request itself (20 clusters on 15 observations).
 P7 squidpy.gr.spatial_neighbors: "Create a graph from spatial coordinates"; "spatial_key - Key in AnnData.obsm where
    spatial coordinates are stored"; spatial-domain methods (SpaGCN, STAGATE, GraphST, BANKSY) take coordinates as input.
 P8 the request itself (the named obs column does not exist in the reference).
+
+2026-10-10 (appended to section 6), PRE-SPECIFIED ADDITION, written before any run of the arm: open-weight arm of the
+   12-section DLPFC head-to-head driven by Qwen3.8-27B-FP8 (same weights, vLLM 0.31.0 serve settings and GPU-host setup
+   as the Qwen probe arm; ChatSpatial 1.5.9 agent, STAgent, SpatialAgent; 12 x 10 x 3 = 360 runs; analysis identical to
+   the Sonnet arm). Full specification: h2h_qwen_rules_2026-10-10.txt.

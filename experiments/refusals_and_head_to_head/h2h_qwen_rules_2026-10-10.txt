@@ -1,0 +1,118 @@
+EXPERIMENT B-X, PART 2 — OPEN-WEIGHT (QWEN3.8 27B) ARM OF THE DLPFC 12-SECTION HEAD-TO-HEAD
+PRE-SPECIFIED ADDENDUM (written 2026-10-10, before any run of this arm, smoke test included; no result of this arm exists)
+=====================================================================================================================
+Parent rules: expBX_rules_2026-10-09.txt (Part 2, sections 3.1-3.6, and the section-6 entries on the
+open-weight probe arm, the GPU-host platform and ChatSpatial 1.5.9). Everything not stated here is as in the parent rules.
+
+1. PURPOSE
+   The 12-section DLPFC head-to-head was driven only by claude-sonnet-5-5. This arm repeats it with an open-weight model
+   so that the accuracy comparison does not rest on one language model. It is reported next to the Sonnet arm whatever
+   the result.
+
+2. ARM AND MODEL
+   - Model: Qwen/Qwen3.8-27B-FP8, revision 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a, served name Qwen3.8-27B-FP8 (the
+     same weights and revision as the Qwen probe arm, GPU-host job 119).
+   - Serving: vLLM 0.31.0 on the departmental GPU host (one node, NVIDIA GB10, aarch64), server bound to 127.0.0.1 inside the
+     job, OpenAI-compatible /v1/chat/completions (and Anthropic-compatible /v1/messages for SpatialAgent). Serve settings
+     identical to the Qwen probe arm: --max-model-len 131072, --enable-auto-tool-choice --tool-call-parser qwen3_coder,
+     --reasoning-parser qwen3, --default-chat-template-kwargs {"enable_thinking": false} (thinking off),
+     --max-num-seqs 64, --limit-mm-per-prompt {"image": 4, "video": 0}, --gpu-memory-utilization 0.45;
+     VLLM_USE_FLASHINFER_SAMPLER=0, VLLM_USE_DEEP_GEMM=0, HF_HUB_OFFLINE=1.
+   - Sampling: the model's served default (generation_config); no temperature is sent by any harness (as for Sonnet).
+     max_tokens 16000 per response.
+
+3. SYSTEMS (three LLM-driven arms; 12 sections x 10 replicates x 3 systems = 360 runs)
+   - chatspatial: ChatSpatial 1.5.9 (GPU-host env chatspatial_bx159 = the aarch64 chatspatial_bx156 env +
+     chatspatial[full]==1.5.9; pip freeze differs from chatspatial_bx156 only in chatspatial 1.5.6 -> 1.5.9 and
+     spagcn-modern 1.4.0 -> 1.4.1, the same difference as the CPU-cluster build of job 2725920). Same MCP agent harness:
+     all 20 tools with their published schemas as functions, tool_choice auto, the same system text, at most 30
+     assistant turns; the open-weight client path of the probe arm (tool results returned as text; an image result
+     replaced by a one-line note). Labels: the last successful identify_spatial_domains call, exported by the harness
+     exactly as in the Sonnet arm (rule 3.3). Harness fix before any run: the open-weight client path did not yet export
+     head-to-head labels (it was only used for probes); the export code of the Sonnet path is now shared by both paths,
+     unchanged.
+   - stagent (git 054cc64) and spatialagent (git e51ec0f): same drivers, same original configuration and the same
+     client configuration as the open-weight probe arm (STAgent: its OpenAI provider path with the two open-weight
+     config entries; SpatialAgent: no code change, ChatAnthropic sent to vLLM's Anthropic-compatible /v1/messages).
+   - chatspatial_single is not run in this arm; the Sonnet arm's result is not re-used as a Qwen
+     result.
+   - Request, input files, prompts, output paths: identical to the Sonnet arm (rule 3.2; same fixture files, byte-
+     identical copies of the CPU-cluster fixtures/dlpfc/<sid>/<sid>.h5ad at the same absolute container paths). Labels withheld.
+
+4. EXECUTION
+   - Isolation as in the open-weight probe arm: one Docker container per run (image buildpack-deps:jammy-scm, arm64),
+     read-only binds of exactly the task's input directory and the code/environments it needs, a writable node-local
+     run directory and HOME copied back afterwards, host network for the localhost endpoint. Containers get
+     --oom-score-adj 800 so that under memory pressure a run container, not the shared model server, is stopped (such a
+     run counts as a failed run, recorded as is).
+   - 45-minute wall-clock limit per run; a run that reaches it is stopped and scored on its saved output (rule 1.3).
+   - 4 runs at a time (as the probe arm on this host; 4 threads each). Order: replicate-major, sections and systems
+     interleaved within each replicate (expBX_make_tasks.py order), so complete replicates of all systems on all 12
+     sections accumulate first. The job is chained (Slurm 24 h limit); a run is started only when at least 47 minutes
+     remain in the job, so no run is cut by the job limit; the next job continues the same queue (finished runs skipped).
+   - Smoke test before the full queue (excluded from all analyses, tag ow_qwen38_h2h_smoke): section 151673, replicate 0,
+     one run per system (3 runs). After the smoke test only harness/environment faults may be fixed (logged below);
+     model, serve settings, prompts, outcomes and statistics cannot change.
+
+5. ANALYSIS (identical to the Sonnet arm)
+   - Same scoring code (expBX_analysis.py h2h; rules 3.3-3.5): ARI and NMI against layer_guess_reordered on annotated
+     spots, label-column rule 3.3, output-verified completion, methods chosen, cross-replicate ARI as the mean pairwise
+     ARI per section, per-system mean over sections of per-section means (primary) and intention-to-treat sensitivity,
+     paired ChatSpatial - agent differences per section with the cluster bootstrap over sections (10,000 draws,
+     percentile, seed 20261009) and the exact two-sided sign-flip test over the 12 sections; same for NMI and
+     cross-replicate ARI. No LLM judge.
+   - Comparisons are within backend (Qwen ChatSpatial vs Qwen STAgent, Qwen ChatSpatial vs Qwen SpatialAgent), reported
+     next to the Sonnet-arm comparisons. "System-reported success" for the chatspatial arm: the loop ended normally
+     (finish_reason "stop", the OpenAI-format equivalent of end_turn), no harness error, no timeout.
+   - If a system cannot use the model at all (no usable tool calls), that is recorded as the outcome, not forced
+     (as the probe-arm rule).
+   - Every run counts; all numbers are reported, favourable or not, with n/N and CIs.
+
+6. DIFFERENCES FROM THE SONNET ARM (besides the model)
+   - Thinking off (served setting of the open-weight arm) vs Sonnet's provider-default adaptive thinking.
+   - Host and isolation: GPU-host Docker (aarch64 rebuilds with the same pins) vs CPU-cluster apptainer; runs share the
+     node's 20 cores and memory with the model server (no per-run memory cap; CPU-cluster runs had 4 CPUs / 40 GB each);
+     4 concurrent runs vs 8 on the CPU cluster.
+   - ChatSpatial client message format is OpenAI chat format with text-only tool results (as in the probe arm).
+
+7. CHANGE LOG (entries after this file was written)
+2026-10-11, smoke test (GPU-host job 121; tag ow_qwen38_h2h_smoke; excluded from all analyses). Harness/environment
+   faults found and fixed; model, serve settings, prompts, outcomes and statistics unchanged:
+ - The ChatSpatial 1.5.9 env was not visible inside the container (the host-prefix mirror needs a link for each env, as
+   for chatspatial_bx156); link added. The first chatspatial smoke run failed at container start (set aside as
+   rep_0__envbind_failed_1). A manual re-launch inside the job started 5 copies of the run by mistake (srun without -n 1);
+   they were killed within 2 minutes and set aside (rep_0__dup_launch_killed_2).
+ - Qwen sends the nested "params" argument of ChatSpatial tools as a JSON-encoded string, which the MCP server accepts
+   and applies (verified in the transcript). The harness's label export assumed a dict and failed after the run had
+   finished (rep_0__export_bug_3, no labels); it now decodes the string. The tool calls themselves are unchanged.
+ - Scoring: the success rule's "end_turn" also accepts "stop" (pre-specified in section 5 above).
+   Smoke results (151673, rep 0): chatspatial 6 tool calls, finish "stop", Leiden (resolution 1.0, spatial weight 0.5,
+   refined), 7 domains, ARI 0.423, NMI 0.602, 3.3 min; spatialagent success, out/result.h5ad written, column
+   spatial_domain (9 labels), ARI 0.269, NMI 0.455, 13.1 min; stagent: 33 well-formed tool-calling responses, then
+   STAgent's own recursion limit (50) was reached without output (GraphRecursionError; original configuration kept),
+   no labels, 20.1 min. Tool calling works for all three clients (no API errors).
+2026-10-11, full queue: 360 runs (tasks/ow_qwen38_h2h.jsonl, tag ow_qwen38_h2h) in chained 24-h jobs on the GPU host.
+2026-10-11, ADDENDUM (written before any run of this arm, smoke test included; no result of it exists): chatspatial_single
+   is added to the Qwen arm (replaces the section-3 sentence "chatspatial_single is not run in this
+   arm"). Settings:
+ - Model and serving: the same as the three agent systems of this arm (section 2): Qwen3.8-27B-FP8 at the same revision,
+   vLLM 0.31.0 with identical serve settings (thinking off via the chat-template default, served default sampling, no
+   temperature sent, max_tokens 16000), OpenAI chat format (/v1/chat/completions; client settings as the chatspatial
+   agent's open-weight path: up to 3 attempts on HTTP 5xx). No tools are offered in this call, so no tool result or image
+   reaches the model.
+ - Protocol: identical to the Sonnet arm's chatspatial_single (rule 3.1, expBX_single_call.py): one call, system = the
+   original SCHEMA_FULL + RESPONSE_INSTRUCTION text, user = the original open DLPFC prompt; the reply is parsed with the
+   original parser, validated against SpatialDomainParameters and executed once with identify_spatial_domains on a
+   fresh copy of the section's input, no further LLM call. Scored label = domain_key (unrefined), as in the Sonnet arm.
+   Code: expBX_single_call.py gains an EXPBX_BACKEND=openai branch; the Anthropic path is unchanged.
+ - Environment and execution: ChatSpatial 1.5.9 env chatspatial_bx159 (as this arm's chatspatial system), same Docker
+   isolation, 45-minute limit, 4 concurrent runs; same 12 sections x 10 replicates (rep 0-9) = 120 runs
+   (tasks/ow_qwen38_h2h_single.jsonl, tag ow_qwen38_h2h, run directories runs/ow_qwen38_h2h/h2h/chatspatial_single/).
+   Job script expBX_openweight_h2h_single.sbatch = the agent-arm job script plus an end-of-job gate check only.
+ - Smoke test first (excluded from all analyses; tag ow_qwen38_h2h_smoke, tasks/ow_qwen38_h2h_single_smoke.jsonl):
+   section 151673, replicate 0, one run. The 120-run job starts only if the smoke run finished with success and labels
+   (Slurm afterok on the gated smoke job). Both are queued after the agent-arm chain (afterany:125), since the node has
+   one GPU.
+ - Analysis unchanged (section 5): the same expBX_analysis.h2h code scores chatspatial_single next to the three agent
+   systems (tasks/ow_qwen38_h2h_all.jsonl = ow_qwen38_h2h.jsonl + ow_qwen38_h2h_single.jsonl); the paired
+   chatspatial_single - agent comparisons are within backend, as in the Sonnet arm.

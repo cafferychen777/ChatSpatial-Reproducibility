@@ -1,0 +1,319 @@
+{
+ "n_runs": 480,
+ "systems": {
+  "chatspatial": {
+   "n": 120,
+   "success": "119/120",
+   "verified": "111/120",
+   "scorable": "120/120",
+   "timeouts": 0,
+   "ari_mean": 0.3116697432956504,
+   "ari_itt_mean": 0.3116697432956504,
+   "nmi_mean": 0.48484033229797746,
+   "xrep_ari_mean": 0.5502437428098255,
+   "ari_per_section": {
+    "151507": 0.4256,
+    "151508": 0.3652,
+    "151509": 0.3323,
+    "151510": 0.3395,
+    "151669": 0.1839,
+    "151670": 0.2253,
+    "151671": 0.3018,
+    "151672": 0.3703,
+    "151673": 0.32,
+    "151674": 0.3062,
+    "151675": 0.2939,
+    "151676": 0.2759
+   },
+   "method_counts": {
+    "stagate": 55,
+    "leiden": 23,
+    "graphst": 22,
+    "banksy": 14,
+    "spagcn": 4,
+    "default": 2
+   },
+   "ari_ci": [
+    0.27423448948714885,
+    0.3476429489314501
+   ]
+  },
+  "stagent": {
+   "n": 120,
+   "success": "39/120",
+   "verified": "45/120",
+   "scorable": "58/120",
+   "timeouts": 4,
+   "ari_mean": 0.21332671581175586,
+   "ari_itt_mean": 0.10574086566008327,
+   "nmi_mean": 0.3358794657092042,
+   "xrep_ari_mean": 0.26423532310918796,
+   "ari_per_section": {
+    "151507": 0.2118,
+    "151508": 0.2585,
+    "151509": 0.2214,
+    "151510": 0.23,
+    "151669": 0.2467,
+    "151670": 0.2157,
+    "151671": 0.0985,
+    "151672": 0.2044,
+    "151673": 0.184,
+    "151674": 0.2131,
+    "151675": 0.2592,
+    "151676": 0.2164
+   },
+   "method_counts": {
+    "": 84,
+    "leiden|squidpy_nhood": 10,
+    "leiden|louvain|squidpy_nhood": 9,
+    "leiden|louvain": 8,
+    "leiden": 5,
+    "squidpy_nhood": 2,
+    "leiden|louvain|gmm|squidpy_nhood": 1,
+    "louvain|squidpy_nhood": 1
+   },
+   "ari_ci": [
+    0.1734582475545318,
+    0.24824677205285828
+   ]
+  },
+  "spatialagent": {
+   "n": 120,
+   "success": "104/120",
+   "verified": "96/120",
+   "scorable": "98/120",
+   "timeouts": 0,
+   "ari_mean": 0.2620948046710851,
+   "ari_itt_mean": 0.21506030484361982,
+   "nmi_mean": 0.40881992452307,
+   "xrep_ari_mean": 0.36129518462795646,
+   "ari_per_section": {
+    "151507": 0.2995,
+    "151508": 0.2507,
+    "151509": 0.1874,
+    "151510": 0.2835,
+    "151669": 0.1924,
+    "151670": 0.165,
+    "151671": 0.2617,
+    "151672": 0.312,
+    "151673": 0.267,
+    "151674": 0.3046,
+    "151675": 0.3537,
+    "151676": 0.2677
+   },
+   "method_counts": {
+    "spagcn|graphst|leiden|squidpy_nhood": 73,
+    "": 18,
+    "graphst|leiden|squidpy_nhood": 8,
+    "spagcn|graphst|leiden": 7,
+    "spagcn|graphst|leiden|kmeans|squidpy_nhood": 3,
+    "spagcn|graphst|leiden|louvain|squidpy_nhood": 3,
+    "graphst|leiden": 2,
+    "spagcn|graphst|leiden|kmeans": 1,
+    "spagcn|graphst|leiden|louvain|kmeans": 1,
+    "spagcn|graphst|leiden|kmeans|agglomerative": 1,
+    "spagcn|graphst|leiden|louvain": 1,
+    "spagcn|graphst|leiden|louvain|kmeans|agglomerative|squidpy_nhood": 1,
+    "spagcn|graphst|leiden|louvain|kmeans|squidpy_nhood": 1
+   },
+   "ari_ci": [
+    0.2280942982777788,
+    0.29535693430407495
+   ]
+  },
+  "chatspatial_single": {
+   "n": 120,
+   "success": "120/120",
+   "verified": "120/120",
+   "scorable": "120/120",
+   "timeouts": 0,
+   "ari_mean": 0.37520756585915027,
+   "ari_itt_mean": 0.37520756585915027,
+   "nmi_mean": 0.49696849518143543,
+   "xrep_ari_mean": 1.0,
+   "ari_per_section": {
+    "151507": 0.417,
+    "151508": 0.3762,
+    "151509": 0.4001,
+    "151510": 0.3858,
+    "151669": 0.2841,
+    "151670": 0.1844,
+    "151671": 0.4585,
+    "151672": 0.5105,
+    "151673": 0.3702,
+    "151674": 0.4151,
+    "151675": 0.3892,
+    "151676": 0.3113
+   },
+   "method_counts": {
+    "spagcn": 120
+   },
+   "ari_ci": [
+    0.32656578951239723,
+    0.41841023287145956
+   ]
+  }
+ },
+ "paired": {
+  "chatspatial-stagent:ari": {
+   "n_sections": 12,
+   "mean_diff": 0.09834302748389455,
+   "n_sections_positive": 11,
+   "ci95": [
+    0.04378496563411189,
+    0.1515181063919766
+   ],
+   "p_signflip": 0.0029296875
+  },
+  "chatspatial-stagent:itt": {
+   "n_sections": 12,
+   "mean_diff": 0.20592887763556714,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.15578268087265354,
+    0.25402257249380633
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial-stagent:nmi": {
+   "n_sections": 12,
+   "mean_diff": 0.14896086658877333,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.09268271536742273,
+    0.21387982903932554
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial-stagent:xrep": {
+   "n_sections": 12,
+   "mean_diff": 0.28600841970063756,
+   "n_sections_positive": 11,
+   "ci95": [
+    0.20089519966187638,
+    0.3623584278561768
+   ],
+   "p_signflip": 0.0009765625
+  },
+  "chatspatial-spatialagent:ari": {
+   "n_sections": 12,
+   "mean_diff": 0.04957493862456531,
+   "n_sections_positive": 10,
+   "ci95": [
+    0.011280279808301274,
+    0.08665047151988402
+   ],
+   "p_signflip": 0.01904296875
+  },
+  "chatspatial-spatialagent:itt": {
+   "n_sections": 12,
+   "mean_diff": 0.09660943845203056,
+   "n_sections_positive": 11,
+   "ci95": [
+    0.05312728004370132,
+    0.14039252259336368
+   ],
+   "p_signflip": 0.0009765625
+  },
+  "chatspatial-spatialagent:nmi": {
+   "n_sections": 12,
+   "mean_diff": 0.07602040777490754,
+   "n_sections_positive": 11,
+   "ci95": [
+    0.043621829154128405,
+    0.10891619508358996
+   ],
+   "p_signflip": 0.0009765625
+  },
+  "chatspatial-spatialagent:xrep": {
+   "n_sections": 12,
+   "mean_diff": 0.1889485581818691,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.14029312935992602,
+    0.23968767594009668
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial_single-stagent:ari": {
+   "n_sections": 12,
+   "mean_diff": 0.16188085004739447,
+   "n_sections_positive": 11,
+   "ci95": [
+    0.09888554378309433,
+    0.22813566236678828
+   ],
+   "p_signflip": 0.0009765625
+  },
+  "chatspatial_single-stagent:itt": {
+   "n_sections": 12,
+   "mean_diff": 0.269466700199067,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.20529373883590002,
+    0.33176044892332346
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial_single-stagent:nmi": {
+   "n_sections": 12,
+   "mean_diff": 0.16108902947223128,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.09713270771452412,
+    0.24160605946934258
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial_single-stagent:xrep": {
+   "n_sections": 12,
+   "mean_diff": 0.735764676890812,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.6693813685733037,
+    0.7952318940092548
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial_single-spatialagent:ari": {
+   "n_sections": 12,
+   "mean_diff": 0.11311276118806524,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.07684403468721818,
+    0.15109720418433395
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial_single-spatialagent:itt": {
+   "n_sections": 12,
+   "mean_diff": 0.16014726101553045,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.11825218331071695,
+    0.20320577954420224
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial_single-spatialagent:nmi": {
+   "n_sections": 12,
+   "mean_diff": 0.08814857065836545,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.0569345229889137,
+    0.12296471943956737
+   ],
+   "p_signflip": 0.00048828125
+  },
+  "chatspatial_single-spatialagent:xrep": {
+   "n_sections": 12,
+   "mean_diff": 0.6387048153720435,
+   "n_sections_positive": 12,
+   "ci95": [
+    0.5966278992448546,
+    0.6803702347853876
+   ],
+   "p_signflip": 0.00048828125
+  }
+ }
+}
