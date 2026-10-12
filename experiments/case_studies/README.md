@@ -1,8 +1,8 @@
 # Case studies: OSCC and HGSOC, and deconvolution method concordance
 
-Manuscript: Results section "Case studies run through recorded ChatSpatial calls recover the central structure of
-two published cancer analyses", Figures 5 and 6, Supplementary Tables 1 and 7, Methods "OSCC case study", "HGSOC
-case study" and "Deconvolution method concordance".
+Manuscript: Results section 2.7 "Recorded multi-method workflows across Python and R recover the central structure
+of two published cancer analyses", Figures 5 and 6, Supplementary Tables 1 and 7, Methods "Case studies"
+(paragraphs "OSCC case study", "HGSOC case study" and "Deconvolution method concordance").
 
 Both case studies were run with ChatSpatial 1.5.7 (`pip install "chatspatial[full]==1.5.7"`). A client started the
 ChatSpatial MCP server over stdio (`python -m chatspatial server --transport stdio`) and issued every analysis step

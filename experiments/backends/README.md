@@ -1,7 +1,7 @@
 # Experiment B: tool selection and execution across eight language-model backends
 
-Manuscript: Results section "Tool selection is determined by the typed interface and holds across eight language
-models", Methods "Backend dependence", Figure 3 (`figures/figureB_backends.py`), Supplementary Table 8 and the
+Manuscript: Results section 2.4 "Tool selection is determined by the typed interface and holds across eight LLMs",
+Methods "Backend dependence", Figure 3 (`figures/figureB_backends.py`), Supplementary Table 8 and the
 `Supplementary_Table_expB_*.csv` files.
 
 The evaluation rules were written before the runs and are in `expB_rules_2026-10-08.txt` (design, per-trial outcome

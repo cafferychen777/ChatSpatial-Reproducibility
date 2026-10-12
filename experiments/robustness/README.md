@@ -1,6 +1,6 @@
 # Experiment A: schema-derived parameter robustness
 
-Manuscript: Results section "Schema-derived parameter spaces make robustness analysis systematic", Methods
+Manuscript: Results section 2.6 "Schema-derived parameter spaces make robustness analysis systematic", Methods
 "Schema-derived parameter robustness and label-free selection", Figure 4 (`figures/figureA_robustness.py`).
 
 The selection rule, the grid rules, the outcomes and the statistics were fixed before any ground-truth evaluation.
