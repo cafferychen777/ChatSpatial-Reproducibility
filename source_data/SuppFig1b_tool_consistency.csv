@@ -1,0 +1,16 @@
+condition,model,consistency_pct,ci_lo_pct,ci_hi_pct
+full_schema,gemini-2.5-flash,100.0,100.0,100.0
+full_schema,claude-haiku-4-5-20251001,100.0,100.0,100.0
+full_schema,gpt-5.4,100.0,100.0,100.0
+bare_schema,gemini-2.5-flash,100.0,100.0,100.0
+bare_schema,claude-haiku-4-5-20251001,100.0,100.0,100.0
+bare_schema,gpt-5.4,100.0,100.0,100.0
+no_schema,gemini-2.5-flash,100.0,100.0,100.0
+no_schema,claude-haiku-4-5-20251001,100.0,100.0,100.0
+no_schema,gpt-5.4,100.0,100.0,100.0
+stagent_context,gemini-2.5-flash,87.5,75.0,96.25
+stagent_context,claude-haiku-4-5-20251001,89.6425,74.6425,100.0
+stagent_context,gpt-5.4,86.25,80.0,92.5
+spatialagent_context,gemini-2.5-flash,98.4375,95.3125,100.0
+spatialagent_context,claude-haiku-4-5-20251001,91.25,78.75,100.0
+spatialagent_context,gpt-5.4,93.75,87.5,98.75

@@ -212,26 +212,83 @@ def table1_dataframe() -> pd.DataFrame:
     )
 
 
-def read_jsonl_summary(path: Path) -> pd.DataFrame:
+def read_sensitivity_trials(path: Path) -> pd.DataFrame:
+    """One row per prompt-sensitivity trial: prompt group, paraphrase, model, replicate, selected tool,
+    parameters (JSON) and validation outcome."""
     rows = []
     with require_path(path).open() as fh:
-        for line_no, line in enumerate(fh, start=1):
+        for line in fh:
             if not line.strip():
                 continue
             record = json.loads(line)
             rows.append(
                 {
-                    "line": line_no,
+                    "trial_key": record.get("trial_key"),
+                    "group_id": record.get("group_id"),
+                    "paraphrase_idx": record.get("paraphrase_idx"),
                     "model": record.get("model"),
-                    "prompt_id": record.get("prompt_id"),
-                    "replicate": record.get("replicate"),
-                    "tool_name": record.get("tool_name"),
-                    "parse_success": record.get("parse_success"),
+                    "rep": record.get("rep"),
+                    "parse_ok": record.get("parse_ok"),
+                    "tool_name": record.get("tool_name_resolved"),
+                    "tool_correct": record.get("tool_correct"),
+                    "params": json.dumps(record.get("params"), sort_keys=True),
                     "pydantic_valid": record.get("pydantic_valid"),
-                    "error": record.get("error"),
+                    "pydantic_error": record.get("pydantic_error"),
                 }
             )
     return pd.DataFrame(rows)
+
+
+# Figure 1b: tool calls per section of each method in the robustness study (PREREGISTRATION, 1.5.5 addendum);
+# each call is scored with six post-processing variants (unrefined, or refined at 0.1/0.3/0.5/0.7/0.9).
+FIG1B_METHODS = [("spagcn", "SpaGCN"), ("stagate", "STAGATE"), ("graphst", "GraphST"),
+                 ("banksy", "BANKSY"), ("leiden", "Leiden"), ("louvain", "Louvain")]
+
+
+def fig1b_configurations() -> pd.DataFrame:
+    """Schema-valid configurations per section of each method (grid and default calls x 6 variants),
+    counted in the robustness-study configuration table and checked to be equal on all 12 sections."""
+    df = pd.read_csv(require_path(PAPER_DIR / "experiments" / "robustness" / "results" / "configurations_dlpfc155.csv.gz"),
+                     usecols=["section", "method", "strategy", "rep", "call_id", "config"])
+    df = df[(df["rep"] == "full") & (df["strategy"] != "expert")]
+    calls = df.groupby(["method", "section"])["call_id"].nunique().unstack()
+    confs = df.groupby(["method", "section"])["config"].nunique().unstack()
+    rows = []
+    for key, label in FIG1B_METHODS:
+        if calls.loc[key].nunique() != 1 or confs.loc[key].nunique() != 1:
+            raise ValueError(f"{label}: configuration count differs between sections")
+        rows.append({"method": label, "calls_per_section": int(calls.loc[key].iloc[0]),
+                     "postprocessing_variants": int(confs.loc[key].iloc[0] // calls.loc[key].iloc[0]),
+                     "configurations_per_section": int(confs.loc[key].iloc[0]),
+                     "n_sections": int(calls.shape[1])})
+    out = pd.DataFrame(rows)
+    if out["configurations_per_section"].sum() != 2724:
+        raise ValueError("Figure 1b configurations do not sum to 2,724")
+    return out
+
+
+def fig1b_parameters() -> pd.DataFrame:
+    """Parameters of the 20 tools of ChatSpatial 1.5.9 by constraint type; last row, the totals
+    (449 parameters: 375 constrained by enumerations, numeric bounds or defaults, 74 free text)."""
+    df = pd.read_csv(require_path(PAPER_DIR / "experiments" / "schema_constraints" / "constraint_surface_chatspatial_1.5.9.csv"))
+    df = df.drop(columns=["determinism_score"])
+    df.insert(df.columns.get_loc("free_text_params"), "constrained_params",
+              df["enum_constrained_params"] + df["numeric_constrained_params"] + df["default_params"])
+    total = df.drop(columns=["tool_name"]).sum()
+    df = pd.concat([df, pd.DataFrame([{"tool_name": "All 20 tools", **total.to_dict()}])], ignore_index=True)
+    if (int(total["total_params"]), int(total["constrained_params"]), int(total["free_text_params"])) != (449, 375, 74):
+        raise ValueError("Figure 1b parameter split is not 449/375/74")
+    return df
+
+
+def fig1d_categories() -> pd.DataFrame:
+    """Methods per analytical category, counted in Supplementary Table 2 (one row per selectable method)."""
+    df = pd.read_csv(require_path(SUPP_TABLE_DIR / "Supplementary_Table_2_Integrated_Methods.csv"))
+    out = (df.groupby("Analytical Category", sort=False).size().rename("n_methods").reset_index()
+           .sort_values("n_methods", ascending=False, kind="stable").reset_index(drop=True))
+    if len(out) != 13 or out["n_methods"].sum() != 65:
+        raise ValueError("Figure 1d does not have 65 methods in 13 categories")
+    return out
 
 
 def source_data_sheets() -> list[tuple[str, pd.DataFrame, str, str]]:
@@ -240,8 +297,12 @@ def source_data_sheets() -> list[tuple[str, pd.DataFrame, str, str]]:
     notes = pd.DataFrame(
         [
             {
-                "item": "Figure 1",
-                "note": "Conceptual architecture schematic; no quantitative plotted source data.",
+                "item": "Figure 1a,c",
+                "note": "Conceptual schematics; no quantitative plotted source data. Panels b and d are in Fig1b_configurations, Fig1b_parameters and Fig1d_categories.",
+            },
+            {
+                "item": "Supplementary Figure 1",
+                "note": "Sheets SuppFig1a_param_concordance and SuppFig1b_tool_consistency; the trials are in Fig2f_SuppFig1a_sens_trials and Fig2f_SuppFig1b_cross_system.",
             },
             {
                 "item": "Figure 5 H&E backgrounds",
@@ -257,8 +318,13 @@ def source_data_sheets() -> list[tuple[str, pd.DataFrame, str, str]]:
 
     sheets.append(("Table1_platform", table1_dataframe(), "main.tex", "Main text platform compatibility table."))
 
-    # Sheets are labelled by the figure numbers of the manuscript: Figure 2 DLPFC
-    # head-to-head (a-b), ablation and cross-system (c-k); Figure 3 backend study; Figure 4 parameter
+    sheets.append(("Fig1b_configurations", fig1b_configurations(), "experiments/robustness/results/configurations_dlpfc155.csv.gz", "Figure 1b lattice: tool calls, post-processing variants and schema-valid configurations per DLPFC section for the six methods of the robustness study (2,724 in total; one dot per 30 configurations)."))
+    sheets.append(("Fig1b_parameters", fig1b_parameters(), "experiments/schema_constraints/constraint_surface_chatspatial_1.5.9.csv", "Figure 1b parameter bar: parameters of the 20 tools by constraint type (ChatSpatial 1.5.9); 449 parameters, 375 constrained (83.5%), 74 free text."))
+    sheets.append(("Fig1d_categories", fig1d_categories(), "supplementary_tables/Supplementary_Table_2_Integrated_Methods.csv", "Figure 1d number of methods in each of the 13 analytical categories (65 methods)."))
+
+    # Sheets are labelled by the figure numbers of the manuscript: Figure 1 schema (b, d); Figure 2 DLPFC
+    # head-to-head (a-b), schema ablation (c-e), tool selection (f) and end-to-end comparison (g-h), with
+    # Supplementary Figure 1 (prompt and replicate consistency); Figure 3 backend study; Figure 4 parameter
     # robustness; Figure 5 OSCC case study; Figure 6 HGSOC case study.
     sheets.append(("Fig2ab_h2h_trials", pd.read_csv(require_path(H2H / "fig2ab_trials.csv")), "fig2ab_trials.csv", "Figure 2a-b DLPFC head-to-head: per-trial ARI and NMI for the four arms (12 sections x 10 replicates)."))
     sheets.append(("Fig2ab_h2h_sections", pd.read_csv(require_path(H2H / "fig2ab_sections.csv")), "fig2ab_sections.csv", "Figure 2a-b DLPFC head-to-head: per-section mean ARI (points in a) and cross-replicate ARI."))
@@ -266,18 +332,24 @@ def source_data_sheets() -> list[tuple[str, pd.DataFrame, str, str]]:
     sheets.append(("Fig2c_invocation", pd.read_csv(require_path(ROUND1 / "ablation" / "invocation" / "ablation_invocation_results.csv")), "ablation_invocation_results.csv", "Figure 2c invocation ablation."))
     sheets.append(("Fig2de_ablation_e2e", pd.read_csv(require_path(ROUND1 / "ablation" / "e2e" / "ablation_e2e_results.csv")), "ablation_e2e_results.csv", "Figure 2d-e execution rates."))
     sheets.append(("Fig2e_concordance", pd.read_csv(require_path(ROUND1 / "ablation" / "analysis" / "ablation_metrics_bootstrap.csv")), "ablation_metrics_bootstrap.csv", "Figure 2e concordance."))
-    sheets.append(("Fig2fg_sensitivity", pd.read_csv(require_path(ROUND1 / "sensitivity" / "prompt_sensitivity_results.csv")), "prompt_sensitivity_results.csv", "Figure 2f-g prompt sensitivity summary."))
-    sheets.append(("Fig2fg_sens_raw", read_jsonl_summary(ROUND1 / "sensitivity" / "prompt_sensitivity_raw.jsonl"), "prompt_sensitivity_raw.jsonl", "Figure 2f-g raw prompt sensitivity trials."))
-    sheets.append(("Fig2hi_cross_system", pd.read_csv(require_path(ROUND1 / "cross_system" / "analysis" / "cross_system_metrics.csv")), "cross_system_metrics.csv", "Figure 2h-i cross-system metrics."))
-    sheets.append(("Fig2j_e2e_summary", pd.read_csv(require_path(ROUND1 / "e2e_benchmark" / "e2e_benchmark_results.csv")), "e2e_benchmark_results.csv", "Figure 2j end-to-end benchmark summary."))
+    sheets.append(("Fig2f_SuppFig1a_sens_trials", read_sensitivity_trials(ROUND1 / "sensitivity" / "prompt_sensitivity_raw.jsonl"), "prompt_sensitivity_raw.jsonl", "Figure 2f (top) and Supplementary Figure 1a: prompt-sensitivity trials (5 prompt groups x 5 paraphrases x 3 LLMs x 5 replicates), with selected tool and parameters."))
+    sheets.append(("Fig2f_SuppFig1a_sens_summary", pd.read_csv(require_path(ROUND1 / "sensitivity" / "prompt_sensitivity_results.csv")), "prompt_sensitivity_results.csv", "Figure 2f (top) and Supplementary Figure 1a: prompt-sensitivity summary per prompt group, paraphrase and LLM."))
+    sheets.append(("Fig2f_SuppFig1b_cross_system", pd.read_csv(require_path(ROUND1 / "cross_system" / "analysis" / "cross_system_metrics.csv")), "cross_system_metrics.csv", "Figure 2f (bottom) and Supplementary Figure 1b: tool selection accuracy and cross-replicate consistency per condition, LLM and prompt (1,200 trials)."))
+    sheets.append(("Fig2g_e2e_summary", pd.read_csv(require_path(ROUND1 / "e2e_benchmark" / "e2e_benchmark_results.csv")), "e2e_benchmark_results.csv", "Figure 2g-h end-to-end comparison on human lymph node: runs completed and mean pairwise concordance per system and task."))
 
-    # Figures 3 and 4 source data are written by figures/figureB_backends.py and
-    # figures/figureA_robustness.py into source_data/ and are read here unchanged.
+    # Source data of Figure 2f-h and Supplementary Figure 1 (figures/figure4.py), Figures 3 and 4
+    # (figures/figureB_backends.py, figures/figureA_robustness.py) and Figure 6f (figures/figure3_hgsoc.py)
+    # are written by the figure scripts into source_data/ and are read here unchanged.
     # Figures 5 and 6 come from the recorded ChatSpatial runs of the case studies
     # (experiments/case_studies/oscc, experiments/case_studies/hgsoc). Their source-data CSVs
     # were written from those outputs (Figure 5: oscc/scripts/oscc157_postrun.py) and are read
     # here unchanged.
     for name, description in [
+        ("Fig2f_tool_selection", "Figure 2f tool selection accuracy per LLM (mean and bootstrap 95% CI): paraphrases per prompt group (top) and system contexts (bottom)."),
+        ("Fig2g_runs_completed", "Figure 2g end-to-end runs completed per system and task (human lymph node, 5 replicates)."),
+        ("Fig2h_pairwise_concordance", "Figure 2h pairwise output concordance between completed replicates of the same system (ARI, Jaccard@100, Jaccard@50)."),
+        ("SuppFig1a_param_concordance", "Supplementary Figure 1a constrained parameter concordance within and across paraphrases (mean and bootstrap 95% CI)."),
+        ("SuppFig1b_tool_consistency", "Supplementary Figure 1b cross-replicate tool consistency per condition and LLM (mean and bootstrap 95% CI over prompts)."),
         ("Fig3a_backends", "Figure 3a output-verified completion and tool-selection accuracy per backend."),
         ("Fig3b_outcomes", "Figure 3b trial outcomes by schema information and constraint mechanism."),
         ("Fig3c_native_vs_json", "Figure 3c odds ratios for native tool calling versus JSON output."),
@@ -288,21 +360,23 @@ def source_data_sheets() -> list[tuple[str, pd.DataFrame, str, str]]:
         ("Fig4b_strategies", "Figure 4b mean ARI under four strategies."),
         ("Fig4c_noise", "Figure 4c ARI retained under count thinning and spot removal."),
         ("Fig4d_platforms", "Figure 4d mean ARI of each method on each platform."),
-        ("Fig5_spatial_maps", "Figure 5a-c,g spot-level overlays."),
-        ("Fig5d_enrichment", "Figure 5d heatmap."),
-        ("Fig5e_consensus", "Figure 5e bars."),
-        ("Fig5e_consensus_CI", "Figure 5e confidence intervals."),
-        ("Fig5f_cellchat", "Figure 5f dot plot."),
-        ("Fig5h_morans", "Figure 5h Moran's I values."),
-        ("Fig5i_marker_genes", "Figure 5i marker gene source."),
-        ("Fig5i_DE_all_genes", "Differential expression table underlying marker summaries."),
-        ("Fig6_spatial_maps", "Figure 6a-b per-spot maps."),
-        ("Fig6cd_summary", "Figure 6c-d summary values."),
-        ("Fig6ef_svg_results", "Figure 6e-f Moran's I values."),
-        ("Fig6f_effect_size", "Figure 6f effect size."),
+        ("Fig5_spatial_maps", "Figure 5a-c,g spot-level overlays of Samples 1 and 9: TC/LE labels (a,b), fibroblast proportion (c), FN1 expression (g)."),
+        ("Fig5d_enrichment", "Figure 5d per-sample LE/TC log2 fold change of mean deconvolution proportion."),
+        ("Fig5e_consensus", "Figure 5e number of samples enriched in the TC or the LE per cell type."),
+        ("Fig5e_consensus_CI", "Figure 5e exact binomial (Clopper-Pearson) 95% confidence intervals."),
+        ("Fig5f_cellchat", "Figure 5f all 105 Fibroblast->Cancer CellChat interactions (17 pathways); the panel shows the 12 with the highest communication probability (column prob)."),
+        ("Fig5h_morans", "Figure 5h and text: Moran's I of every tested gene in all 12 sections (15,215 genes in Sample 1)."),
+        ("Fig5h_marker_genes", "Figure 5h Moran's I of the eight TC and LE target genes in Sample 1 (rows with source_category moranI_sample1), and the consensus TC and LE gene lists named in the text."),
+        ("Fig5h_DE_all_genes", "TC versus LE differential expression per sample underlying the consensus gene lists of Fig5h_marker_genes."),
+        ("Fig6_spatial_maps", "Figure 6a-b per-spot tumor-cell proportion, tumor class, CNV score and CNV cluster."),
+        ("Fig6cd_summary", "Figure 6c-d per-patient cell type composition, tumor burden and CNV score."),
+        ("Fig6ef_svg_results", "Figure 6e Moran's I and rank of all 19,180 genes of P3, with CNV-cluster and cell type marker flags."),
+        ("Fig6f_cnv_vs_background", "Figure 6f Moran's I of the 95 CNV-cluster marker genes and the other 19,085 genes of P3 (drawn_as_point marks the random subset of 200 other genes drawn as points)."),
+        ("Fig6f_effect_size", "Figure 6f two-sided Mann-Whitney test and Cliff's delta with 95% CI (95 CNV-cluster markers versus 19,085 other genes)."),
     ]:
         path = require_path(SOURCE_DIR / f"{name}.csv")
-        sheets.append((name, pd.read_csv(path), str(path.relative_to(PAPER_DIR)), description))
+        # round_trip parsing keeps every float of these pass-through sheets bit-identical when rewritten
+        sheets.append((name, pd.read_csv(path, float_precision="round_trip"), str(path.relative_to(PAPER_DIR)), description))
 
     for idx in range(1, 8):
         filename = f"Supplementary_Table_{idx}_" + {
@@ -355,6 +429,13 @@ def write_source_data() -> list[Path]:
         index_csv = SOURCE_DIR / f"{metadata_name}.csv"
         write_csv(index_csv, metadata)
         source_csv_paths.append(index_csv)
+
+    # Sheets renamed with the figure panels leave their old CSV behind; remove every CSV not written above.
+    written = {path.name for path in source_csv_paths}
+    for stale in sorted(SOURCE_DIR.glob("*.csv")):
+        if stale.name not in written:
+            print(f"  removing stale {stale.relative_to(PAPER_DIR)}")
+            stale.unlink()
 
     zip_path = PAPER_DIR / "source_data.zip"
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:

@@ -92,12 +92,8 @@ def main(tables: Path, out: Path, followup: str = "P3") -> None:
     mk = pd.read_csv(tables / f"cnv_cluster_markers_{followup}.csv")
     markers = mk.loc[mk["rank"] <= 20, "gene"].astype(str).tolist()
     res = marker_vs_background(moran["I"], markers)
-    res_fig = marker_vs_background(moran["I"], markers, exclude=CT_MARKERS)
     pd.DataFrame([res]).to_csv(out / "cliffs_delta_cnv_vs_background.csv", index=False)
-    pd.DataFrame([{**res_fig, "background": "excluding CD14, KRT7, CDH5 (Fig. 6f boxplot)"}]).to_csv(
-        out / "cnv_vs_background_fig3f.csv", index=False)
     print("CNV markers vs background:", res)
-    print("Figure 6f version:", res_fig)
     ranked = moran["I"].dropna().sort_values(ascending=False)
     n = len(ranked)
     ct = [{"gene": g, "I": float(ranked[g]), "rank": int(ranked.index.get_loc(g)) + 1, "n_genes": n,

@@ -1,0 +1,11 @@
+prompt_group,series,concordance_pct,ci_lo_pct,ci_hi_pct
+spatial_domains,within,100.0,100.0,100.0
+spatial_domains,cross,100.0,100.0,100.0
+deconvolution,within,100.0,100.0,100.0
+deconvolution,cross,100.0,100.0,100.0
+svg_detection,within,93.33333333333334,86.66666666666667,98.66666666666667
+svg_detection,cross,93.33333333333333,80.00000000000001,100.0
+cell_communication,within,100.0,100.0,100.0
+cell_communication,cross,100.0,100.0,100.0
+moran_i,within,100.0,100.0,100.0
+moran_i,cross,100.0,100.0,100.0

@@ -1,0 +1,7 @@
+method,calls_per_section,postprocessing_variants,configurations_per_section,n_sections
+SpaGCN,35,6,210,12
+STAGATE,35,6,210,12
+GraphST,84,6,504,12
+BANKSY,150,6,900,12
+Leiden,75,6,450,12
+Louvain,75,6,450,12

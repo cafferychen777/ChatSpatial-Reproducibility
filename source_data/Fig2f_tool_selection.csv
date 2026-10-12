@@ -1,0 +1,31 @@
+block,row,key,model,accuracy_pct,ci_lo_pct,ci_hi_pct,n_trials,bootstrap_unit
+Paraphrases (full schema),Spatial domains,spatial_domains,gemini-2.5-flash,76.0,60.0,92.0,25,trial
+Paraphrases (full schema),Spatial domains,spatial_domains,claude-haiku-4-5-20251001,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Spatial domains,spatial_domains,gpt-5.4,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Deconvolution,deconvolution,gemini-2.5-flash,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Deconvolution,deconvolution,claude-haiku-4-5-20251001,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Deconvolution,deconvolution,gpt-5.4,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),SVG detection,svg_detection,gemini-2.5-flash,96.0,88.0,100.0,25,trial
+Paraphrases (full schema),SVG detection,svg_detection,claude-haiku-4-5-20251001,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),SVG detection,svg_detection,gpt-5.4,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Cell communication,cell_communication,gemini-2.5-flash,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Cell communication,cell_communication,claude-haiku-4-5-20251001,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Cell communication,cell_communication,gpt-5.4,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Moran's $I$,moran_i,gemini-2.5-flash,64.0,44.0,80.0,25,trial
+Paraphrases (full schema),Moran's $I$,moran_i,claude-haiku-4-5-20251001,100.0,100.0,100.0,25,trial
+Paraphrases (full schema),Moran's $I$,moran_i,gpt-5.4,100.0,100.0,100.0,25,trial
+System context,"ChatSpatial, full schema",full_schema,gemini-2.5-flash,95.0,87.5,100.0,80,prompt
+System context,"ChatSpatial, full schema",full_schema,claude-haiku-4-5-20251001,100.0,100.0,100.0,80,prompt
+System context,"ChatSpatial, full schema",full_schema,gpt-5.4,100.0,100.0,100.0,80,prompt
+System context,"ChatSpatial, bare schema",bare_schema,gemini-2.5-flash,81.25,62.5,97.5,80,prompt
+System context,"ChatSpatial, bare schema",bare_schema,claude-haiku-4-5-20251001,100.0,100.0,100.0,80,prompt
+System context,"ChatSpatial, bare schema",bare_schema,gpt-5.4,100.0,100.0,100.0,80,prompt
+System context,"ChatSpatial, no schema",no_schema,gemini-2.5-flash,91.25,78.75,98.75,80,prompt
+System context,"ChatSpatial, no schema",no_schema,claude-haiku-4-5-20251001,100.0,100.0,100.0,80,prompt
+System context,"ChatSpatial, no schema",no_schema,gpt-5.4,100.0,100.0,100.0,80,prompt
+System context,STAgent context,stagent_context,gemini-2.5-flash,85.0,67.5,98.75,80,prompt
+System context,STAgent context,stagent_context,claude-haiku-4-5-20251001,81.25,61.25000000000001,96.25,80,prompt
+System context,STAgent context,stagent_context,gpt-5.4,96.24999999999999,91.25,100.0,80,prompt
+System context,SpatialAgent context,spatialagent_context,gemini-2.5-flash,96.25,88.75,100.0,80,prompt
+System context,SpatialAgent context,spatialagent_context,claude-haiku-4-5-20251001,83.75,67.5,96.25,80,prompt
+System context,SpatialAgent context,spatialagent_context,gpt-5.4,91.25000000000001,81.25,98.75,80,prompt

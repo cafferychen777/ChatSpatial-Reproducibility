@@ -1,66 +1,57 @@
 """
-Figure 5: OSCC spatial transcriptomics case study
-Nature Communications style, double-column (183 mm)
+Figure 5 (file name figure2): OSCC spatial transcriptomics case study.
+Direction A ("Ink & Cobalt") style, authored at 180 mm width.
 
-Layout: 3x3 grid (a-i), 183 mm x ~160 mm
+Row 1 - Spatial discovery:
+  [a] H&E + TC/LE spots (Sample 1)
+  [b] H&E + TC/LE spots (Sample 9)
+  [c] Fibroblast deconvolution proportion (Sample 1)
 
-Row 1 - Spatial Discovery:
-  [a] H&E + TC/LE overlay (s1)
-  [b] H&E + TC/LE overlay (s9)
-  [c] Fibroblast spatial map (s1)
+Row 2 - Cellular composition:
+  [d] Per-sample LE/TC enrichment heatmap (10 cell types x 12 samples)
+  [e] Consensus bar chart (rows shared with d)
+  [f] CellChat Fibroblast -> Cancer interactions, ECM-syndecan axis highlighted
 
-Row 2 - Cellular Composition:
-  [d] Per-sample enrichment heatmap (10 x 12)
-  [e] Consensus bar chart
-  [f] CellChat L-R dot plot
-
-Row 3 - Molecular Mechanism:
-  [g] FN1 spatial expression (s1)
-  [h] Moran's I lollipop chart
-  [i] TC/LE marker gene summary
+Row 3 - Molecular mechanism:
+  [g] FN1 spatial expression (Sample 1)
+  [h] Moran's I of the TC and LE target genes, grouped by programme
 """
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-import matplotlib.gridspec as gridspec
-import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from matplotlib.colors import TwoSlopeNorm
-from PIL import Image as PILImage
+import matplotlib as mpl
 
-from matplotlib.colors import LinearSegmentedColormap
+mpl.use("Agg")
+import matplotlib.patches as mpatches  # noqa: E402
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+from matplotlib.colors import Normalize  # noqa: E402
+from PIL import Image as PILImage  # noqa: E402
+from scipy.spatial import cKDTree  # noqa: E402
 
-from figure_style import (
-    FULL_WIDTH,
-    OI,
-    add_panel_label,
+from figure_style import (  # noqa: E402
+    CMAP_DIVERGING,
+    CMAP_SEQUENTIAL,
+    DOUBLE_COL,
+    HAIRLINE,
+    INK,
+    INK_SOFT,
+    NA_COLOR,
+    PANEL_LABEL_FONT,
+    REGION_COLORS,
     apply_style,
 )
 
-# Custom diverging colormap: TC-blue ← white → LE-vermillion
-# Semantically matches the TC/LE overlay colors in panels a/b
-_TC_LE_CMAP = LinearSegmentedColormap.from_list(
-    "tc_le_diverging",
-    [OI["blue"], "#FFFFFF", OI["vermillion"]],
-    N=256,
-)
-
-# Sequential colormap for LE-associated continuous data (fibroblast, FN1)
-# Starts from a light warm tint (not pure white) so colorbar is visible on white bg
-_VERM_SEQ = LinearSegmentedColormap.from_list(
-    "vermillion_seq",
-    ["#FDF0E8", "#E8985A", OI["vermillion"]],
-    N=256,
-)
-
-# ── Apply global style ────────────────────────────────────────────
 apply_style()
+mpl.rcParams["hatch.linewidth"] = 0.4
+mpl.rcParams["hatch.color"] = "#9A9A9A"
+mpl.rcParams["savefig.bbox"] = "standard"  # keep the 180 mm canvas exactly
 
 # ── Paths ─────────────────────────────────────────────────────────
 FIGURE_DIR = Path(__file__).resolve().parent
@@ -81,104 +72,70 @@ SPOTS_DIR = RUN_DIR / "spots"
 SAMPLE_GEO = {f"s{i}": f"GSM{6339630 + i}" for i in range(1, 13)}
 SAMPLES = [f"s{i}" for i in range(1, 13)]
 
-CELLTYPE_ORDER = [
-    "B cell",
-    "T cell",
-    "Fibroblast",
-    "myocyte",
-    "-Fibroblast",
-    "Endothelial",
-    "Dendritic",
-    "Mast",
-    "Macrophage",
-    "Cancer",
-]
-
+# Rows of d/e: LE-enriched cell types ordered by consensus count, then the TC-enriched cancer cells
+CELLTYPE_ORDER = ["-Fibroblast", "Fibroblast", "Macrophage", "Endothelial", "myocyte",
+                  "B cell", "T cell", "Dendritic", "Mast", "Cancer"]
 CELLTYPE_DISPLAY: Dict[str, str] = {
-    "B cell": "B cell",
-    "T cell": "T cell",
-    "Fibroblast": "Fibroblast",
-    "myocyte": "Myocyte",
-    "-Fibroblast": "Myofibroblast",
-    "Endothelial": "Endothelial",
-    "Dendritic": "Dendritic",
-    "Mast": "Mast cell",
-    "Macrophage": "Macrophage",
-    "Cancer": "Cancer",
+    "-Fibroblast": "CAF", "myocyte": "Myocyte", "Mast": "Mast cell",
 }
 
-# Spot annotation colors
-COLOR_TC = OI["blue"]       # #0072B2
-COLOR_LE = OI["vermillion"]  # #D55E00
-COLOR_OTHER = "#CCCCCC"
+COLOR_TC = REGION_COLORS["TC"]
+COLOR_LE = REGION_COLORS["LE"]
+REGION_NAME = {"TC": "Tumor core", "LE": "Leading edge"}
+
+# Panel f: ECM-syndecan axis named in the text, highlighted in ink; everything else grey
+ECM_SDC1_AXIS = {("COL1A1", "SDC1"), ("COL1A2", "SDC1"), ("FN1", "SDC1")}
+F_TOP_N = 12
+GREY_DOT = "#B8B8B8"
+
+# Font sizes (pt at final 180 mm width; minimum 5 pt)
+FS_TICK = 6.0
+FS_LABEL = 6.5
+FS_SMALL = 5.5
+
+# Fraction of the 100-um Visium spot pitch used as marker diameter
+SPOT_FRAC = 0.78
+SPOT_FRAC_CONT = 0.92  # continuous maps: larger spots so the colour field reads over the H&E
+# H&E opacity on white
+HE_ALPHA = 0.6
 
 
-# ── Helpers ───────────────────────────────────────────────────────
+# ── Loaders ───────────────────────────────────────────────────────
 
 def _load_he_image(sid: str) -> Optional[np.ndarray]:
-    gsm = SAMPLE_GEO[sid]
-    path = GEO_DIR / f"{gsm}_{sid}_tissue_hires_image.png"
-    if not path.exists():
-        return None
-    return np.array(PILImage.open(path))
+    path = GEO_DIR / f"{SAMPLE_GEO[sid]}_{sid}_tissue_hires_image.png"
+    return np.array(PILImage.open(path).convert("RGB")) if path.exists() else None
 
 
 def _load_tissue_positions(sid: str) -> Optional[pd.DataFrame]:
-    import json
     gsm = SAMPLE_GEO[sid]
     path = GEO_DIR / f"{gsm}_{sid}_tissue_positions_list.csv"
     if not path.exists():
         return None
-    df = pd.read_csv(
-        path, header=None,
-        names=["barcode", "in_tissue", "row", "col", "pixel_row", "pixel_col"],
-    )
+    df = pd.read_csv(path, header=None,
+                     names=["barcode", "in_tissue", "row", "col", "pixel_row", "pixel_col"])
     df = df[df["in_tissue"] == 1].copy()
-    sf_path = GEO_DIR / f"{gsm}_{sid}_scalefactors_json.json"
-    if sf_path.exists():
-        with open(sf_path) as f:
-            sf = json.load(f)
-        scale = sf.get("tissue_hires_scalef", 1.0)
-        df["pixel_row"] = df["pixel_row"] * scale
-        df["pixel_col"] = df["pixel_col"] * scale
+    with open(GEO_DIR / f"{gsm}_{sid}_scalefactors_json.json") as fh:
+        scale = json.load(fh).get("tissue_hires_scalef", 1.0)
+    df["pixel_row"] *= scale
+    df["pixel_col"] *= scale
     return df
 
 
-def _load_h5ad(sid: str) -> Any:
+def _load_spots(sid: str) -> Optional[pd.DataFrame]:
     """Spot table of the ChatSpatial run: Leiden domain, TC/LE label and FN1 (log-normalized)."""
     path = SPOTS_DIR / f"{sid}.csv"
-    if not path.exists():
-        return None
-    return pd.read_csv(path, index_col=0)
+    return pd.read_csv(path, index_col=0) if path.exists() else None
 
 
-SpatialData = Tuple[Optional[np.ndarray], Optional[pd.DataFrame], Optional[Any]]
+SpatialData = Tuple[Optional[np.ndarray], Optional[pd.DataFrame], Optional[pd.DataFrame]]
+_CACHE: Dict[str, SpatialData] = {}
 
 
 def _load_spatial_data(sid: str) -> SpatialData:
-    return _load_he_image(sid), _load_tissue_positions(sid), _load_h5ad(sid)
-
-
-def _autocrop_limits(img: np.ndarray, pad: int = 40) -> Tuple[float, float, float, float]:
-    gray = np.mean(img[:, :, :3], axis=2)
-    mask = gray < 230
-    rows = np.any(mask, axis=1)
-    cols = np.any(mask, axis=0)
-    if rows.any() and cols.any():
-        rmin, rmax = np.where(rows)[0][[0, -1]]
-        cmin, cmax = np.where(cols)[0][[0, -1]]
-        return (
-            max(0, cmin - pad), min(img.shape[1], cmax + pad),
-            min(img.shape[0], rmax + pad), max(0, rmin - pad),
-        )
-    return (0, img.shape[1], img.shape[0], 0)
-
-
-def _strip_axes(ax: plt.Axes) -> None:
-    ax.set_xticks([])
-    ax.set_yticks([])
-    for spine in ax.spines.values():
-        spine.set_visible(False)
+    if sid not in _CACHE:
+        _CACHE[sid] = (_load_he_image(sid), _load_tissue_positions(sid), _load_spots(sid))
+    return _CACHE[sid]
 
 
 def _fallback_text(ax: plt.Axes, msg: str) -> None:
@@ -186,548 +143,470 @@ def _fallback_text(ax: plt.Axes, msg: str) -> None:
             transform=ax.transAxes, color="#999999", style="italic")
 
 
-# ── Shared spatial overlay helpers ────────────────────────────────
+# ── Spatial helpers ───────────────────────────────────────────────
 
-TC_LE_ANNOT_COLS = ["tc_le_region", "spatial_domain", "region", "annotation", "cluster"]
+_SPOT_SCATTERS: List[Tuple[plt.Axes, Any, float]] = []  # (ax, scatter, marker diameter in data units)
 
 
-def _prepare_he_faded(img: np.ndarray, tissue_alpha: float = 0.30) -> np.ndarray:
-    """Fade H&E tissue toward white and whiten the grey slide background.
+def _spot_pitch(pos: pd.DataFrame) -> float:
+    """Median nearest-neighbour distance between spots (= 100 um Visium pitch), in image pixels."""
+    xy = pos[["pixel_col", "pixel_row"]].to_numpy(float)
+    d, _ = cKDTree(xy).query(xy, k=2)
+    return float(np.median(d[:, 1]))
 
-    Returns an RGB uint8 array where:
-    - Slide background (uniform grey) → pure white
-    - Tissue → blended toward white by (1 - tissue_alpha)
-    This lets overlay spots pop against a clean, muted background.
-    """
+
+def _tissue_extent(sid: str) -> Tuple[float, float, float, float, float]:
+    """(x0, x1, y0, y1, pitch) of the analysed spots plus one spot pitch of margin."""
+    _, pos, spots = _load_spatial_data(sid)
+    if spots is not None:
+        pos = pos[pos["barcode"].isin(spots.index)]
+    pitch = _spot_pitch(pos)
+    pad = 1.0 * pitch
+    return (pos["pixel_col"].min() - pad, pos["pixel_col"].max() + pad,
+            pos["pixel_row"].min() - pad, pos["pixel_row"].max() + pad, pitch)
+
+
+def _prepare_he(img: np.ndarray, mask: Optional[np.ndarray] = None) -> np.ndarray:
+    """Whiten the slide background (and everything outside the spot-covered tissue mask);
+    show the tissue at HE_ALPHA opacity on white."""
     rgb = img[:, :, :3].astype(np.float64) / 255.0
     sat = rgb.max(axis=2) - rgb.min(axis=2)
     lum = rgb.mean(axis=2)
-    # Slide background: low-saturation mid-grey
-    bg = (sat < 0.06) & (lum > 0.60) & (lum < 0.96)
-    # Dark slide edges / debris
-    bg |= (lum < 0.12)
+    bg = ((sat < 0.07) & (lum > 0.50)) | (lum < 0.12)
     rgb[bg] = 1.0
-    # Blend remaining tissue toward white
-    rgb = tissue_alpha * rgb + (1.0 - tissue_alpha)
+    if mask is not None:
+        rgb = mask[..., None] * rgb + (1.0 - mask[..., None])
+    rgb = HE_ALPHA * rgb + (1.0 - HE_ALPHA)
     return (np.clip(rgb, 0, 1) * 255).astype(np.uint8)
 
 
-def _draw_tc_le_overlay(ax: plt.Axes, sid: str, label: str, title: str) -> None:
-    img, pos, adata = _load_spatial_data(sid)
+def _tissue_mask(pos: pd.DataFrame, c0: int, c1: int, r0: int, r1: int, pitch: float) -> np.ndarray:
+    """Soft mask of the area covered by in-tissue spots (hides the fiducial frame and empty slide)."""
+    from scipy.ndimage import gaussian_filter
+    tree = cKDTree(pos[["pixel_col", "pixel_row"]].to_numpy(float))
+    cc, rr = np.meshgrid(np.arange(c0, c1) + 0.5, np.arange(r0, r1) + 0.5)
+    d, _ = tree.query(np.column_stack([cc.ravel(), rr.ravel()]), k=1)
+    m = (d.reshape(cc.shape) < 0.62 * pitch).astype(float)
+    return np.clip(gaussian_filter(m, sigma=0.12 * pitch), 0, 1)
 
+
+def _draw_he(ax: plt.Axes, sid: str) -> float:
+    """Show the H&E cropped to the analysed tissue (no fiducial frame); return the spot pitch."""
+    img, pos, _ = _load_spatial_data(sid)
+    x0, x1, y0, y1, pitch = _tissue_extent(sid)
     if img is not None:
-        faded = _prepare_he_faded(img, tissue_alpha=0.30)
-        ax.imshow(faded, interpolation="lanczos")
-        xlim = _autocrop_limits(img)
-        ax.set_xlim(xlim[0], xlim[1])
-        ax.set_ylim(xlim[2], xlim[3])
-        ax.set_facecolor("white")
-
-    annotated = False
-    if adata is not None and pos is not None:
-        obs = adata
-        annot_col = next((c for c in TC_LE_ANNOT_COLS if c in obs.columns), None)
-        if annot_col is not None:
-            merged = pos.merge(obs[[annot_col]], left_on="barcode",
-                               right_index=True, how="left")
-            region_str = merged[annot_col].astype(str).fillna("")
-            tc_mask = region_str.apply(
-                lambda v: any(k in v.upper() for k in ("TC", "TUMOR", "CORE")))
-            le_mask = region_str.apply(
-                lambda v: any(k in v.upper() for k in ("LE", "LEADING", "EDGE")))
-            other_mask = ~tc_mask & ~le_mask
-
-            # Other spots: subtle grey to show tissue shape
-            if other_mask.any():
-                ax.scatter(merged.loc[other_mask, "pixel_col"],
-                           merged.loc[other_mask, "pixel_row"],
-                           c="#E0E0E0", s=8, alpha=0.5, linewidths=0,
-                           rasterized=False, zorder=1)
-            # TC spots
-            ax.scatter(merged.loc[tc_mask, "pixel_col"],
-                       merged.loc[tc_mask, "pixel_row"],
-                       c=COLOR_TC, s=16, alpha=0.80, linewidths=0,
-                       rasterized=False, zorder=2)
-            # LE spots
-            ax.scatter(merged.loc[le_mask, "pixel_col"],
-                       merged.loc[le_mask, "pixel_row"],
-                       c=COLOR_LE, s=16, alpha=0.80, linewidths=0,
-                       rasterized=False, zorder=2)
-
-            handles = [
-                mpatches.Patch(color=COLOR_TC, label="TC"),
-                mpatches.Patch(color=COLOR_LE, label="LE"),
-            ]
-            ax.legend(handles=handles, loc="lower right", frameon=False,
-                      fontsize=5, handlelength=0.6, handletextpad=0.3,
-                      borderpad=0.2, labelspacing=0.2)
-            annotated = True
-
-    if not annotated:
-        if pos is not None and img is not None:
-            ax.scatter(pos["pixel_col"], pos["pixel_row"],
-                       c=COLOR_OTHER, s=6, alpha=0.6, linewidths=0, rasterized=False)
-            _fallback_text(ax, "Annotations pending")
-        elif img is None:
-            _fallback_text(ax, "H&E not found")
-
-    _strip_axes(ax)
-    ax.set_title(title, fontsize=7, pad=2)
-    add_panel_label(ax, label)
+        c0, c1 = int(max(np.floor(x0), 0)), int(min(np.ceil(x1), img.shape[1]))
+        r0, r1 = int(max(np.floor(y0), 0)), int(min(np.ceil(y1), img.shape[0]))
+        if sid not in _MASKS:
+            _MASKS[sid] = _tissue_mask(pos, c0, c1, r0, r1, pitch)
+        ax.imshow(_prepare_he(img[r0:r1, c0:c1], _MASKS[sid]), extent=(c0, c1, r1, r0),
+                  interpolation="lanczos", zorder=1)
+    ax.set_xlim(x0, x1)
+    ax.set_ylim(y1, y0)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    return pitch
 
 
-# ── Panel a: H&E + TC/LE (s1) ────────────────────────────────────
-
-def draw_panel_a(ax: plt.Axes) -> None:
-    _draw_tc_le_overlay(ax, "s1", "a", "Sample 1")
+_MASKS: Dict[str, np.ndarray] = {}
 
 
-# ── Panel b: H&E + TC/LE (s9) ────────────────────────────────────
-
-def draw_panel_b(ax: plt.Axes) -> None:
-    _draw_tc_le_overlay(ax, "s9", "b", "Sample 9")
-
-
-# ── Panel c: Fibroblast deconvolution spatial map (s1) ────────────
-
-def draw_panel_c(ax: plt.Axes) -> None:
-    img, pos, adata = _load_spatial_data("s1")
-
-    if img is not None:
-        faded = _prepare_he_faded(img, tissue_alpha=0.25)
-        ax.imshow(faded, interpolation="lanczos")
-        xlim = _autocrop_limits(img)
-        ax.set_xlim(xlim[0], xlim[1])
-        ax.set_ylim(xlim[2], xlim[3])
-        ax.set_facecolor("white")
-
-    fib_col = "Fibroblast"
-    prop_path = RUN_DIR / "proportions" / "s1.csv"
-    props = pd.read_csv(prop_path, index_col=0) if prop_path.exists() else None
-    if props is not None and pos is not None and fib_col in props.columns:
-        merged = pos.merge(props[[fib_col]], left_on="barcode",
-                           right_index=True, how="left")
-        vals = merged[fib_col].fillna(0).values.astype(float)
-        sc = ax.scatter(merged["pixel_col"], merged["pixel_row"],
-                        c=vals, cmap=_VERM_SEQ, s=6, alpha=0.8, linewidths=0,
-                        rasterized=False, vmin=0,
-                        vmax=np.nanmax(vals) if np.nanmax(vals) > 0 else 1)
-        cbar = plt.colorbar(sc, ax=ax, fraction=0.03, pad=0.02, shrink=0.6)
-        cbar.set_label("Proportion", fontsize=5, labelpad=2)
-        cbar.ax.tick_params(labelsize=4.5, width=0.3, length=1.5)
-        cbar.outline.set_linewidth(0.5)
-        cbar.outline.set_edgecolor("#666666")
-    elif pos is not None and img is not None:
-        ax.scatter(pos["pixel_col"], pos["pixel_row"],
-                   c=COLOR_OTHER, s=6, alpha=0.6, linewidths=0, rasterized=False)
-        _fallback_text(ax, "Deconvolution\npending")
-    elif img is None:
-        _fallback_text(ax, "H&E not found")
-
-    _strip_axes(ax)
-    ax.set_title("Fibroblast", fontsize=7, pad=2)
-    add_panel_label(ax, "c")
+def _scatter_spots(ax: plt.Axes, x, y, pitch: float, frac: float = SPOT_FRAC, **kw) -> Any:
+    sc = ax.scatter(x, y, s=4, linewidths=0, zorder=2, **kw)
+    _SPOT_SCATTERS.append((ax, sc, pitch * frac))
+    return sc
 
 
-# ── Panel d: Per-sample enrichment heatmap ────────────────────────
-
-def draw_panel_d(ax: plt.Axes) -> None:
-    path = ANALYSIS_DIR / "per_sample_tc_le_enrichment.csv"
-    df = pd.read_csv(path)
-
-    pivot_fc = df.pivot(index="cell_type", columns="sample", values="log2fc"
-                        ).reindex(index=CELLTYPE_ORDER, columns=SAMPLES)
-
-    mat = pivot_fc.values.astype(float)
-    vmax = 5.0
-    mat_clipped = np.clip(mat, -vmax, vmax)
-
-    norm = TwoSlopeNorm(vmin=-vmax, vcenter=0, vmax=vmax)
-    im = ax.imshow(mat_clipped, aspect="auto", cmap=_TC_LE_CMAP, norm=norm,
-                   interpolation="nearest")
-    # Lock y-limits to match panel e's barh y = arange(n)
-    ax.set_ylim(len(CELLTYPE_ORDER) - 0.5, -0.5)
-
-    # Separator between LE-enriched and TC-enriched
-    ax.axhline(y=8.5, color="black", linewidth=0.8, linestyle="--", zorder=5)
-
-    display_names = [CELLTYPE_DISPLAY.get(ct, ct) for ct in CELLTYPE_ORDER]
-    ax.set_yticks(range(len(CELLTYPE_ORDER)))
-    ax.set_yticklabels(display_names, fontsize=5.5)
-    ax.set_xticks(range(len(SAMPLES)))
-    ax.set_xticklabels([str(i + 1) for i in range(len(SAMPLES))], fontsize=5.5)
-    ax.set_xlabel("Sample", fontsize=6)
-    ax.tick_params(length=2, width=0.4)
-
-    ax.set_title(r"Cell type enrichment (log$_2$ FC)", fontsize=7, pad=3)
-
-    # Restore spines for heatmap
-    for spine in ax.spines.values():
-        spine.set_visible(True)
-        spine.set_linewidth(0.3)
-
-    # Colorbar
-    cbar = plt.colorbar(im, ax=ax, fraction=0.03, pad=0.04, shrink=0.8)
-    cbar.set_label(r"log$_2$ FC", fontsize=5)
-    cbar.ax.tick_params(labelsize=5, width=0.3, length=1.5)
-    cbar.outline.set_linewidth(0.3)
-
-    add_panel_label(ax, "d")
+def _finalize_spot_sizes(fig: plt.Figure) -> None:
+    """Marker diameter (a fraction of the spot pitch) converted to points from the final axes scale."""
+    fig.canvas.draw()
+    for ax, sc, pitch in _SPOT_SCATTERS:
+        p0 = ax.transData.transform((0, 0))
+        p1 = ax.transData.transform((pitch, 0))
+        pitch_pt = abs(p1[0] - p0[0]) * 72.0 / fig.dpi
+        sc.set_sizes([pitch_pt ** 2])
+        print(f"    spot marker: diameter {pitch_pt:.2f} pt, s = {pitch_pt ** 2:.1f} pt^2")
 
 
-# ── Panel e: Consensus bar chart ──────────────────────────────────
+def _identifier(ax: plt.Axes, text: str) -> None:
+    """Short sample identifier under the lower-left corner of a map."""
+    ax.text(0.0, -0.035, text, transform=ax.transAxes, fontsize=FS_TICK,
+            color=INK_SOFT, ha="left", va="top")
 
-def draw_panel_e(ax: plt.Axes) -> None:
-    path = ANALYSIS_DIR / "consensus_tc_le_patterns.csv"
-    consensus = pd.read_csv(path, index_col=0)
-    consensus = consensus.reindex(CELLTYPE_ORDER).copy()
 
-    le_counts = consensus["le_enriched_count"].values
-    tc_counts = consensus["tc_enriched_count"].values
+def _map_colorbar(fig: plt.Figure, ax: plt.Axes, sc, label: str, ticks) -> None:
+    """Short horizontal colour bar under the lower-right corner of a map; label to its left."""
+    pos = ax.get_position()
+    W, H = fig.get_size_inches()
+    w_in, h_in = 0.50, 0.05
+    cax = fig.add_axes([pos.x1 - w_in / W, pos.y0 - 0.075 / H - h_in / H, w_in / W, h_in / H])
+    cb = fig.colorbar(sc, cax=cax, orientation="horizontal", ticks=ticks)
+    cb.outline.set_visible(False)
+    cb.ax.tick_params(labelsize=FS_SMALL, length=1.5, width=0.4, pad=1)
+    if isinstance(label, tuple):  # (italic gene symbol, plain remainder)
+        t = cax.text(-0.06, 0.5, label[1], transform=cax.transAxes, fontsize=FS_SMALL,
+                     ha="right", va="center", color=INK)
+        cax.annotate(label[0], xy=(0, 0.5), xycoords=t, fontsize=FS_SMALL, fontstyle="italic",
+                     ha="right", va="center", color=INK)
+    else:
+        cax.text(-0.06, 0.5, label, transform=cax.transAxes, fontsize=FS_SMALL,
+                 ha="right", va="center", color=INK)
 
-    y = np.arange(len(CELLTYPE_ORDER))
-    bar_h = 0.55
 
-    ax.barh(y, le_counts, height=bar_h, color=OI["vermillion"],
-            edgecolor="white", linewidth=0.3, label="LE enriched", zorder=3)
-    ax.barh(y, -tc_counts, height=bar_h, color=OI["blue"],
-            edgecolor="white", linewidth=0.3, label="TC enriched", zorder=3)
+# ── Panels a, b: H&E + TC/LE ─────────────────────────────────────
 
-    # Clopper-Pearson 95% CI error bars
-    ci_path = ANALYSIS_DIR / "consensus_binomial_ci.csv"
-    if ci_path.exists():
-        ci_df = pd.read_csv(ci_path)
-        for i, ct in enumerate(CELLTYPE_ORDER):
-            le_row = ci_df[(ci_df["cell_type"] == ct) & (ci_df["direction"] == "LE")]
-            if len(le_row) == 1:
-                lo = le_row["ci_lower"].values[0] * 12
-                hi = le_row["ci_upper"].values[0] * 12
-                k = le_row["k"].values[0]
-                if k > 0:
-                    ax.plot([lo, hi], [y[i], y[i]], color="#333333",
-                            linewidth=0.5, zorder=4, solid_capstyle="round")
-            tc_row = ci_df[(ci_df["cell_type"] == ct) & (ci_df["direction"] == "TC")]
-            if len(tc_row) == 1:
-                lo = tc_row["ci_lower"].values[0] * 12
-                hi = tc_row["ci_upper"].values[0] * 12
-                k = tc_row["k"].values[0]
-                if k > 0:
-                    ax.plot([-hi, -lo], [y[i], y[i]], color="#333333",
-                            linewidth=0.5, zorder=4, solid_capstyle="round")
+def _draw_tc_le(ax: plt.Axes, sid: str) -> None:
+    pitch = _draw_he(ax, sid)
+    _, pos, spots = _load_spatial_data(sid)
+    if spots is None or "tc_le_region" not in spots.columns:
+        _fallback_text(ax, "Annotations pending")
+        return
+    merged = pos.merge(spots[["tc_le_region"]], left_on="barcode", right_index=True, how="inner")
+    # Unlabelled spots are left unpainted; the H&E shows the tissue.
+    for reg, col in (("TC", COLOR_TC), ("LE", COLOR_LE)):
+        sub = merged[merged["tc_le_region"] == reg]
+        _scatter_spots(ax, sub["pixel_col"], sub["pixel_row"], pitch, color=col)
 
-    # 75% threshold line
-    ax.axvline(x=9, color="black", linewidth=0.5, linestyle="--", alpha=0.6)
-    ax.text(9.2, len(CELLTYPE_ORDER) - 0.5, "75%", fontsize=4,
-            va="top", ha="left", style="italic", color="#555555")
+
+def _region_key(ax: plt.Axes) -> None:
+    """Direct key for the TC/LE colours under the lower-right corner of a map."""
+    x = 1.0
+    for reg in ("LE", "TC"):
+        t = ax.text(x, -0.035, REGION_NAME[reg], transform=ax.transAxes, fontsize=FS_TICK,
+                    color=REGION_COLORS[reg], ha="right", va="top")
+        ax.figure.canvas.draw()
+        bb = t.get_window_extent().transformed(ax.transAxes.inverted())
+        x = bb.x0 - 0.02
+        ax.scatter([x - 0.012], [-0.035 - 0.5 * bb.height], transform=ax.transAxes, s=9,
+                   color=REGION_COLORS[reg], linewidths=0, clip_on=False)
+        x -= 0.07
+
+
+# ── Panel c: Fibroblast deconvolution map (s1) ────────────────────
+
+def draw_panel_c(fig: plt.Figure, ax: plt.Axes) -> None:
+    pitch = _draw_he(ax, "s1")
+    _, pos, _ = _load_spatial_data("s1")
+    props = pd.read_csv(RUN_DIR / "proportions" / "s1.csv", index_col=0)
+    # Only spots analysed by the run (QC-passing) carry a proportion
+    merged = pos.merge(props[["Fibroblast"]], left_on="barcode", right_index=True, how="inner")
+    merged = merged.sort_values("Fibroblast")
+    vals = merged["Fibroblast"].to_numpy(float)
+    sc = _scatter_spots(ax, merged["pixel_col"], merged["pixel_row"], pitch, frac=SPOT_FRAC_CONT, c=vals,
+                        cmap=CMAP_SEQUENTIAL, norm=Normalize(0, float(np.nanmax(vals))))
+    _identifier(ax, "Sample 1")
+    _map_colorbar(fig, ax, sc, "Fibroblast proportion", [0, 0.4, 0.8])
+
+
+# ── Panel d: per-sample enrichment heatmap ────────────────────────
+
+VLIM = 5.0
+
+
+def draw_panel_d(fig: plt.Figure, ax: plt.Axes, key_y_in: float) -> None:
+    df = pd.read_csv(ANALYSIS_DIR / "per_sample_tc_le_enrichment.csv")
+    mat = (df.pivot(index="cell_type", columns="sample", values="log2fc")
+           .reindex(index=CELLTYPE_ORDER, columns=SAMPLES).to_numpy(float))
+    n_r, n_c = mat.shape
+    cmap = CMAP_DIVERGING.copy()
+    cmap.set_bad(NA_COLOR)
+    mesh = ax.pcolormesh(np.ma.masked_invalid(np.clip(mat, -VLIM, VLIM)), cmap=cmap,
+                         vmin=-VLIM, vmax=VLIM, edgecolors="white", linewidth=0.5)
+
+    # Samples without any value (Sample 6: no LE spots) are hatched as not evaluable
+    na_cols = [j for j in range(n_c) if np.all(np.isnan(mat[:, j]))]
+    for j in na_cols:
+        ax.add_patch(mpatches.Rectangle((j + 0.04, 0.03), 0.92, n_r - 0.06, facecolor=NA_COLOR,
+                                        edgecolor="#9A9A9A", hatch="//////", linewidth=0, zorder=3))
+
+    # Hairline separating the TC-enriched cancer row from the LE-enriched rows
+    ax.plot([-0.25, n_c], [n_r - 1, n_r - 1], color=INK, lw=0.5, clip_on=False, zorder=4)
+
+    ax.set_xlim(0, n_c)
+    ax.set_ylim(n_r, 0)
+    ax.set_yticks(np.arange(n_r) + 0.5)
+    ax.set_yticklabels([CELLTYPE_DISPLAY.get(c, c) for c in CELLTYPE_ORDER], fontsize=FS_TICK)
+    ax.set_xticks(np.arange(n_c) + 0.5)
+    ax.set_xticklabels([str(i + 1) for i in range(n_c)], fontsize=FS_TICK)
+    ax.set_xlabel("OSCC sample", fontsize=FS_LABEL, labelpad=2)
+    ax.tick_params(length=0, pad=2)
+    for s in ax.spines.values():
+        s.set_visible(False)
+
+    # Key band above the heatmap: colour bar (left) and NA chip (right)
+    W, H = fig.get_size_inches()
+    pos = ax.get_position()
+    cb_w, cb_h = 0.62, 0.055
+    x_lab = pos.x0
+    lab = fig.text(x_lab, 1 - key_y_in / H, "log$_2$FC (LE/TC)", fontsize=FS_LABEL,
+                   ha="left", va="center", color=INK)
+    fig.canvas.draw()
+    lab_w = lab.get_window_extent().width / fig.dpi
+    cax = fig.add_axes([pos.x0 + (lab_w + 0.08) / W, 1 - (key_y_in + cb_h / 2) / H,
+                        cb_w / W, cb_h / H])
+    cb = fig.colorbar(mesh, cax=cax, orientation="horizontal", extend="both",
+                      extendfrac=0.10, ticks=[-5, 0, 5])
+    cb.outline.set_visible(False)
+    cb.ax.xaxis.set_ticks_position("top")
+    cb.ax.set_xticklabels(["−5", "0", "5"])
+    cb.ax.tick_params(labelsize=FS_SMALL, length=1.5, width=0.4, pad=1)
+    if na_cols:
+        chip_w, chip_h = 0.075, 0.075
+        cx = pos.x1 - (chip_w + 0.55) / W
+        fig.add_artist(mpatches.Rectangle(
+            (cx, 1 - (key_y_in + chip_h / 2) / H), chip_w / W, chip_h / H, transform=fig.transFigure,
+            facecolor=NA_COLOR, edgecolor="#9A9A9A", hatch="//////", linewidth=0.4))
+        fig.text(cx + (chip_w + 0.04) / W, 1 - key_y_in / H, "No LE spots", fontsize=FS_SMALL,
+                 ha="left", va="center", color=INK)
+
+
+# ── Panel e: consensus bars ───────────────────────────────────────
+
+def draw_panel_e(fig: plt.Figure, ax: plt.Axes, key_y_in: float) -> None:
+    consensus = pd.read_csv(ANALYSIS_DIR / "consensus_tc_le_patterns.csv", index_col=0).reindex(CELLTYPE_ORDER)
+    le = consensus["le_enriched_count"].to_numpy(float)
+    tc = consensus["tc_enriched_count"].to_numpy(float)
+    n_total = 12
+    y = np.arange(len(CELLTYPE_ORDER)) + 0.5
+    bar_h = 0.62
+
+    ax.barh(y, le, height=bar_h, color=COLOR_LE, edgecolor="none", zorder=3)
+    ax.barh(y, -tc, height=bar_h, color=COLOR_TC, edgecolor="none", zorder=3)
+
+    # Clopper-Pearson 95% CI
+    ci = pd.read_csv(ANALYSIS_DIR / "consensus_binomial_ci.csv")
+    for yi, ct in zip(y, CELLTYPE_ORDER):
+        for direction, sign in (("LE", 1), ("TC", -1)):
+            row = ci[(ci["cell_type"] == ct) & (ci["direction"] == direction)]
+            if len(row) == 1 and row["k"].iloc[0] > 0:
+                lo, hi = row["ci_lower"].iloc[0] * n_total, row["ci_upper"].iloc[0] * n_total
+                ax.plot([sign * lo, sign * hi], [yi, yi], color=INK, lw=0.6, zorder=4,
+                        solid_capstyle="butt")
+
+    # 75% threshold (>= 9 of 12 samples) in both directions
+    n_r = len(CELLTYPE_ORDER)
+    for xv in (-9, 9):
+        ax.plot([xv, xv], [0, n_r], color=INK_SOFT, lw=0.5, ls=(0, (2, 1.6)), zorder=2)
+    ax.text(9, -0.12, "75%", fontsize=FS_SMALL, ha="center", va="bottom", color=INK_SOFT)
+    ax.axvline(0, color=INK, lw=0.5, zorder=5)
+    ax.plot([-12, 12], [n_r - 1, n_r - 1], color=INK, lw=0.5, zorder=4)
+
+    ax.set_ylim(n_r, 0)
+    ax.set_xlim(-12, 12)
+    ax.set_yticks([])
+    ax.spines["left"].set_visible(False)
+    ax.set_xticks([-10, -5, 0, 5, 10])
+    ax.set_xticklabels(["10", "5", "0", "5", "10"])
+    ax.tick_params(axis="x", labelsize=FS_TICK, pad=1.5)
+    ax.set_xlabel("Samples enriched\n(← TC | LE →)", fontsize=FS_LABEL, labelpad=2,
+                  linespacing=1.1)
+
+    # Direct TC / LE labels in the key band above each half
+    H = fig.get_size_inches()[1]
+    tr = mpl.transforms.blended_transform_factory(ax.transData, fig.transFigure)
+    ax.text(-6, 1 - key_y_in / H, "TC", transform=tr, fontsize=FS_TICK, color=COLOR_TC,
+            ha="center", va="center", fontweight="bold")
+    ax.text(6, 1 - key_y_in / H, "LE", transform=tr, fontsize=FS_TICK, color=COLOR_LE,
+            ha="center", va="center", fontweight="bold")
+
+
+# ── Panel f: CellChat Fibroblast -> Cancer ────────────────────────
+
+def _gene_pair(lig: str, rec: str) -> str:
+    """Label 'LIG -> REC' (complex subunits joined by '+'); drawn in italic."""
+    return f"{lig.replace('_', '+')} \u2192 {rec.replace('_', '+')}"
+
+
+def draw_panel_f(ax: plt.Axes, key_y_in: float) -> None:
+    df = pd.read_csv(RUN_DIR / "cellchat_tc_le_caf_cancer_interactions.csv")
+    df = df[(df["source"] == "Fibroblast") & (df["target"] == "Cancer")]
+    top = df.nlargest(F_TOP_N, "prob").reset_index(drop=True)
+    y = np.arange(len(top))
+    on_axis = np.array([(l, r) in ECM_SDC1_AXIS for l, r in zip(top["ligand"], top["receptor"])])
+    probs = top["prob"].to_numpy(float)
+
+    for yi, p, a in zip(y, probs, on_axis):
+        ax.plot([0.2, p], [yi, yi], color=INK if a else "#D6D6D6", lw=0.6, zorder=2,
+                solid_capstyle="butt")
+    ax.scatter(probs[~on_axis], y[~on_axis], s=14, color=GREY_DOT, linewidths=0, zorder=3)
+    ax.scatter(probs[on_axis], y[on_axis], s=16, color=INK, linewidths=0, zorder=3)
 
     ax.set_yticks(y)
-    ax.set_yticklabels([])  # shared with panel d
-    ax.set_xlabel("# samples", fontsize=6)
-    ax.set_xlim(min(-7, -(np.nanmax(tc_counts) + 1)), 12)
-    ax.set_xticks([-5, 0, 5, 10])
-    ax.set_ylim(len(CELLTYPE_ORDER) - 0.5, -0.5)  # match panel d
-    ax.axvline(x=0, color="black", linewidth=0.4, zorder=1)
+    ax.set_yticklabels([_gene_pair(l, r) for l, r in zip(top["ligand"], top["receptor"])],
+                       fontsize=FS_TICK, fontstyle="italic")
+    for lab, a in zip(ax.get_yticklabels(), on_axis):
+        lab.set_color(INK if a else INK_SOFT)
+    ax.set_ylim(len(top) - 0.4, -0.6)
+    ax.set_xlim(0.2, 0.35)
+    ax.set_xticks([0.2, 0.25, 0.3, 0.35])
+    ax.set_xticklabels(["0.20", "0.25", "0.30", "0.35"])
+    ax.set_xlabel("Communication probability", fontsize=FS_LABEL, labelpad=2)
+    ax.tick_params(axis="x", labelsize=FS_TICK, pad=1.5)
+    ax.tick_params(axis="y", length=0, pad=2)
 
-    ax.legend(loc="upper right", frameon=False, fontsize=4.5,
-              handletextpad=0.2, handlelength=0.5, borderpad=0.1, labelspacing=0.1)
-    ax.set_title("Consensus (n = 12)", fontsize=7, pad=3)
-    add_panel_label(ax, "e")
-
-
-# ── Panel f: CellChat L-R dot plot ────────────────────────────────
-
-def draw_panel_f(ax: plt.Axes) -> None:
-    caf_path = RUN_DIR / "cellchat_tc_le_caf_cancer_interactions.csv"
-    lr_path = RUN_DIR / "cellchat_tc_le_lr_pairs.csv"
-
-    path = caf_path if caf_path.exists() else lr_path
-    if path.exists():
-        _draw_cellchat_dotplot(ax, path, caf_only=caf_path.exists())
-    else:
-        _fallback_text(ax, "CellChat data\nnot found")
-
-    add_panel_label(ax, "f")
-
-
-def _draw_cellchat_dotplot(ax: plt.Axes, path: Path, caf_only: bool = False) -> None:
-    df = pd.read_csv(path)
-    if caf_only and {"source", "target"} <= set(df.columns):
-        # The panel shows the Fibroblast -> Cancer direction named in its title.
-        df = df[(df["source"] == "Fibroblast") & (df["target"] == "Cancer")]
-
-    prob_col = next((c for c in ["prob", "probability"] if c in df.columns), None)
-    name_col = next((c for c in ["interaction_name_2", "interaction_name"]
-                     if c in df.columns), None)
-    pw_col = next((c for c in ["pathway_name"] if c in df.columns), None)
-
-    if prob_col is None or name_col is None:
-        _fallback_text(ax, "CellChat data\nnot found")
-        return
-
-    if pw_col and caf_only:
-        top_per_pw = (
-            df.sort_values(prob_col, ascending=False)
-            .groupby(pw_col).first().reset_index()
-            .nlargest(10, prob_col)
-        )
-        df_sorted = top_per_pw.sort_values(prob_col, ascending=True)
-    else:
-        df_sorted = df.nlargest(10, prob_col).sort_values(prob_col, ascending=True)
-
-    if "ligand" in df_sorted.columns and "receptor" in df_sorted.columns:
-        names = [f"{l}\u2192{r}" for l, r in
-                 zip(df_sorted["ligand"].values, df_sorted["receptor"].values)]
-    else:
-        names = df_sorted[name_col].values
-    probs = df_sorted[prob_col].values.astype(float)
-
-    pw_colors = {
-        "COLLAGEN": OI["blue"], "FN1": OI["vermillion"],
-        "TENASCIN": OI["skyblue"], "THBS": OI["orange"],
-        "ADGRG": OI["redpurple"], "LAMININ": OI["green"],
-    }
-    dot_colors = []
-    if pw_col:
-        for pw in df_sorted[pw_col].values:
-            dot_colors.append(pw_colors.get(str(pw), OI["grey"]))
-    else:
-        dot_colors = [OI["orange"]] * len(probs)
-
-    y_pos = np.arange(len(names))
-    ax.scatter(probs, y_pos, c=dot_colors, s=35, edgecolors="grey",
-               linewidths=0.3, zorder=3)
-
-    ax.set_yticks(y_pos)
-    # Format L-R pair labels: italicize gene names, keep arrow plain
-    def _format_lr_label(name: str) -> str:
-        name = name.replace("_", "+")  # complex subunits (ITGAV_ITGB5) read as ITGAV+ITGB5, not a subscript
-        if "\u2192" in name:
-            ligand, receptor = name.split("\u2192", 1)
-            return f"$\\it{{{ligand}}}$\u2192$\\it{{{receptor}}}$"
-        return f"$\\it{{{name}}}$"
-    ax.set_yticklabels([_format_lr_label(n) for n in names], fontsize=5)
-    for i, n in enumerate(names):
-        if "FN1" in str(n).upper() or "COL1A1" in str(n).upper():
-            ax.get_yticklabels()[i].set_fontweight("bold")
-
-    ax.set_xlabel("Comm. probability", fontsize=6)
-    title = "Fibroblast \u2192 Cancer" if caf_only else "CellChat L-R pairs"
-    ax.set_title(title, fontsize=7, pad=3)
-    ax.tick_params(length=2, width=0.4)
-
-    if pw_col and caf_only:
-        used_pws = set(str(p) for p in df_sorted[pw_col].values)
-        handles = [mpatches.Patch(color=c, label=pw)
-                   for pw, c in pw_colors.items() if pw in used_pws]
-        if handles:
-            ax.legend(handles=handles, loc="lower right", frameon=False,
-                      fontsize=4.5, handlelength=0.6, handletextpad=0.3,
-                      borderpad=0.2, labelspacing=0.15)
+    # Bracket naming the highlighted axis
+    idx = np.where(on_axis)[0]
+    if len(idx):
+        y0, y1 = idx.min() - 0.3, idx.max() + 0.3
+        xb = 0.343
+        ax.plot([xb, xb + 0.002, xb + 0.002, xb], [y0, y0, y1, y1], color=INK, lw=0.5,
+                clip_on=False, solid_capstyle="butt")
+        ax.text(xb + 0.004, 0.5 * (y0 + y1), "ECM–syndecan\naxis", fontsize=FS_SMALL,
+                color=INK, ha="left", va="center", linespacing=1.1, clip_on=False)
+    # Direction identifier in the row's key band
+    H = ax.figure.get_size_inches()[1]
+    tr = mpl.transforms.blended_transform_factory(ax.transAxes, ax.figure.transFigure)
+    ax.text(0.0, 1 - key_y_in / H, "Fibroblast \u2192 Cancer", transform=tr, fontsize=FS_TICK,
+            color=INK, ha="left", va="center")
 
 
 # ── Panel g: FN1 spatial expression (s1) ──────────────────────────
 
-def draw_panel_g(ax: plt.Axes) -> None:
-    img, pos, adata = _load_spatial_data("s1")
-
-    if img is not None:
-        faded = _prepare_he_faded(img, tissue_alpha=0.25)
-        ax.imshow(faded, interpolation="lanczos")
-        xlim = _autocrop_limits(img)
-        ax.set_xlim(xlim[0], xlim[1])
-        ax.set_ylim(xlim[2], xlim[3])
-        ax.set_facecolor("white")
-
-    has_fn1 = False
-    if adata is not None and pos is not None:
-        if "FN1_lognorm" in adata.columns:
-            expr_df = pd.DataFrame({"expression": adata["FN1_lognorm"].values}, index=adata.index)
-            merged = pos.merge(expr_df, left_on="barcode", right_index=True, how="left")
-            vals = merged["expression"].fillna(0).values
-            sc = ax.scatter(merged["pixel_col"], merged["pixel_row"],
-                            c=vals, cmap=_VERM_SEQ, s=6, alpha=0.85,
-                            linewidths=0, rasterized=False, vmin=0)
-            from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-            cax = inset_axes(ax, width="4%", height="30%", loc="lower left",
-                             borderpad=0.5)
-            cbar = plt.colorbar(sc, cax=cax)
-            cbar.set_label("Expr.", fontsize=4, labelpad=1)
-            cbar.ax.tick_params(labelsize=3.5, width=0.3, length=1)
-            cbar.outline.set_linewidth(0.5)
-            cbar.outline.set_edgecolor("#666666")
-            has_fn1 = True
-
-    if not has_fn1:
-        if pos is not None and img is not None:
-            ax.scatter(pos["pixel_col"], pos["pixel_row"],
-                       c=COLOR_OTHER, s=6, alpha=0.6, linewidths=0, rasterized=False)
-        _fallback_text(ax, "FN1 expression\npending")
-
-    _strip_axes(ax)
-    ax.set_title(r"$\it{FN1}$", fontsize=7, pad=2)
-    add_panel_label(ax, "g")
+def draw_panel_g(fig: plt.Figure, ax: plt.Axes) -> None:
+    pitch = _draw_he(ax, "s1")
+    _, pos, spots = _load_spatial_data("s1")
+    expr = spots[["FN1_lognorm"]]
+    merged = pos.merge(expr, left_on="barcode", right_index=True, how="inner").sort_values("FN1_lognorm")
+    vals = merged["FN1_lognorm"].to_numpy(float)
+    sc = _scatter_spots(ax, merged["pixel_col"], merged["pixel_row"], pitch, frac=SPOT_FRAC_CONT, c=vals,
+                        cmap=CMAP_SEQUENTIAL, norm=Normalize(0, float(np.nanmax(vals))))
+    _identifier(ax, "Sample 1")
+    _map_colorbar(fig, ax, sc, ("FN1", " (log-normalized)"), [0, 2, 4])
 
 
-# ── Panel h: Moran's I lollipop chart ─────────────────────────────
+# ── Panel h: Moran's I grouped by programme ───────────────────────
+
+PROGRAMMES = [
+    ("TC", "Tumor core", "Keratinization /\ndifferentiation"),
+    ("LE", "Leading edge", "Partial EMT /\ninvasion front"),
+]
+
 
 def draw_panel_h(ax: plt.Axes) -> None:
-    # Sample 1 Moran's I of the target genes (scripts/compute_case_study_stats.py)
-    single_path = ANALYSIS_DIR / "svg_target_genes_summary.csv"
+    df = pd.read_csv(ANALYSIS_DIR / "svg_target_genes_summary.csv")[["gene", "category", "moranI"]]
+    df = df.dropna(subset=["moranI"])
+    df["category"] = df["category"].astype(str).str.upper()
 
-    if single_path.exists():
-        df = _load_single_moran(single_path)
-    else:
-        _fallback_text(ax, "Moran's I data\nnot found")
-        _strip_axes(ax)
-        add_panel_label(ax, "h")
-        return
+    rows, groups = [], []
+    for key, name, desc in PROGRAMMES:
+        sub = df[df["category"] == key].sort_values("moranI", ascending=False)
+        start = len(rows)
+        rows.extend((g, v, REGION_COLORS[key]) for g, v in zip(sub["gene"], sub["moranI"]))
+        groups.append((start, len(rows) - 1, name, desc, REGION_COLORS[key]))
 
-    df = df.dropna(subset=["moranI"]).sort_values("moranI", ascending=True).copy()
+    gap = 0.8
+    y_pos, yv = [], 0.0
+    for s, e, *_ in groups:
+        for _ in range(s, e + 1):
+            y_pos.append(yv)
+            yv += 1.0
+        yv += gap
+    y_pos = np.array(y_pos)
 
-    y_pos = np.arange(len(df))
-    colors = []
-    for cat in df["category"].fillna("Unknown"):
-        cat_upper = str(cat).upper()
-        if "LE" in cat_upper:
-            colors.append(OI["vermillion"])
-        elif "TC" in cat_upper:
-            colors.append(OI["blue"])
-        else:
-            colors.append("#999999")
+    for yp, (g, val, col) in zip(y_pos, rows):
+        ax.plot([0, val], [yp, yp], color=col, lw=0.9, zorder=2, solid_capstyle="butt")
+        ax.scatter([val], [yp], s=14, color=col, linewidths=0, zorder=3)
 
-    # Lollipop: horizontal lines + dots
-    for i, (yp, val, col) in enumerate(zip(y_pos, df["moranI"].values, colors)):
-        ax.plot([0, val], [yp, yp], color=col, linewidth=1.0, zorder=2)
-        ax.plot(val, yp, "o", color=col, markersize=4, zorder=3,
-                markeredgecolor="white", markeredgewidth=0.3)
-
-    gene_labels = [f"$\\it{{{g}}}$" for g in df["gene"].values]
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(gene_labels, fontsize=5.5)
-    ax.set_xlabel("Moran's I", fontsize=6)
-    ax.set_title("Spatial autocorrelation", fontsize=7, pad=3)
-    ax.tick_params(length=2, width=0.4)
+    ax.set_yticklabels([r[0] for r in rows], fontsize=FS_TICK, fontstyle="italic")
+    ax.set_ylim(y_pos.max() + 0.6, y_pos.min() - 0.6)
+    ax.set_xlim(0, 0.6)
+    ax.set_xticks([0, 0.2, 0.4, 0.6])
+    ax.set_xlabel("Moran's $I$ (Sample 1)", fontsize=FS_LABEL, labelpad=2)
+    ax.tick_params(axis="x", labelsize=FS_TICK, pad=1.5)
+    ax.tick_params(axis="y", length=0, pad=2)
 
-    handles = [
-        mpatches.Patch(color=OI["vermillion"], label="LE marker"),
-        mpatches.Patch(color=OI["blue"], label="TC marker"),
-    ]
-    ax.legend(handles=handles, loc="lower right", frameon=False,
-              fontsize=5, handlelength=0.6, handletextpad=0.3)
-
-    add_panel_label(ax, "h")
-
-
-def _load_single_moran(path: Path) -> pd.DataFrame:
-    df = pd.read_csv(path)
-    return df[["gene", "category", "moranI"]].copy()
+    trans = ax.get_yaxis_transform()
+    for s, e, name, desc, col in groups:
+        y0, y1 = y_pos[s] - 0.3, y_pos[e] + 0.3
+        xb = 1.03
+        ax.plot([xb, xb + 0.015, xb + 0.015, xb], [y0, y0, y1, y1], transform=trans,
+                color=col, lw=0.6, clip_on=False, solid_capstyle="butt")
+        ym = 0.5 * (y_pos[s] + y_pos[e])
+        ax.text(xb + 0.05, ym - 0.15, name, transform=trans, fontsize=FS_LABEL,
+                fontweight="bold", color=col, ha="left", va="bottom")
+        ax.text(xb + 0.05, ym + 0.05, desc, transform=trans, fontsize=FS_SMALL,
+                color=INK_SOFT, ha="left", va="top", linespacing=1.15)
 
 
-# ── Panel i: TC/LE marker gene summary ────────────────────────────
+# ── Panel letters ─────────────────────────────────────────────────
 
-def draw_panel_i(ax: plt.Axes) -> None:
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
-    _strip_axes(ax)
-
-    # TC markers (top)
-    tc_box = mpatches.FancyBboxPatch(
-        (0.3, 5.5), 9.4, 4.0,
-        boxstyle="round,pad=0.15", facecolor="#EEF2F8",
-        edgecolor=OI["blue"], linewidth=0.6)
-    ax.add_patch(tc_box)
-    ax.text(5, 9.0, "Tumor Core", ha="center", va="center",
-            fontsize=7, fontweight="bold", color=OI["blue"])
-    ax.text(5, 7.5, r"$\it{SPRR1B}$, $\it{CLDN4}$,"
-            "\n" r"$\it{SPRR2E}$, $\it{KRT6C}$",
-            ha="center", va="center", fontsize=6, color="#333333", linespacing=1.4)
-    ax.text(5, 6.1, "Keratinization /\ndifferentiation",
-            ha="center", va="center", fontsize=5.5, color="#888888",
-            style="italic", linespacing=1.3)
-
-    # LE markers (bottom)
-    le_box = mpatches.FancyBboxPatch(
-        (0.3, 0.5), 9.4, 4.0,
-        boxstyle="round,pad=0.15", facecolor="#FDF3E8",
-        edgecolor=OI["vermillion"], linewidth=0.6)
-    ax.add_patch(le_box)
-    ax.text(5, 4.0, "Leading Edge", ha="center", va="center",
-            fontsize=7, fontweight="bold", color=OI["vermillion"])
-    ax.text(5, 2.5, r"$\it{FN1}$, $\it{LAMC2}$,"
-            "\n" r"$\it{ITGA5}$, $\it{COL1A1}$",
-            ha="center", va="center", fontsize=6, color="#333333", linespacing=1.4)
-    ax.text(5, 1.1, "Partial-EMT /\ninvasion front",
-            ha="center", va="center", fontsize=5.5, color="#888888",
-            style="italic", linespacing=1.3)
-
-    add_panel_label(ax, "i")
+def _row_letters(fig: plt.Figure, items, top_in: float, dx_in: float = 0.04) -> None:
+    """8-pt bold letters on one top line per row, at the left edge of each panel's decorations."""
+    renderer = fig.canvas.get_renderer()
+    W, H = fig.get_size_inches()
+    for ax, letter in items:
+        x_in = ax.get_tightbbox(renderer).x0 / fig.dpi
+        fig.text(max(x_in - dx_in, 0.0) / W, 1 - top_in / H, letter,
+                 **PANEL_LABEL_FONT, ha="left", va="top")
 
 
 # ── Main ──────────────────────────────────────────────────────────
 
 def main() -> None:
-    print("Building Figure 5: OSCC case study")
-    print(f"  Data dir: {GEO_DIR}")
-    print(f"  ChatSpatial run: {RUN_DIR}")
-    print()
+    print("Building Figure 2 (manuscript Fig. 5): OSCC case study")
+    W = DOUBLE_COL  # 180 mm
 
-    fig_w = FULL_WIDTH  # 7.2 in = 183 mm
-    fig_h = 6.3         # ~160 mm
+    # Map widths follow the tissue aspect ratio at a common map height
+    asp = {}
+    for sid in ("s1", "s9"):
+        x0, x1, y0, y1, _ = _tissue_extent(sid)
+        asp[sid] = (x1 - x0) / (y1 - y0)
+    gap = 0.22
+    left, right = 0.12, 0.04
+    hmap = (W - left - right - 2 * gap) / (2 * asp["s1"] + asp["s9"])
+    wa, wb = asp["s1"] * hmap, asp["s9"] * hmap
 
-    fig = plt.figure(figsize=(fig_w, fig_h))
+    r1 = 0.17                     # top of row-1 maps
+    r2 = r1 + hmap + 0.70         # top of row-2 plot area (key band above it)
+    h2 = 1.55
+    r3 = r2 + h2 + 0.62           # top of row-3 axes
+    h3 = 1.50 if hmap > 1.5 else hmap
+    g_h = hmap * 0.98
+    H = r3 + max(g_h, h3) + 0.30
+    fig = plt.figure(figsize=(W, H))
 
-    # ── 3x3 GridSpec ─────────────────────────────────────────────
-    gs = gridspec.GridSpec(
-        3, 1, figure=fig,
-        height_ratios=[1.0, 1.0, 1.0],
-        hspace=0.42,
-        left=0.08, right=0.96, top=0.96, bottom=0.04,
-    )
+    def axin(x, y_top, w, h):
+        return fig.add_axes([x / W, 1 - (y_top + h) / H, w / W, h / H])
 
-    # Row 1: equal 3 spatial maps
-    gs_row1 = gs[0].subgridspec(1, 3, wspace=0.12)
-    ax_a = fig.add_subplot(gs_row1[0])
-    ax_b = fig.add_subplot(gs_row1[1])
-    ax_c = fig.add_subplot(gs_row1[2])
+    ax_a = axin(left, r1, wa, hmap)
+    ax_b = axin(left + wa + gap, r1, wb, hmap)
+    ax_c = axin(left + wa + wb + 2 * gap, r1, wa, hmap)
 
-    # Row 2: [d + e] tight (shared y-axis) | gap | [f] separate
-    gs_row2 = gs[1].subgridspec(1, 2, width_ratios=[0.70, 0.30], wspace=0.40)
-    gs_de = gs_row2[0].subgridspec(1, 2, width_ratios=[0.68, 0.32], wspace=0.08)
-    ax_d = fig.add_subplot(gs_de[0])
-    ax_e = fig.add_subplot(gs_de[1])
-    ax_f = fig.add_subplot(gs_row2[1])
+    ax_d = axin(0.62, r2, 2.55, h2)
+    ax_e = axin(3.27, r2, 1.02, h2)
+    ax_f = axin(5.30, r2, 1.20, h2)
 
-    # Row 3: FN1 (33%) + Moran's I (33%) + marker summary (34%)
-    gs_row3 = gs[2].subgridspec(1, 3, width_ratios=[0.33, 0.33, 0.34], wspace=0.35)
-    ax_g = fig.add_subplot(gs_row3[0])
-    ax_h = fig.add_subplot(gs_row3[1])
-    ax_i = fig.add_subplot(gs_row3[2])
+    ax_g = axin(left, r3, asp["s1"] * g_h, g_h)
+    h_top = r3 + 0.08
+    ax_h = axin(3.30, h_top, 2.45, g_h - 0.40)
 
-    # ── Draw all panels ───────────────────────────────────────────
-    print("Drawing Row 1: Spatial discovery...")
-    draw_panel_a(ax_a)
-    draw_panel_b(ax_b)
-    draw_panel_c(ax_c)
-
-    print("Drawing Row 2: Cellular composition...")
-    draw_panel_d(ax_d)
-    draw_panel_e(ax_e)
-    draw_panel_f(ax_f)
-
-    print("Drawing Row 3: Molecular mechanism...")
-    draw_panel_g(ax_g)
+    print("Drawing panels...")
+    _draw_tc_le(ax_a, "s1")
+    _identifier(ax_a, "Sample 1")
+    _draw_tc_le(ax_b, "s9")
+    _identifier(ax_b, "Sample 9")
+    draw_panel_c(fig, ax_c)
+    key2 = r2 - 0.17
+    draw_panel_d(fig, ax_d, key2)
+    draw_panel_e(fig, ax_e, key2)
+    draw_panel_f(ax_f, key2)
+    draw_panel_g(fig, ax_g)
     draw_panel_h(ax_h)
-    draw_panel_i(ax_i)
 
-    # ── Save ──────────────────────────────────────────────────────
-    FIGURE_DIR.mkdir(parents=True, exist_ok=True)
-    for fmt in ["pdf", "png"]:
-        out_path = FIGURE_DIR / f"figure2.{fmt}"
-        fig.savefig(str(out_path), dpi=300, facecolor="white")
-        print(f"  Saved: {out_path}")
+    _finalize_spot_sizes(fig)
+    _region_key(ax_a)
 
+    _row_letters(fig, [(ax_a, "a"), (ax_b, "b"), (ax_c, "c")], top_in=0.02, dx_in=0.10)
+    _row_letters(fig, [(ax_d, "d"), (ax_e, "e"), (ax_f, "f")], top_in=r2 - 0.40, dx_in=0.06)
+    _row_letters(fig, [(ax_g, "g"), (ax_h, "h")], top_in=r3 - 0.22, dx_in=0.10)
+
+    for fmt in ("pdf", "png"):
+        out = FIGURE_DIR / f"figure2.{fmt}"
+        fig.savefig(str(out), dpi=300, facecolor="white", bbox_inches=None)
+        print(f"  Saved: {out}")
     plt.close(fig)
-    print("\nDone!")
+    print(f"Done! ({W * 25.4:.0f} x {H * 25.4:.0f} mm)")
 
 
 if __name__ == "__main__":

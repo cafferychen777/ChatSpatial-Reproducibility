@@ -147,7 +147,7 @@ sheets = {
                        "cellchat_tc_le_caf_cancer_interactions.csv (analyze_cell_communication, cellchat_r)"),
     "Fig5h_morans": (pd.read_csv(T / "moranI_results_all_samples.csv"),
                      "moranI_results_all_samples.csv (analyze_spatial_statistics, moran)"),
-    "Fig5i_DE_all_genes": (pd.read_csv(T / "deg_tc_vs_le_top500.csv"),
+    "Fig5h_DE_all_genes": (pd.read_csv(T / "deg_tc_vs_le_top500.csv"),
                            "deg_tc_vs_le_top500.csv (find_markers, top 500 genes per direction)"),
 }
 mk = []
@@ -159,7 +159,7 @@ for g in ("tc", "le"):
 svg = pd.read_csv(CASE / "svg_target_genes_summary.csv").rename(columns={"category": "region"})
 svg["source_category"] = "moranI_sample1"
 mk.append(svg)
-sheets["Fig5i_marker_genes"] = (pd.concat(mk, ignore_index=True, sort=False),
+sheets["Fig5h_marker_genes"] = (pd.concat(mk, ignore_index=True, sort=False),
                                 "consensus gene lists and Sample 1 Moran's I summary")
 sheets["Supp_Table_1"] = (pd.read_csv(P / "supplementary_tables" / "Supplementary_Table_1_Effect_Sizes.csv"),
                           "supplementary_tables/Supplementary_Table_1_Effect_Sizes.csv")
@@ -170,8 +170,8 @@ for name, (df, source) in sheets.items():
     idx.loc[m, "rows"] = len(df)
     idx.loc[m, "columns"] = df.shape[1]
     idx.loc[m, "source"] = source
-idx.loc[idx["sheet"] == "Fig5h_morans", "description"] = "Figure 5h Moran's I values (all sections; panel shows Sample 1)."
-idx.loc[idx["sheet"] == "Fig5i_DE_all_genes", "description"] = "TC vs LE marker genes underlying the consensus lists."
+idx.loc[idx["sheet"] == "Fig5h_morans", "description"] = "Figure 5h Moran's I of every tested gene in all 12 sections (all 15,215 genes of Sample 1; mean I across sections in the text)."
+idx.loc[idx["sheet"] == "Fig5h_DE_all_genes", "description"] = "TC vs LE differential expression per sample underlying the consensus gene lists of Fig5h_marker_genes."
 idx.to_csv(SD / "Index.csv", index=False)
 with pd.ExcelWriter(P / "source_data.xlsx", engine="openpyxl") as w:
     for name in idx["sheet"]:

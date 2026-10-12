@@ -1,0 +1,10 @@
+system,task,n_runs,n_completed
+chatspatial,spatial_domains,5,5
+stagent,spatial_domains,5,5
+spatialagent,spatial_domains,5,4
+chatspatial,svg_detection,5,5
+stagent,svg_detection,5,1
+spatialagent,svg_detection,5,3
+chatspatial,cell_communication,5,5
+stagent,cell_communication,5,5
+spatialagent,cell_communication,5,5

@@ -1,34 +1,44 @@
 """
-Figure 6: Spatial transcriptomics reveals tumor heterogeneity in HGSOC
-Nature Communications style, double-column (183 mm)
+Fig. 6 of the manuscript (file figure3): ChatSpatial reanalysis of the HGSOC subclone study.
+Direction A ("Ink & Cobalt") style, authored at 180 mm width.
 
 Panels:
-  Row 1 (a): Tumor cell fraction spatial maps (8 patients)
-  Row 2 (b): CNV subclone spatial maps (8 patients)
-  Row 3 (c,d): Cell type composition + tumor burden / CNV score (side by side)
-  Row 4 (e,f): Moran's I ranked plot (P3) + CNV vs background comparison
+  a  Tumor-cell proportion maps (RCTD) of the 8 patients, one physical scale (um) and a scale bar
+  b  CNV clusters of each sample (infercnvpy Leiden clusters, numbered by size within each sample)
+  c  Cell type composition per patient (mean RCTD proportion)
+  d  Tumor burden (top) and CNV score, mean +/- s.d. (bottom), per patient
+  e  Moran's I of all 19,180 genes of P3 against gene rank (log scale)
+  f  Moran's I of the 95 CNV-cluster marker genes versus the other 19,085 genes of P3
 """
 
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.colors import Normalize
 from matplotlib import cm
+from matplotlib.colors import Normalize
+from scipy.spatial import cKDTree
 from scipy.stats import mannwhitneyu
 
 from figure_style import (
     apply_style,
-    add_panel_label,
-    FULL_WIDTH,
-    OI,
-    SUBCLONE_COLORS,
-    HGSOC_CELLTYPE_COLORS as CELLTYPE_COLORS,
+    CELLTYPE_COLORS,
+    CMAP_SEQUENTIAL,
+    COBALT,
+    COBALT_LIGHT,
+    DOUBLE_COL,
+    HAIRLINE,
+    INK,
+    INK_SOFT,
+    RUST,
 )
 
 apply_style()
+plt.rcParams["savefig.bbox"] = "standard"  # keep the authored 180 mm page size
 
 FIGURE_DIR = Path(__file__).resolve().parent
 REPO_DIR = FIGURE_DIR.parent
@@ -40,89 +50,100 @@ HGSOC_DIR = REPO_DIR / "experiments" / "case_studies" / "hgsoc" / "results"
 DATA_DIR = HGSOC_DIR / "tables"
 SPOTS_DIR = DATA_DIR / "spots"
 STATS_DIR = HGSOC_DIR / "stats"
+SOURCE_DIR = REPO_DIR / "source_data"  # source data of panel f (Fig6f_cnv_vs_background.csv)
 
 PATIENTS = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"]
+VISIUM_SPOT_PITCH_UM = 100.0  # centre-to-centre distance of neighbouring Visium spots
 
-# Cell type marker genes highlighted in Moran's I analysis
-CELLTYPE_MARKER_GENES = {
-    "CD14": "Monocyte/Macrophage",
-    "KRT7": "Epithelial/Tumor",
-    "CDH5": "Vascular endothelial",
-}
+# Cell type marker genes highlighted in the Moran's I analysis
+CELLTYPE_MARKER_GENES = ["KRT7", "CD14", "CDH5"]
+
+# RCTD cell types of the deposited reference -> shared Direction A cell type keys (stack order, bottom first)
+CELLTYPES = [
+    ("Tumour_cells", "Tumour", "Tumor"),
+    ("Macrophages", "Macrophage", "Macrophage"),
+    ("Fibroblasts", "Fibroblast", "Fibroblast"),
+    ("T_cells", "T cell", "T cell"),
+    ("B_plasma_cells", "B/plasma", "B/plasma"),
+    ("Endothelial_cells", "Endothelial", "Endothelial"),
+    ("Mesothelial_cells", "Mesothelial", "Mesothelial"),
+    ("Myofibroblasts", "Myofibroblast", "Myofibroblast"),
+]
+
+# CNV clusters are defined within each sample, so they get their own muted set (greens, violets, rose,
+# greys) that shares no tone with CELLTYPE_COLORS or the cobalt accent. Defined locally (not in
+# figure_style.py). Index = cluster rank by size within the sample (Leiden labels are size-ordered).
+CNV_CLUSTER_COLORS = [
+    "#3E6B48",  # forest green
+    "#D48BA0",  # rose
+    "#A6A15A",  # olive
+    "#6A5F9E",  # violet
+    "#A8A8A8",  # mid grey
+    "#93BA86",  # sage
+    "#3D3D3D",  # charcoal
+    "#BDB2DD",  # lavender
+    "#EBC6D1",  # pale pink
+    "#D3E5C6",  # pale mint
+]
+
+BG_GREY = "#C9C9C9"      # points of the other genes (e, f)
+TOP_GREY = "#3D3D3D"     # highlighted patients in d
+REST_GREY = "#ABABAB"    # other patients in d
+
+# ── figure geometry (mm) ─────────────────────────────────────────
+W_MM = DOUBLE_COL * 25.4  # 180 mm
+H_MM = 160.0
+MM = 1 / 25.4
 
 
+def ax_mm(fig, x, y, w, h):
+    """Axes at x, y (top-left, mm from the top-left corner of the figure), size w x h mm."""
+    return fig.add_axes([x / W_MM, 1 - (y + h) / H_MM, w / W_MM, h / H_MM])
+
+
+def fig_text(fig, x, y, s, **kw):
+    return fig.text(x / W_MM, 1 - y / H_MM, s, **kw)
+
+
+def panel_letter(fig, x, y, letter):
+    fig_text(fig, x, y, letter, fontsize=8, fontweight="bold", color=INK, va="baseline", ha="left")
+
+
+def sci_parts(v, digits=1):
+    """5.486e-63 -> ('5.5', '\u221263'): mantissa and exponent with a true minus sign."""
+    m, e = f"{v:.{digits}e}".split("e")
+    return m, str(int(e)).replace("-", "\u2212")
+
+
+def p_value_text(ax, x, y, pval, fontsize=6.5, exp_size=5.5):
+    """'P = 5.5 × 10^-63' with an italic P and an exponent no smaller than 5.5 pt (mathtext would shrink it
+    to 70%, below the 5 pt minimum), drawn as a separate raised text."""
+    m, e = sci_parts(pval)
+    t = ax.text(x, y, f"$P$ = {m} × 10", fontsize=fontsize, ha="center", va="bottom")
+    ax.annotate(e, xy=(1, 0.62), xycoords=t, xytext=(0.3, 0), textcoords="offset points",
+                fontsize=exp_size, ha="left", va="bottom")
+    return t
+
+
+# ── data ─────────────────────────────────────────────────────────
 def load_patient_data(patient: str) -> dict:
     """Spot table of the ChatSpatial run: coordinates, RCTD proportions, CNV score and CNV cluster."""
     obs = pd.read_csv(SPOTS_DIR / f"{patient}.csv", index_col=0)
-
+    xy = obs[["spatial_x", "spatial_y"]].to_numpy(dtype=float)
+    # Full-resolution pixel coordinates differ in scale between sections (129 vs 207 px per spot pitch);
+    # convert to micrometres with the Visium spot pitch so that all maps share one physical scale.
+    nn = cKDTree(xy).query(xy, k=2)[0][:, 1]
+    um = xy * (VISIUM_SPOT_PITCH_UM / np.median(nn))
+    um -= (um.min(axis=0) + um.max(axis=0)) / 2
     data = {
-        "spatial": obs[["spatial_x", "spatial_y"]].to_numpy(dtype=float),
+        "xy_um": um,
         "tumour_weight": obs["RCTD_Tumour_cells"].to_numpy(dtype=float),
-        "cnv_score": obs["cnv_score"].to_numpy(dtype=float),
-        "cnv_leiden": obs["cnv_clusters"].astype(int).to_numpy(),
+        "cnv_cluster": obs["cnv_clusters"].astype(int).to_numpy(),
         "n_spots": len(obs),
     }
-
-    ct_cols = [c for c in obs.columns if c.startswith("RCTD_")]
-    for col in ct_cols:
-        ct_name = col.replace("RCTD_", "")
-        data[ct_name] = np.nanmean(obs[col].values)
-
+    for col, _, _ in CELLTYPES:
+        data[col] = np.nanmean(obs[f"RCTD_{col}"].values)
     return data
-
-
-def center_spatial(all_data: dict) -> dict:
-    for p in PATIENTS:
-        sp = all_data[p]["spatial"]
-        cx = (sp[:, 0].min() + sp[:, 0].max()) / 2
-        cy = (sp[:, 1].min() + sp[:, 1].max()) / 2
-        all_data[p]["spatial_centered"] = sp - np.array([cx, cy])
-    return all_data
-
-
-def compute_spot_size(n_spots: int, ax_width_inches: float) -> float:
-    spots_per_row = np.sqrt(n_spots)
-    ax_width_pts = ax_width_inches * 72
-    spot_diameter_pts = max(ax_width_pts / spots_per_row * 0.9, 2.0)
-    return max(spot_diameter_pts ** 2, 4.0)
-
-
-def plot_spatial(
-    ax, spatial, values, title, cmap="YlOrRd", vmin=None, vmax=None,
-    is_categorical=False, categories=None, cat_colors=None, spot_size=4.0,
-    global_lim=None,
-):
-    x = spatial[:, 0]
-    y = spatial[:, 1]
-
-    ax.set_facecolor("white")
-
-    if is_categorical:
-        unique_cats = np.unique(categories)
-        for cat in unique_cats:
-            mask = categories == cat
-            color = cat_colors[cat % len(cat_colors)]
-            ax.scatter(x[mask], y[mask], c=color, s=spot_size,
-                       edgecolors="none", rasterized=True, label=f"C{cat}")
-    else:
-        ax.scatter(x, y, c=values, cmap=cmap, s=spot_size,
-                   vmin=vmin, vmax=vmax, edgecolors="none", rasterized=True)
-
-    if global_lim is not None:
-        ax.set_xlim(-global_lim, global_lim)
-        ax.set_ylim(global_lim, -global_lim)
-    else:
-        x_pad = np.ptp(x) * 0.05
-        y_pad = np.ptp(y) * 0.05
-        ax.set_xlim(x.min() - x_pad, x.max() + x_pad)
-        ax.set_ylim(y.max() + y_pad, y.min() - y_pad)
-
-    ax.set_aspect("equal")
-    ax.set_title(title, fontsize=7, fontweight="bold", pad=3)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    for spine in ax.spines.values():
-        spine.set_visible(False)
 
 
 def compute_cnv_markers_p3() -> set:
@@ -139,356 +160,313 @@ def load_svg_data() -> pd.DataFrame:
     return pd.read_csv(DATA_DIR / "moranI_P3.csv", index_col=0).dropna(subset=["I"])
 
 
+# ── panels a, b ──────────────────────────────────────────────────
+def style_map(ax, lim):
+    ax.set_xlim(-lim, lim)
+    ax.set_ylim(lim, -lim)  # image coordinates: y downwards
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for s in ax.spines.values():
+        s.set_visible(False)
+
+
+def spot_size_pts2(ax_w_mm, lim):
+    """Marker area (pt^2) so that spots of 100 um pitch tile the map without gaps."""
+    pts_per_um = ax_w_mm * MM * 72 / (2 * lim)
+    return (VISIUM_SPOT_PITCH_UM * pts_per_um * 1.05) ** 2
+
+
+def draw_scale_bar(ax, lim, length_um=1000):
+    x0 = -lim * 0.97
+    y0 = lim * 0.96
+    ax.plot([x0, x0 + length_um], [y0, y0], color=INK, lw=0.8, solid_capstyle="butt", clip_on=False)
+    ax.text(x0 + length_um / 2, y0 - lim * 0.05, "1 mm", fontsize=5.5, color=INK,
+            ha="center", va="bottom")
+
+
+# ── panel e ──────────────────────────────────────────────────────
 def plot_morans_ranked(ax, svg_df, cnv_markers):
-    svg_sorted = svg_df.sort_values("rank")
-    ranks = svg_sorted["rank"].values
-    morans_i = svg_sorted["I"].values
-    genes = svg_sorted.index.values
+    s = svg_df.sort_values("rank")
+    ranks = s["rank"].values
+    mi = s["I"].values
+    genes = s.index.values
+    is_cnv = np.array([g in cnv_markers for g in genes])
+    # Other genes: every gene other than the CNV-cluster markers (19,085 genes of P3), as in the
+    # statistics of cliffs_delta_cnv_vs_background.csv; CD14, KRT7 and CDH5 belong to it and are highlighted.
+    is_bg = ~is_cnv
+    n_genes = len(s)
 
-    is_ct_marker = np.array([g in CELLTYPE_MARKER_GENES for g in genes])
-    is_cnv_marker = np.array([g in cnv_markers for g in genes])
-    cnv_in_svg = is_cnv_marker & ~is_ct_marker
-    is_background = ~is_ct_marker & ~is_cnv_marker
+    top2_rank = int(n_genes * 0.02)
+    ax.axvline(top2_rank, color="#8A8A8A", lw=0.5, ls=(0, (3, 2)), zorder=0)
+    ax.text(top2_rank * 1.12, 0.84, "top 2%", fontsize=5.5, color=INK_SOFT, ha="left", va="center")
 
-    ax.scatter(ranks[is_background], morans_i[is_background],
-               c="#DDDDDD", s=3, edgecolors="none", rasterized=True,
-               zorder=1, label=f"Background (n={is_background.sum():,})")
+    ax.scatter(ranks[is_bg], mi[is_bg], s=2.0, c=BG_GREY, edgecolors="none", rasterized=True, zorder=1)
+    ax.scatter(ranks[is_cnv], mi[is_cnv], s=7, c=COBALT, edgecolors="white", linewidths=0.25,
+               rasterized=True, zorder=3)
 
-    n_cnv_in_svg = cnv_in_svg.sum()
-    ax.scatter(ranks[cnv_in_svg], morans_i[cnv_in_svg],
-               c=OI["blue"], s=10, edgecolors="none", rasterized=True,
-               zorder=2, alpha=0.7, label=f"CNV markers (n={n_cnv_in_svg})")
+    in_top = int((is_cnv & (ranks <= top2_rank)).sum())
+    print(f"    CNV markers in top 2% (rank <= {top2_rank}): {in_top} of {is_cnv.sum()}")
 
-    for gene in CELLTYPE_MARKER_GENES:
-        if gene in svg_sorted.index:
-            row = svg_sorted.loc[gene]
-            ax.scatter(row["rank"], row["I"], c=OI["vermillion"], s=24,
-                       edgecolors="white", linewidths=0.3, zorder=3)
-            ax.annotate(f"  {gene}", xy=(row["rank"], row["I"]),
-                        fontsize=5.5, fontstyle="italic",
-                        color=OI["vermillion"], va="center", ha="left", zorder=4)
+    ax.text(1.4, 0.36, f"CNV-cluster markers\n($n$ = {is_cnv.sum()})", fontsize=6, color=COBALT,
+            ha="left", va="top", linespacing=1.15)
+    ax.text(3500, 0.2, f"Other genes\n($n$ = {is_bg.sum():,})", fontsize=6, color=INK_SOFT,
+            ha="left", va="bottom", linespacing=1.15)
 
-    ax.scatter([], [], c=OI["vermillion"], s=14, edgecolors="white",
-               linewidths=0.3, label="Cell type markers")
+    label_pos = {"KRT7": (60, 0.19), "CD14": (1408 * 0.55, 0.30), "CDH5": (6062 * 0.6, 0.11)}
+    for g in CELLTYPE_MARKER_GENES:
+        r, v = s.loc[g, "rank"], s.loc[g, "I"]
+        ax.scatter(r, v, s=16, c=RUST, edgecolors="white", linewidths=0.4, zorder=5)
+        tx, ty = label_pos[g]
+        ax.annotate(g, xy=(r, v), xytext=(tx, ty), fontsize=6, fontstyle="italic", color=RUST,
+                    ha="center", va="center", zorder=6,
+                    arrowprops=dict(arrowstyle="-", color=RUST, lw=0.4, shrinkA=1.5, shrinkB=2.2))
 
-    top2_rank = int(len(svg_sorted) * 0.02)
-    ax.axvline(x=top2_rank, color="#AAAAAA", linewidth=0.5,
-               linestyle="--", zorder=0)
-    ax.text(top2_rank + 20, morans_i.max() * 0.80,
-            "Top 2%", fontsize=5.5, color="#888888", va="top")
-
-    ax.set_xlabel(f"Gene rank (P3, n={len(svg_sorted):,})", fontsize=7)
-    ax.set_ylabel("Moran's I", fontsize=7)
-    ax.set_xlim(0, len(svg_sorted) + 50)
-
-    ax.legend(loc="upper right", frameon=False, fontsize=5.5,
-              handletextpad=0.3, labelspacing=0.35, markerscale=0.8)
-
-    add_panel_label(ax, "e")
+    ax.set_xscale("log")
+    ax.set_xlim(0.8, n_genes * 1.3)
+    ax.set_xticks([1, 10, 100, 1000, 10000])
+    ax.set_xticklabels(["1", "10", "100", "1,000", "10,000"])
+    ax.minorticks_off()
+    ax.set_ylim(-0.1, 0.9)
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8])
+    ax.set_xlabel(f"Gene rank by Moran's $I$ (P3, $n$ = {n_genes:,} genes)")
+    ax.set_ylabel("Moran's $I$")
+    ax.tick_params(pad=1.5)
 
 
+# ── panel f ──────────────────────────────────────────────────────
 def plot_morans_comparison(ax, svg_df, cnv_markers):
-    genes_in_svg = set(svg_df.index)
-    cnv_in_svg = cnv_markers & genes_in_svg
-    ct_genes = set(CELLTYPE_MARKER_GENES.keys()) & genes_in_svg
+    genes = set(svg_df.index)
+    cnv_in = cnv_markers & genes
+    cnv_I = svg_df.loc[svg_df.index.isin(cnv_in), "I"].values
+    # Other genes include CD14, KRT7 and CDH5, which are marked on them (19,085 genes of P3)
+    bg_I = svg_df.loc[svg_df.index.isin(genes - cnv_in), "I"].values
 
-    cnv_morans = svg_df.loc[svg_df.index.isin(cnv_in_svg), "I"].values
-    bg_genes = genes_in_svg - cnv_in_svg - ct_genes
-    bg_morans = svg_df.loc[svg_df.index.isin(bg_genes), "I"].values
+    stat, pval = mannwhitneyu(cnv_I, bg_I, alternative="two-sided")
+    print(f"    Mann-Whitney U: stat={stat:.0f}, p={pval:.4g}")
+    print(f"    CNV markers: n={len(cnv_I)}, median={np.median(cnv_I):.4f}")
+    print(f"    Other genes: n={len(bg_I)}, median={np.median(bg_I):.4f}")
 
-    stat, pval = mannwhitneyu(cnv_morans, bg_morans, alternative="two-sided")
-    print(f"    Mann-Whitney U: stat={stat:.0f}, p={pval:.4f}")
-    print(f"    CNV markers: n={len(cnv_morans)}, median={np.median(cnv_morans):.4f}")
-    print(f"    Background: n={len(bg_morans)}, median={np.median(bg_morans):.4f}")
-
-    bp = ax.boxplot(
-        [cnv_morans, bg_morans], positions=[0, 1], widths=0.5,
-        patch_artist=True, showfliers=False,
-        medianprops=dict(color="black", linewidth=0.8),
-        whiskerprops=dict(linewidth=0.5),
-        capprops=dict(linewidth=0.5),
-        boxprops=dict(linewidth=0.5),
-    )
-    bp["boxes"][0].set_facecolor(OI["blue"])
-    bp["boxes"][0].set_alpha(0.4)
-    bp["boxes"][1].set_facecolor("#CCCCCC")
-    bp["boxes"][1].set_alpha(0.4)
-
-    jitter_cnv = np.random.default_rng(42).normal(0, 0.06, len(cnv_morans))
-    ax.scatter(jitter_cnv, cnv_morans, c=OI["blue"], s=6, edgecolors="none",
-               alpha=0.6, rasterized=True, zorder=2)
+    bp = ax.boxplot([cnv_I, bg_I], positions=[0, 1], widths=0.42, patch_artist=True, showfliers=False,
+                    medianprops=dict(color=INK, lw=0.9), whiskerprops=dict(lw=0.5, color=INK),
+                    capprops=dict(lw=0.5, color=INK), boxprops=dict(lw=0.5, color=INK), zorder=2)
+    bp["boxes"][0].set_facecolor(COBALT_LIGHT)
+    bp["boxes"][1].set_facecolor("#ECECEC")
 
     rng = np.random.default_rng(42)
-    n_bg_show = min(200, len(bg_morans))
-    bg_sample = rng.choice(bg_morans, n_bg_show, replace=False)
-    jitter_bg = rng.normal(1, 0.06, n_bg_show)
-    ax.scatter(jitter_bg, bg_sample, c="#999999", s=2, edgecolors="none",
-               alpha=0.4, rasterized=True, zorder=2)
+    ax.scatter(rng.normal(0, 0.07, len(cnv_I)), cnv_I, s=5, c=COBALT, edgecolors="white",
+               linewidths=0.2, alpha=0.9, rasterized=True, zorder=3)
+    rng = np.random.default_rng(42)
+    n_show = min(200, len(bg_I))
+    bg_sample = rng.choice(bg_I, n_show, replace=False)
+    ax.scatter(rng.normal(1, 0.07, n_show), bg_sample, s=2, c="#9A9A9A", edgecolors="none",
+               alpha=0.6, rasterized=True, zorder=3)
 
-    for gene in CELLTYPE_MARKER_GENES:
-        if gene in svg_df.index:
-            mi = svg_df.loc[gene, "I"]
-            ax.scatter(1, mi, c=OI["vermillion"], s=18, edgecolors="white",
-                       linewidths=0.3, zorder=3)
-            ax.annotate(f" {gene}", xy=(1, mi), fontsize=5.5, fontstyle="italic",
-                        color=OI["vermillion"], va="center", ha="left", zorder=4)
+    label_y = {"KRT7": 0.30, "CD14": 0.17, "CDH5": 0.06}
+    for g in CELLTYPE_MARKER_GENES:
+        v = svg_df.loc[g, "I"]
+        ax.scatter(1, v, s=14, c=RUST, edgecolors="white", linewidths=0.4, zorder=5)
+        ax.annotate(g, xy=(1, v), xytext=(1.42, label_y[g]), fontsize=6, fontstyle="italic", color=RUST,
+                    ha="left", va="center", zorder=6,
+                    arrowprops=dict(arrowstyle="-", color=RUST, lw=0.4, shrinkA=0.5, shrinkB=2.2))
 
-    q75_bg = np.percentile(bg_morans, 97.5)
-    q75_cnv = np.percentile(cnv_morans, 97.5) if len(cnv_morans) > 0 else 0
-    y_bracket = max(q75_bg, q75_cnv) * 1.1
-    ax.plot([0, 0, 1, 1],
-            [y_bracket * 0.92, y_bracket, y_bracket, y_bracket * 0.92],
-            color="black", linewidth=0.5)
-    p_text = f"p = {pval:.2f}" if pval > 0.01 else f"p = {pval:.2e}"
-
-    delta_path = STATS_DIR / "cliffs_delta_cnv_vs_background.csv"
-    delta_label = ""
-    if delta_path.exists():
-        delta_df = pd.read_csv(delta_path)
-        d = delta_df["cliffs_delta"].values[0]
-        ci_lo = delta_df["ci_lower"].values[0]
-        ci_hi = delta_df["ci_upper"].values[0]
-        delta_label = f"\n$\\delta$ = {d:.2f} [{ci_lo:.2f}, {ci_hi:.2f}]"
-
-    ax.text(0.5, y_bracket * 1.03, f"M-W {p_text}{delta_label}",
-            fontsize=5.5, ha="center", va="bottom", linespacing=1.1)
-    ax.set_ylim(None, y_bracket * 1.20)
+    delta_df = pd.read_csv(STATS_DIR / "cliffs_delta_cnv_vs_background.csv")
+    d, lo, hi = delta_df[["cliffs_delta", "ci_lower", "ci_upper"]].values[0]
+    yb = 0.88
+    ax.plot([0, 0, 1, 1], [yb - 0.025, yb, yb, yb - 0.025], color=INK, lw=0.5)
+    p_value_text(ax, 0.47, yb + 0.025, pval)
+    ax.text(0.5, yb + 0.15, f"Cliff's $\\delta$ = {d:.2f} [{lo:.2f}, {hi:.2f}]", fontsize=6.5,
+            ha="center", va="bottom")
 
     ax.set_xticks([0, 1])
-    ax.set_xticklabels([f"CNV markers\n(n={len(cnv_morans)})",
-                        f"Background\n(n={len(bg_morans)})"], fontsize=6)
-    ax.set_ylabel("Moran's I", fontsize=7)
-    ax.set_xlim(-0.6, 1.8)
+    ax.set_xticklabels([f"CNV-cluster\nmarkers\n$n$ = {len(cnv_I)}",
+                        f"Other\ngenes\n$n$ = {len(bg_I):,}"], fontsize=6, linespacing=1.15)
+    ax.tick_params(axis="x", length=0, pad=3)
+    ax.tick_params(axis="y", pad=1.5)
+    ax.set_xlim(-0.5, 1.95)
+    ax.set_ylim(-0.1, 1.05)
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8])
+    ax.spines["left"].set_bounds(-0.1, 0.8)
+    ax.set_ylabel("Moran's $I$")
 
-    add_panel_label(ax, "f")
+    # Source data of panel f: every gene of the two groups with its Moran's I, the cell type markers
+    # marked on the other genes, and the random subset of 200 other genes drawn as points.
+    cnv_genes = svg_df.index[svg_df.index.isin(cnv_in)]
+    bg_genes = svg_df.index[svg_df.index.isin(genes - cnv_in)]
+    idx = np.random.default_rng(42).choice(len(bg_I), n_show, replace=False)
+    assert np.array_equal(bg_I[idx], bg_sample)
+    shown = np.zeros(len(bg_I), bool)
+    shown[idx] = True
+    sd = pd.concat([
+        pd.DataFrame({"gene": cnv_genes, "group": "CNV-cluster marker", "moran_I": cnv_I,
+                      "cell_type_marker": False, "drawn_as_point": True}),
+        pd.DataFrame({"gene": bg_genes, "group": "Other gene", "moran_I": bg_I,
+                      "cell_type_marker": bg_genes.isin(CELLTYPE_MARKER_GENES), "drawn_as_point": shown}),
+    ], ignore_index=True)
+    SOURCE_DIR.mkdir(exist_ok=True)
+    sd.to_csv(SOURCE_DIR / "Fig6f_cnv_vs_background.csv", index=False)
+    print(f"    source data: {len(cnv_I)} CNV-cluster markers, {len(bg_I):,} other genes")
+    return pval
 
 
 def main():
     print("Loading patient data...")
-    all_data = {}
-    for p in PATIENTS:
-        print(f"  {p}...")
-        all_data[p] = load_patient_data(p)
-    print("Data loaded.\n")
-
-    print("Loading SVG data and computing CNV markers...")
+    data = {p: load_patient_data(p) for p in PATIENTS}
     svg_df = load_svg_data()
     cnv_markers = compute_cnv_markers_p3()
-    print(f"  SVG genes: {len(svg_df)}, CNV markers in SVG: "
-          f"{len(cnv_markers & set(svg_df.index))}\n")
+    summ = pd.read_csv(STATS_DIR / "hgsoc_patient_summary.csv").set_index("patient").loc[PATIENTS]
+    cnv_stats = pd.read_csv(STATS_DIR / "cnv_score_per_patient_stats.csv").set_index("patient").loc[PATIENTS]
 
-    all_data = center_spatial(all_data)
+    lim = max(np.abs(data[p]["xy_um"]).max() for p in PATIENTS) * 1.04
+    print(f"  map half-width: {lim:.0f} um")
 
-    global_lim = 0
-    for p in PATIENTS:
-        sp = all_data[p]["spatial_centered"]
-        lim = np.abs(sp).max() * 1.08
-        global_lim = max(global_lim, lim)
+    fig = plt.figure(figsize=(W_MM * MM, H_MM * MM))
 
-    # ── Content-driven sizing ─────────────────────────────────────
-    fig_w = FULL_WIDTH  # 7.2 in = 183 mm
-    n_patients = len(PATIENTS)
+    # ── rows a, b: maps ──────────────────────────────────────────
+    x0, map_w, gap = 7.0, 19.0, 1.3
+    xs = [x0 + i * (map_w + gap) for i in range(len(PATIENTS))]
+    ya, yb = 7.0, 31.5
+    norm = Normalize(0, 1)
+    ss = spot_size_pts2(map_w, lim)
 
-    usable_w = fig_w * (0.97 - 0.05)
-    panel_w_inches = usable_w / (n_patients + 0.12)
-    spatial_row_h = panel_w_inches + 0.25
-
-    summary_row_h = 1.40
-    morans_row_h = 1.45
-
-    margin_h = 0.40
-    gap_h = 0.50
-    fig_h = 2 * spatial_row_h + summary_row_h + morans_row_h + margin_h + gap_h
-    fig_h = min(fig_h, 7.2)
-
-    print(f"Figure size: {fig_w:.2f} x {fig_h:.2f} in "
-          f"({fig_w * 25.4:.0f} x {fig_h * 25.4:.0f} mm)")
-    print(f"  Spatial panel width: {panel_w_inches:.2f} in")
-
-    fig = plt.figure(figsize=(fig_w, fig_h))
-
-    gs_main = gridspec.GridSpec(
-        4, 1, figure=fig,
-        height_ratios=[spatial_row_h, spatial_row_h, summary_row_h, morans_row_h],
-        hspace=0.25,
-        left=0.05, right=0.97, top=0.96, bottom=0.07,
-    )
-
-    # ── Row 0: Tumor fraction spatial maps (a) ─────────────────────
-    gs_row0 = gs_main[0].subgridspec(
-        1, n_patients + 1, wspace=0.06,
-        width_ratios=[1] * n_patients + [0.12],
-    )
-
-    axes_tumour = []
+    panel_letter(fig, 0.5, 3.6, "a")
     for i, p in enumerate(PATIENTS):
-        ax = fig.add_subplot(gs_row0[0, i])
-        axes_tumour.append(ax)
-        ss = compute_spot_size(all_data[p]["n_spots"], panel_w_inches)
-        plot_spatial(ax, all_data[p]["spatial_centered"],
-                     all_data[p]["tumour_weight"], p,
-                     cmap="YlOrRd", vmin=0, vmax=1,
-                     spot_size=ss, global_lim=global_lim)
+        d = data[p]
+        ax = ax_mm(fig, xs[i], ya, map_w, map_w)
+        ax.scatter(d["xy_um"][:, 0], d["xy_um"][:, 1], c=d["tumour_weight"], cmap=CMAP_SEQUENTIAL,
+                   norm=norm, s=ss, marker="h", edgecolors="none", rasterized=True)
+        style_map(ax, lim)
+        fig_text(fig, xs[i] + map_w / 2, 3.6, p, fontsize=6.5, fontweight="bold", color=INK,
+                 ha="center", va="baseline")
+        if i == 0:
+            draw_scale_bar(ax, lim)
 
-    cbar_ax = fig.add_subplot(gs_row0[0, n_patients])
-    norm = Normalize(vmin=0, vmax=1)
-    sm = cm.ScalarMappable(cmap="YlOrRd", norm=norm)
-    sm.set_array([])
-    cbar = fig.colorbar(sm, cax=cbar_ax)
-    cbar.set_label("Tumor\nfraction", fontsize=6, labelpad=2)
-    cbar.ax.tick_params(labelsize=5, width=0.4, length=2)
-    cbar.outline.set_linewidth(0.4)
+    cax = ax_mm(fig, xs[-1] + map_w + 3.2, ya + 3.0, 1.6, map_w - 6.0)
+    cb = fig.colorbar(cm.ScalarMappable(norm=norm, cmap=CMAP_SEQUENTIAL), cax=cax, ticks=[0, 0.5, 1])
+    cb.ax.set_yticklabels(["0", "0.5", "1"])
+    cb.outline.set_visible(False)
+    cb.ax.tick_params(labelsize=5.5, width=0.4, length=1.5, pad=1)
+    fig_text(fig, xs[-1] + map_w + 1.4, ya + 1.6, "Tumor-cell\nproportion", fontsize=5.5,
+             color=INK, ha="left", va="baseline", linespacing=1.1)
 
-    add_panel_label(axes_tumour[0], "a")
-
-    # ── Row 1: CNV subclone spatial maps (b) ───────────────────────
-    gs_row1 = gs_main[1].subgridspec(
-        1, n_patients + 1, wspace=0.06,
-        width_ratios=[1] * n_patients + [0.12],
-    )
-
-    axes_cnv = []
-    max_n_clusters = max(
-        len(np.unique(all_data[p]["cnv_leiden"])) for p in PATIENTS
-    )
-
+    panel_letter(fig, 0.5, yb - 3.4, "b")
+    max_k = 0
     for i, p in enumerate(PATIENTS):
-        ax = fig.add_subplot(gs_row1[0, i])
-        axes_cnv.append(ax)
-        ss = compute_spot_size(all_data[p]["n_spots"], panel_w_inches)
-        plot_spatial(ax, all_data[p]["spatial_centered"], None, p,
-                     is_categorical=True,
-                     categories=all_data[p]["cnv_leiden"],
-                     cat_colors=SUBCLONE_COLORS,
-                     spot_size=ss, global_lim=global_lim)
+        d = data[p]
+        ax = ax_mm(fig, xs[i], yb, map_w, map_w)
+        k = len(np.unique(d["cnv_cluster"]))
+        max_k = max(max_k, k)
+        ax.scatter(d["xy_um"][:, 0], d["xy_um"][:, 1],
+                   c=[CNV_CLUSTER_COLORS[c] for c in d["cnv_cluster"]],
+                   s=ss, marker="h", edgecolors="none", rasterized=True)
+        style_map(ax, lim)
+        fig_text(fig, xs[i] + map_w / 2, yb + map_w + 2.6, f"{k} clusters", fontsize=5.5, color=INK_SOFT,
+                 ha="center", va="baseline")
 
-    legend_ax = fig.add_subplot(gs_row1[0, n_patients])
-    legend_ax.axis("off")
-    for i in range(max_n_clusters):
-        legend_ax.scatter([], [], c=SUBCLONE_COLORS[i % len(SUBCLONE_COLORS)],
-                          s=10, label=f"C{i}", rasterized=True)
-    legend_ax.legend(loc="center left", frameon=False, fontsize=5.5,
-                     handletextpad=0.2, labelspacing=0.35,
-                     title="Subclone", title_fontsize=6, markerscale=0.8)
+    # swatch legend for b, below the maps
+    ly = yb + map_w + 6.6
+    fig_text(fig, x0, ly, "CNV cluster within each sample, numbered by size (not matched across samples):",
+             fontsize=5.5, color=INK, ha="left", va="center")
+    sx = x0 + 89.5
+    for j in range(max_k):
+        fig.patches.append(plt.Rectangle(((sx + j * 7.2) / W_MM, 1 - (ly + 1.1) / H_MM),
+                                         2.2 / W_MM, 2.2 / H_MM, transform=fig.transFigure,
+                                         facecolor=CNV_CLUSTER_COLORS[j], edgecolor="none"))
+        fig_text(fig, sx + j * 7.2 + 2.9, ly, str(j + 1), fontsize=5.5, color=INK, ha="left", va="center")
 
-    add_panel_label(axes_cnv[0], "b")
+    # ── row c, d ─────────────────────────────────────────────────
+    yr3 = 68.0
+    h3 = 34.0
+    panel_letter(fig, 0.5, yr3 - 3.4, "c")
+    ax_c = ax_mm(fig, 12.0, yr3, 62.0, h3)
+    xpos = np.arange(len(PATIENTS))
+    frac = np.array([[data[p][col] for col, _, _ in CELLTYPES] for p in PATIENTS])
+    frac = frac / frac.sum(axis=1, keepdims=True)
+    bottom = np.zeros(len(PATIENTS))
+    for j, (_, key, _) in enumerate(CELLTYPES):
+        ax_c.bar(xpos, frac[:, j], bottom=bottom, width=0.72, color=CELLTYPE_COLORS[key],
+                 edgecolor="white", linewidth=0.3)
+        bottom += frac[:, j]
+    ax_c.set_xticks(xpos)
+    ax_c.set_xticklabels(PATIENTS)
+    ax_c.tick_params(axis="x", length=0, pad=2)
+    ax_c.set_xlim(-0.55, len(PATIENTS) - 0.45)
+    ax_c.set_ylim(0, 1)
+    ax_c.set_yticks([0, 0.25, 0.5, 0.75, 1])
+    ax_c.set_yticklabels(["0", "0.25", "0.50", "0.75", "1"])
+    ax_c.set_ylabel("Mean cell type proportion")
+    ax_c.spines["bottom"].set_visible(False)
+    # legend in stack order (top of the stack first)
+    lx, ly0, dy = 76.5, yr3 + 1.6, h3 / len(CELLTYPES) * 0.98
+    for j, (_, key, disp) in enumerate(reversed(CELLTYPES)):
+        yy = ly0 + j * dy
+        fig.patches.append(plt.Rectangle((lx / W_MM, 1 - (yy + 1.1) / H_MM), 2.2 / W_MM, 2.2 / H_MM,
+                                         transform=fig.transFigure, facecolor=CELLTYPE_COLORS[key],
+                                         edgecolor="#BDBDBD" if key == "Mesothelial" else "none",
+                                         linewidth=0.3))
+        fig_text(fig, lx + 3.2, yy, disp, fontsize=6, color=INK, ha="left", va="center")
 
-    # ── Row 2: Summary statistics (c, d_left, d_right) ─────────────
-    gs_row2 = gs_main[2].subgridspec(
-        1, 4, wspace=0.42,
-        width_ratios=[1.0, 0.28, 0.50, 0.50],
-    )
+    # d: tumor burden (top) and CNV score (bottom), sharing the patient axis
+    tumour_pct = summ["n_tumor_enriched"].values / summ["n_spots"].values * 100
+    top3 = set(np.argsort(-tumour_pct)[:3])
+    cols = [TOP_GREY if i in top3 else REST_GREY for i in range(len(PATIENTS))]
+    print("  top-3 tumor burden:", [PATIENTS[i] for i in sorted(top3)])
 
-    # Panel c: Cell type composition stacked bar
-    ax_comp = fig.add_subplot(gs_row2[0, 0])
+    xd, wd = 113.0, 64.0
+    hd = 14.5
+    panel_letter(fig, 100.0, yr3 - 3.4, "d")
+    ax_d1 = ax_mm(fig, xd, yr3, wd, hd)
+    ax_d1.bar(xpos, tumour_pct, width=0.62, color=cols, edgecolor="none")
+    for i, v in enumerate(tumour_pct):
+        ax_d1.text(i, v + 2.5, f"{v:.0f}", fontsize=5.5, color=INK_SOFT, ha="center", va="bottom")
+    ax_d1.set_ylim(0, 100)
+    ax_d1.set_yticks([0, 50, 100])
+    ax_d1.set_xlim(-0.55, len(PATIENTS) - 0.45)
+    ax_d1.set_xticks(xpos)
+    ax_d1.set_xticklabels([])
+    ax_d1.tick_params(axis="x", length=0)
+    ax_d1.spines["bottom"].set_visible(False)
+    ax_d1.set_ylabel("Tumor-enriched\nspots (%)", linespacing=1.1)
 
-    ct_names = list(CELLTYPE_COLORS.keys())
-    ct_fractions = np.zeros((len(PATIENTS), len(ct_names)))
-    for i, p in enumerate(PATIENTS):
-        for j, ct in enumerate(ct_names):
-            ct_fractions[i, j] = all_data[p].get(ct, 0.0)
+    ax_d2 = ax_mm(fig, xd, yr3 + hd + 5.0, wd, hd)
+    mean_cnv = cnv_stats["mean_cnv_score"].values
+    sd_cnv = cnv_stats["sd_cnv_score"].values
+    assert np.allclose(mean_cnv, summ["mean_cnv_score"].values)
+    for i in range(len(PATIENTS)):
+        ax_d2.errorbar(i, mean_cnv[i], yerr=sd_cnv[i], fmt="o", ms=3.8, mfc=cols[i], mec="white",
+                       mew=0.4, ecolor="black", elinewidth=0.6, capsize=1.6, capthick=0.6, zorder=3)
+    ax_d2.set_ylim(0, 0.02)
+    ax_d2.set_yticks([0, 0.01, 0.02])
+    ax_d2.set_yticklabels(["0", "0.01", "0.02"])
+    ax_d2.set_xlim(-0.55, len(PATIENTS) - 0.45)
+    ax_d2.set_xticks(xpos)
+    ax_d2.set_xticklabels(PATIENTS)
+    ax_d2.tick_params(axis="x", length=0, pad=2)
+    ax_d2.spines["bottom"].set_visible(False)
+    ax_d2.set_ylabel("CNV score\n(mean ± s.d.)", linespacing=1.1)
+    for a in (ax_d1, ax_d2):
+        a.tick_params(axis="y", pad=1.5)
 
-    row_sums = ct_fractions.sum(axis=1, keepdims=True)
-    row_sums[row_sums == 0] = 1
-    ct_fractions_norm = ct_fractions / row_sums
-
-    x_pos = np.arange(len(PATIENTS))
-    bottoms = np.zeros(len(PATIENTS))
-
-    ct_labels_display = {
-        "Tumour_cells": "Tumor", "Macrophages": "Macrophage",
-        "Fibroblasts": "Fibroblast", "T_cells": "T cell",
-        "B_plasma_cells": "B/Plasma", "Endothelial_cells": "Endothelial",
-        "Mesothelial_cells": "Mesothelial", "Myofibroblasts": "Myofibroblast",
-    }
-
-    for j, ct in enumerate(ct_names):
-        color = CELLTYPE_COLORS[ct]
-        ax_comp.bar(x_pos, ct_fractions_norm[:, j], bottom=bottoms,
-                    width=0.7, color=color,
-                    label=ct_labels_display.get(ct, ct),
-                    edgecolor="white", linewidth=0.3)
-        bottoms += ct_fractions_norm[:, j]
-
-    ax_comp.set_xticks(x_pos)
-    ax_comp.set_xticklabels(PATIENTS, fontsize=6, rotation=0)
-    ax_comp.set_ylabel("Cell type fraction", fontsize=7)
-    ax_comp.set_ylim(0, 1.02)
-    ax_comp.set_xlim(-0.5, len(PATIENTS) - 0.5)
-
-    add_panel_label(ax_comp, "c")
-
-    # Cell type legend
-    ax_ct_legend = fig.add_subplot(gs_row2[0, 1])
-    ax_ct_legend.axis("off")
-    handles, labels = ax_comp.get_legend_handles_labels()
-    ax_ct_legend.legend(handles, labels, loc="center left", frameon=False,
-                        fontsize=5.5, handletextpad=0.3, labelspacing=0.4,
-                        handlelength=1.0)
-
-    # Panel d-left: Tumor spots (%)
-    ax_d_left = fig.add_subplot(gs_row2[0, 2])
-
-    cnv_df = pd.read_csv(STATS_DIR / "hgsoc_patient_summary.csv")
-    cnv_df = cnv_df.set_index("patient").loc[PATIENTS]
-
-    tumour_pct = cnv_df["n_tumor_enriched"].values / cnv_df["n_spots"].values * 100
-
-    ax_d_left.bar(x_pos, tumour_pct, width=0.6, color=OI["vermillion"],
-                  edgecolor="white", linewidth=0.3)
-    ax_d_left.set_ylabel("Tumor spots (%)", fontsize=7, color=OI["vermillion"])
-    ax_d_left.tick_params(axis="y", colors=OI["vermillion"])
-    ax_d_left.set_xticks(x_pos)
-    ax_d_left.set_xticklabels(PATIENTS, fontsize=6)
-    ax_d_left.set_ylim(0, 110)
-    ax_d_left.set_xlim(-0.5, len(PATIENTS) - 0.5)
-
-    add_panel_label(ax_d_left, "d")
-
-    # Panel d-right: Mean CNV score with SD error bars
-    ax_d_right = fig.add_subplot(gs_row2[0, 3])
-
-    mean_cnv = cnv_df["mean_cnv_score"].values
-    ax_d_right.bar(x_pos, mean_cnv, width=0.6, color=OI["blue"],
-                   edgecolor="white", linewidth=0.3)
-
-    cnv_stats_path = STATS_DIR / "cnv_score_per_patient_stats.csv"
-    if cnv_stats_path.exists():
-        cnv_stats = pd.read_csv(cnv_stats_path)
-        cnv_stats = cnv_stats.set_index("patient").loc[PATIENTS]
-        sd_cnv = cnv_stats["sd_cnv_score"].values
-        ax_d_right.errorbar(x_pos, mean_cnv, yerr=sd_cnv, fmt="none",
-                            ecolor=OI["blue"], elinewidth=0.5,
-                            capsize=2, capthick=0.5, zorder=5)
-
-    ax_d_right.set_ylabel("Mean CNV score", fontsize=7, color=OI["blue"])
-    ax_d_right.tick_params(axis="y", colors=OI["blue"])
-    ax_d_right.set_xticks(x_pos)
-    ax_d_right.set_xticklabels(PATIENTS, fontsize=6)
-    ax_d_right.set_xlim(-0.5, len(PATIENTS) - 0.5)
-
-    # ── Row 3: Moran's I analysis (e, f) ──────────────────────────
-    gs_row3 = gs_main[3].subgridspec(1, 3, wspace=0.12,
-                                      width_ratios=[1.0, 0.06, 0.9])
-
-    ax_e = fig.add_subplot(gs_row3[0, 0])
+    # ── row e, f ─────────────────────────────────────────────────
+    yr4 = 117.0
+    h4 = 33.0
+    panel_letter(fig, 0.5, yr4 - 3.4, "e")
+    ax_e = ax_mm(fig, 12.0, yr4, 86.0, h4)
     plot_morans_ranked(ax_e, svg_df, cnv_markers)
 
-    ax_spacer = fig.add_subplot(gs_row3[0, 1])
-    ax_spacer.axis("off")
-
-    ax_f = fig.add_subplot(gs_row3[0, 2])
+    panel_letter(fig, 109.0, yr4 - 3.4, "f")
+    ax_f = ax_mm(fig, 122.0, yr4, 55.0, h4)
     plot_morans_comparison(ax_f, svg_df, cnv_markers)
 
-    # ── Save ──────────────────────────────────────────────────────
-    FIGURE_DIR.mkdir(parents=True, exist_ok=True)
-    for fmt in ["pdf", "png"]:
-        out_path = FIGURE_DIR / f"figure3.{fmt}"
-        fig.savefig(str(out_path), dpi=300, facecolor="white")
-        print(f"Saved: {out_path}")
+    # align y labels of the left column and of the right column
+    fig.align_ylabels([ax_c, ax_e])
+    fig.align_ylabels([ax_d1, ax_d2])
 
+    for fmt in ["pdf", "png"]:
+        out = FIGURE_DIR / f"figure3.{fmt}"
+        fig.savefig(str(out), dpi=300, facecolor="white", bbox_inches=None)
+        print(f"Saved: {out}")
     plt.close(fig)
-    print("\nDone!")
 
 
 if __name__ == "__main__":

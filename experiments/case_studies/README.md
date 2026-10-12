@@ -59,7 +59,7 @@ positions.
 | `results/tables/spots/` | Per spot: coordinates, RCTD proportions, tumor label, CNV score and cluster | Fig. 6a-d |
 | `results/tables/cnv_cluster_markers_P3.csv`, `moranI_P3.csv` | CNV-cluster marker genes and Moran's I of P3 | Fig. 6e,f |
 | `results/stats/hgsoc_patient_summary.csv`, `cnv_score_per_patient_stats.csv` | Tumor burden, CNV clusters, mean CNV score per patient | Fig. 6c,d; 5 to 10 CNV clusters; 17% to 97% tumor-enriched spots |
-| `results/stats/cliffs_delta_cnv_vs_background.csv`, `cnv_vs_background_fig3f.csv`, `celltype_marker_moran_ranks.csv` | Moran's I of the 95 marker genes versus all other genes; ranks of KRT7, CD14, CDH5 | Fig. 6e,f; Cliff's delta 0.99, P = 5e-63; 91 of 95 in the top 2% |
+| `results/stats/cliffs_delta_cnv_vs_background.csv`, `celltype_marker_moran_ranks.csv` | Moran's I of the 95 marker genes versus the other 19,085 genes (per-gene values in `source_data/Fig6f_cnv_vs_background.csv`, written by `figures/figure3_hgsoc.py`); ranks of KRT7, CD14, CDH5 | Fig. 6e,f; Cliff's delta 0.99, P = 5e-63; 91 of 95 in the top 2% |
 
 ## Deconvolution method concordance (`deconvolution_concordance/`; Supplementary Table 7)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pairwise cross-replicate concordance of the end-to-end benchmark (Figure 2k).
+"""Pairwise cross-replicate concordance of the end-to-end benchmark (Figure 2h).
 
 Computes, for each system and task of the lymph node end-to-end benchmark,
 the concordance between every pair of successful replicates:
@@ -10,7 +10,7 @@ the concordance between every pair of successful replicates:
   svg_detection       Jaccard index of the top 100 genes of svg_results.csv
   cell_communication  Jaccard index of the top 50 ligand-receptor pairs
 
-This is the computation of figures/figure4.py panel k (Figure 2k), moved here so that the
+This is the computation of figures/figure4.py panel h (Figure 2h), moved here so that the
 figure reads a small table instead of the 5.7 GB of benchmark outputs. Only
 the obs table of each h5ad file is read.
 

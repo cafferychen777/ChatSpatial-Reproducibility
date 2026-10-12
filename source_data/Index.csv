@@ -1,16 +1,24 @@
 sheet,rows,columns,source,description
-README,3,2,generated,Notes for source-data workbook.
+README,4,2,generated,Notes for source-data workbook.
 Table1_platform,11,7,main.tex,Main text platform compatibility table.
+Fig1b_configurations,6,5,experiments/robustness/results/configurations_dlpfc155.csv.gz,"Figure 1b lattice: tool calls, post-processing variants and schema-valid configurations per DLPFC section for the six methods of the robustness study (2,724 in total; one dot per 30 configurations)."
+Fig1b_parameters,21,7,experiments/schema_constraints/constraint_surface_chatspatial_1.5.9.csv,"Figure 1b parameter bar: parameters of the 20 tools by constraint type (ChatSpatial 1.5.9); 449 parameters, 375 constrained (83.5%), 74 free text."
+Fig1d_categories,13,2,supplementary_tables/Supplementary_Table_2_Integrated_Methods.csv,Figure 1d number of methods in each of the 13 analytical categories (65 methods).
 Fig2ab_h2h_trials,480,10,fig2ab_trials.csv,Figure 2a-b DLPFC head-to-head: per-trial ARI and NMI for the four arms (12 sections x 10 replicates).
 Fig2ab_h2h_sections,48,6,fig2ab_sections.csv,Figure 2a-b DLPFC head-to-head: per-section mean ARI (points in a) and cross-replicate ARI.
 Fig2b_h2h_summary,4,8,fig2b_summary.csv,Figure 2b: system means with 95% section-bootstrap intervals.
 Fig2c_invocation,72,10,ablation_invocation_results.csv,Figure 2c invocation ablation.
 Fig2de_ablation_e2e,27,9,ablation_e2e_results.csv,Figure 2d-e execution rates.
 Fig2e_concordance,35,18,ablation_metrics_bootstrap.csv,Figure 2e concordance.
-Fig2fg_sensitivity,75,8,prompt_sensitivity_results.csv,Figure 2f-g prompt sensitivity summary.
-Fig2fg_sens_raw,375,8,prompt_sensitivity_raw.jsonl,Figure 2f-g raw prompt sensitivity trials.
-Fig2hi_cross_system,120,8,cross_system_metrics.csv,Figure 2h-i cross-system metrics.
-Fig2j_e2e_summary,9,9,e2e_benchmark_results.csv,Figure 2j end-to-end benchmark summary.
+Fig2f_SuppFig1a_sens_trials,375,11,prompt_sensitivity_raw.jsonl,"Figure 2f (top) and Supplementary Figure 1a: prompt-sensitivity trials (5 prompt groups x 5 paraphrases x 3 LLMs x 5 replicates), with selected tool and parameters."
+Fig2f_SuppFig1a_sens_summary,75,8,prompt_sensitivity_results.csv,"Figure 2f (top) and Supplementary Figure 1a: prompt-sensitivity summary per prompt group, paraphrase and LLM."
+Fig2f_SuppFig1b_cross_system,120,8,cross_system_metrics.csv,"Figure 2f (bottom) and Supplementary Figure 1b: tool selection accuracy and cross-replicate consistency per condition, LLM and prompt (1,200 trials)."
+Fig2g_e2e_summary,9,9,e2e_benchmark_results.csv,Figure 2g-h end-to-end comparison on human lymph node: runs completed and mean pairwise concordance per system and task.
+Fig2f_tool_selection,30,9,source_data/Fig2f_tool_selection.csv,Figure 2f tool selection accuracy per LLM (mean and bootstrap 95% CI): paraphrases per prompt group (top) and system contexts (bottom).
+Fig2g_runs_completed,9,4,source_data/Fig2g_runs_completed.csv,"Figure 2g end-to-end runs completed per system and task (human lymph node, 5 replicates)."
+Fig2h_pairwise_concordance,59,6,source_data/Fig2h_pairwise_concordance.csv,"Figure 2h pairwise output concordance between completed replicates of the same system (ARI, Jaccard@100, Jaccard@50)."
+SuppFig1a_param_concordance,10,5,source_data/SuppFig1a_param_concordance.csv,Supplementary Figure 1a constrained parameter concordance within and across paraphrases (mean and bootstrap 95% CI).
+SuppFig1b_tool_consistency,15,5,source_data/SuppFig1b_tool_consistency.csv,Supplementary Figure 1b cross-replicate tool consistency per condition and LLM (mean and bootstrap 95% CI over prompts).
 Fig3a_backends,8,6,source_data/Fig3a_backends.csv,Figure 3a output-verified completion and tool-selection accuracy per backend.
 Fig3b_outcomes,6,8,source_data/Fig3b_outcomes.csv,Figure 3b trial outcomes by schema information and constraint mechanism.
 Fig3c_native_vs_json,4,4,source_data/Fig3c_native_vs_json.csv,Figure 3c odds ratios for native tool calling versus JSON output.
@@ -21,18 +29,19 @@ Fig4a_sensitivity,72,7,source_data/Fig4a_sensitivity.csv,Figure 4a ARI range acr
 Fig4b_strategies,14,7,source_data/Fig4b_strategies.csv,Figure 4b mean ARI under four strategies.
 Fig4c_noise,10,6,source_data/Fig4c_noise.csv,Figure 4c ARI retained under count thinning and spot removal.
 Fig4d_platforms,72,4,source_data/Fig4d_platforms.csv,Figure 4d mean ARI of each method on each platform.
-Fig5_spatial_maps,4776,7,source_data/Fig5_spatial_maps.csv,"Figure 5a-c,g spot-level overlays."
-Fig5d_enrichment,120,8,source_data/Fig5d_enrichment.csv,Figure 5d heatmap.
-Fig5e_consensus,10,6,source_data/Fig5e_consensus.csv,Figure 5e bars.
-Fig5e_consensus_CI,20,7,source_data/Fig5e_consensus_CI.csv,Figure 5e confidence intervals.
-Fig5f_cellchat,105,11,source_data/Fig5f_cellchat.csv,Figure 5f dot plot.
-Fig5h_morans,189274,14,source_data/Fig5h_morans.csv,Figure 5h Moran's I values.
-Fig5i_marker_genes,63,10,source_data/Fig5i_marker_genes.csv,Figure 5i marker gene source.
-Fig5i_DE_all_genes,11000,8,source_data/Fig5i_DE_all_genes.csv,Differential expression table underlying marker summaries.
-Fig6_spatial_maps,19990,8,source_data/Fig6_spatial_maps.csv,Figure 6a-b per-spot maps.
-Fig6cd_summary,8,26,source_data/Fig6cd_summary.csv,Figure 6c-d summary values.
-Fig6ef_svg_results,19180,14,source_data/Fig6ef_svg_results.csv,Figure 6e-f Moran's I values.
-Fig6f_effect_size,1,11,source_data/Fig6f_effect_size.csv,Figure 6f effect size.
+Fig5_spatial_maps,4776,7,source_data/Fig5_spatial_maps.csv,"Figure 5a-c,g spot-level overlays of Samples 1 and 9: TC/LE labels (a,b), fibroblast proportion (c), FN1 expression (g)."
+Fig5d_enrichment,120,8,source_data/Fig5d_enrichment.csv,Figure 5d per-sample LE/TC log2 fold change of mean deconvolution proportion.
+Fig5e_consensus,10,6,source_data/Fig5e_consensus.csv,Figure 5e number of samples enriched in the TC or the LE per cell type.
+Fig5e_consensus_CI,20,7,source_data/Fig5e_consensus_CI.csv,Figure 5e exact binomial (Clopper-Pearson) 95% confidence intervals.
+Fig5f_cellchat,105,11,source_data/Fig5f_cellchat.csv,Figure 5f all 105 Fibroblast->Cancer CellChat interactions (17 pathways); the panel shows the 12 with the highest communication probability (column prob).
+Fig5h_morans,189274,14,source_data/Fig5h_morans.csv,"Figure 5h and text: Moran's I of every tested gene in all 12 sections (15,215 genes in Sample 1)."
+Fig5h_marker_genes,63,10,source_data/Fig5h_marker_genes.csv,"Figure 5h Moran's I of the eight TC and LE target genes in Sample 1 (rows with source_category moranI_sample1), and the consensus TC and LE gene lists named in the text."
+Fig5h_DE_all_genes,11000,8,source_data/Fig5h_DE_all_genes.csv,TC versus LE differential expression per sample underlying the consensus gene lists of Fig5h_marker_genes.
+Fig6_spatial_maps,19990,8,source_data/Fig6_spatial_maps.csv,"Figure 6a-b per-spot tumor-cell proportion, tumor class, CNV score and CNV cluster."
+Fig6cd_summary,8,26,source_data/Fig6cd_summary.csv,"Figure 6c-d per-patient cell type composition, tumor burden and CNV score."
+Fig6ef_svg_results,19180,14,source_data/Fig6ef_svg_results.csv,"Figure 6e Moran's I and rank of all 19,180 genes of P3, with CNV-cluster and cell type marker flags."
+Fig6f_cnv_vs_background,19180,5,source_data/Fig6f_cnv_vs_background.csv,"Figure 6f Moran's I of the 95 CNV-cluster marker genes and the other 19,085 genes of P3 (drawn_as_point marks the random subset of 200 other genes drawn as points)."
+Fig6f_effect_size,1,11,source_data/Fig6f_effect_size.csv,"Figure 6f two-sided Mann-Whitney test and Cliff's delta with 95% CI (95 CNV-cluster markers versus 19,085 other genes)."
 Supp_Table_1,10,14,supplementary_tables/Supplementary_Table_1_Effect_Sizes.csv,Supplementary Table 1.
 Supp_Table_2,65,4,supplementary_tables/Supplementary_Table_2_Integrated_Methods.csv,Supplementary Table 2.
 Supp_Table_3,31,8,supplementary_tables/Supplementary_Table_3_Test_Scenarios.csv,Supplementary Table 3.

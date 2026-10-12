@@ -1,4 +1,5 @@
 item,note
-Figure 1,Conceptual architecture schematic; no quantitative plotted source data.
+"Figure 1a,c","Conceptual schematics; no quantitative plotted source data. Panels b and d are in Fig1b_configurations, Fig1b_parameters and Fig1d_categories."
+Supplementary Figure 1,Sheets SuppFig1a_param_concordance and SuppFig1b_tool_consistency; the trials are in Fig2f_SuppFig1a_sens_trials and Fig2f_SuppFig1b_cross_system.
 Figure 5 H&E backgrounds,Histology image files are figure image sources; plotted spot coordinates and quantitative overlays are provided in Fig5_spatial_maps.
 Figure 6 spatial maps,"Per-spot coordinates, tumor fractions, CNV scores, and CNV subclone labels are provided in Fig6_spatial_maps."
